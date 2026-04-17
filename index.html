@@ -62,7 +62,6 @@ main{
 </style>
 </head>
 
-
 <body>
 
 
@@ -96,7 +95,7 @@ PREMIUM
 
 <p id="telegramID"></p>
 
-<p id="premiumStatus">Checking premium...</p>
+<p id="premiumStatus">Checking premium... ⏳</p>
 
 </main>
 
@@ -127,13 +126,16 @@ document.getElementById("username").innerText =
 user.first_name + " " + (user.last_name || "");
 
 document.getElementById("avatar").src =
-user.photo_url || "";
+user.photo_url || "https://via.placeholder.com/45";
 
 document.getElementById("telegramID").innerText =
 "Telegram ID: " + user.id;
 
 
-// 🔐 SECURE BACKEND CHECK (NEW)
+// 🔐 SECURE BACKEND CHECK
+document.getElementById("premiumStatus").innerText =
+"Checking premium... ⏳";
+
 fetch("http://127.0.0.1:8000/secure-check", {
     method: "POST",
     headers: {
@@ -161,7 +163,7 @@ fetch("http://127.0.0.1:8000/secure-check", {
         document.getElementById("premiumBadge").style.display =
         "inline-block";
 
-    }else{
+    } else {
 
         document.getElementById("premiumStatus").innerText =
         "Kein Premium ❌";
@@ -172,14 +174,13 @@ fetch("http://127.0.0.1:8000/secure-check", {
 .catch(()=>{
 
 document.getElementById("premiumStatus").innerText =
-"Backend offline";
+"Backend offline ❌";
 
 });
 
 }
 
 </script>
-
 
 </body>
 </html>
