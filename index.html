@@ -1,87 +1,188 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Telegram Web App</title>
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<meta charset="UTF-8">
+<title>Telegram Web App</title>
 
-    <style>
-        body {
-            font-family: Arial;
-            background: #111;
-            color: white;
-            text-align: center;
-            padding-top: 50px;
-        }
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 
-        .hidden {
-            display: none;
-        }
+<style>
 
-        #blocked {
-            color: red;
-            font-size: 20px;
-        }
+body{
+    margin:0;
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+}
 
-        #app {
-            display: none;
-        }
+header{
+    height:70px;
+    background:#020617;
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    padding-right:20px;
+}
 
-        img {
-            border-radius: 50%;
-        }
-    </style>
+#profile{
+    display:flex;
+    align-items:center;
+}
+
+#avatar{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+}
+
+main{
+    padding:40px;
+    text-align:center;
+}
+
+#blocked{
+    display:none;
+    font-size:26px;
+    color:red;
+    margin-top:120px;
+}
+
+#dashboard{
+    display:none;
+}
+
+.badge{
+    background:gold;
+    color:black;
+    padding:6px 12px;
+    border-radius:10px;
+    margin-left:10px;
+}
+
+</style>
 </head>
+
 
 <body>
 
+
 <div id="blocked">
-    ⚠️ Open in Telegram
+
+⚠️ Open in Telegram
+
 </div>
 
-<div id="app">
-    <h1>Dashboard</h1>
 
-    <img id="profilePic" width="80">
 
-    <p id="username"></p>
+<div id="dashboard">
 
-    <h2 id="premiumStatus"></h2>
+
+<header>
+
+<div id="profile">
+
+<img id="avatar">
+
+<span id="username"></span>
+
+<span id="premiumBadge" class="badge" style="display:none;">
+PREMIUM
+</span>
+
 </div>
+
+</header>
+
+
+<main>
+
+<h1>Dashboard</h1>
+
+<p id="telegramID"></p>
+
+<p id="premiumStatus">Checking premium...</p>
+
+</main>
+
+</div>
+
+
 
 <script>
+
 let tg = window.Telegram.WebApp;
+
 tg.expand();
 
-if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
-    document.getElementById("blocked").style.display = "block";
-} else {
 
-    document.getElementById("blocked").style.display = "none";
-    document.getElementById("app").style.display = "block";
 
-    let user = tg.initDataUnsafe.user;
+if(!tg.initDataUnsafe || !tg.initDataUnsafe.user){
 
-    document.getElementById("username").innerText =
-        user.first_name + " " + (user.last_name || "");
+document.getElementById("blocked").style.display="block";
 
-    document.getElementById("profilePic").src =
-        user.photo_url || "";
+}else{
 
-    // send user id to backend
-    fetch("https://DEIN-BACKEND-URL.com/user", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            user_id: user.id,
-            username: user.username
-        })
-    });
 
-    // fake premium check (later backend)
-    document.getElementById("premiumStatus").innerText =
-        "Premium: CHECKING...";
+document.getElementById("dashboard").style.display="block";
+
+
+let user = tg.initDataUnsafe.user;
+
+
+
+document.getElementById("username").innerText =
+user.first_name + " " + (user.last_name || "");
+
+
+
+document.getElementById("avatar").src =
+user.photo_url || "";
+
+
+
+document.getElementById("telegramID").innerText =
+"Telegram ID: " + user.id;
+
+
+
+fetch("https://DEIN-BACKEND-HIER.com/check/" + user.id)
+
+.then(res => res.json())
+
+.then(data => {
+
+
+if(data.premium){
+
+document.getElementById("premiumStatus").innerText =
+"Premium aktiv ✅";
+
+
+document.getElementById("premiumBadge").style.display =
+"inline-block";
+
+}else{
+
+document.getElementById("premiumStatus").innerText =
+"Kein Premium ❌";
+
 }
+
+})
+
+.catch(()=>{
+
+document.getElementById("premiumStatus").innerText =
+"Backend offline";
+
+});
+
+
+}
+
+
 </script>
+
 
 </body>
 </html>
