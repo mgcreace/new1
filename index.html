@@ -67,15 +67,11 @@ main{
 
 
 <div id="blocked">
-
 ⚠️ Open in Telegram
-
 </div>
 
 
-
 <div id="dashboard">
-
 
 <header>
 
@@ -107,15 +103,13 @@ PREMIUM
 </div>
 
 
-
 <script>
 
 let tg = window.Telegram.WebApp;
-
 tg.expand();
 
 
-
+// ❌ BLOCK IF NOT TELEGRAM
 if(!tg.initDataUnsafe || !tg.initDataUnsafe.user){
 
 document.getElementById("blocked").style.display="block";
@@ -123,53 +117,58 @@ document.getElementById("blocked").style.display="block";
 }else{
 
 
-document.getElementById("dashboard").style.display="block";
-
-
 let user = tg.initDataUnsafe.user;
 
 
+// UI SHOW
+document.getElementById("dashboard").style.display="block";
 
 document.getElementById("username").innerText =
 user.first_name + " " + (user.last_name || "");
 
-
-
 document.getElementById("avatar").src =
 user.photo_url || "";
-
-
 
 document.getElementById("telegramID").innerText =
 "Telegram ID: " + user.id;
 
 
-
-fetch("http://127.0.0.1:8000/check/" + user.id)
-
+// 🔐 SECURE BACKEND CHECK (NEW)
+fetch("http://127.0.0.1:8000/secure-check", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        initData: tg.initData,
+        user_id: user.id
+    })
+})
 .then(res => res.json())
-
 .then(data => {
 
+    if(data.error){
+        document.getElementById("premiumStatus").innerText =
+        "Security check failed ❌";
+        return;
+    }
 
-if(data.premium){
+    if(data.premium){
 
-document.getElementById("premiumStatus").innerText =
-"Premium aktiv ✅";
+        document.getElementById("premiumStatus").innerText =
+        "Premium aktiv ✅";
 
+        document.getElementById("premiumBadge").style.display =
+        "inline-block";
 
-document.getElementById("premiumBadge").style.display =
-"inline-block";
+    }else{
 
-}else{
+        document.getElementById("premiumStatus").innerText =
+        "Kein Premium ❌";
 
-document.getElementById("premiumStatus").innerText =
-"Kein Premium ❌";
-
-}
+    }
 
 })
-
 .catch(()=>{
 
 document.getElementById("premiumStatus").innerText =
@@ -177,9 +176,7 @@ document.getElementById("premiumStatus").innerText =
 
 });
 
-
 }
-
 
 </script>
 
