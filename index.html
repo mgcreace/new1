@@ -45,6 +45,123 @@ main{
     color:black;
     padding:5px 10px;
     border-radius:10px;
+    margin-left:10px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div id="profile">
+<img id="avatar">
+<span id="username"></span>
+<span id="premiumBadge" class="badge" style="display:none;">PREMIUM</span>
+</div>
+</header>
+
+<main>
+<h1>Dashboard</h1>
+<p id="telegramID"></p>
+<p id="status">Loading...</p>
+</main>
+
+<script>
+let tg = window.Telegram.WebApp;
+tg.expand();
+
+// ❌ outside telegram
+if(!tg.initDataUnsafe || !tg.initDataUnsafe.user){
+    document.body.innerHTML = "<h2 style='color:red;text-align:center;margin-top:100px'>Open in Telegram</h2>";
+} else {
+
+let user = tg.initDataUnsafe.user;
+
+document.getElementById("username").innerText = user.first_name;
+document.getElementById("avatar").src = user.photo_url || "https://via.placeholder.com/45";
+document.getElementById("telegramID").innerText = "ID: " + user.id;
+
+fetch("http://193.34.69.85:8000/secure-check", {
+    method: "POST",
+    headers: {
+        "Content-Type": "application/json"
+    },
+    body: JSON.stringify({
+        initData: tg.initData,
+        user_id: user.id
+    })
+})
+.then(res => res.json())
+.then(data => {
+
+    if(data.error){
+        document.getElementById("status").innerText = "Server error ❌";
+        return;
+    }
+
+    if(data.premium){
+        document.getElementById("status").innerText = "Premium aktiv ✅";
+        document.getElementById("premiumBadge").style.display = "inline-block";
+    } else {
+        document.getElementById("status").innerText = "Kein Premium ❌";
+    }
+
+})
+.catch(() => {
+    document.getElementById("status").innerText = "Backend offline ❌";
+});
+
+}
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Telegram WebApp</title>
+
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+<style>
+body{
+    margin:0;
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+}
+
+header{
+    height:70px;
+    background:#020617;
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    padding:0 20px;
+}
+
+#profile{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+#avatar{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+}
+
+main{
+    text-align:center;
+    margin-top:60px;
+}
+
+.badge{
+    background:gold;
+    color:black;
+    padding:5px 10px;
+    border-radius:10px;
 }
 </style>
 </head>
