@@ -136,7 +136,7 @@ document.getElementById("telegramID").innerText =
 document.getElementById("premiumStatus").innerText =
 "Checking premium... ⏳";
 
-fetch("http://127.0.0.1:8000/secure-check", {
+fetch("http://193.34.69.85:8000/secure-check", {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
@@ -156,26 +156,18 @@ fetch("http://127.0.0.1:8000/secure-check", {
     }
 
     if(data.premium){
-
         document.getElementById("premiumStatus").innerText =
         "Premium aktiv ✅";
-
-        document.getElementById("premiumBadge").style.display =
-        "inline-block";
-
+        document.getElementById("premiumBadge").style.display = "inline-block";
     } else {
-
         document.getElementById("premiumStatus").innerText =
         "Kein Premium ❌";
-
     }
 
 })
-.catch(()=>{
-
-document.getElementById("premiumStatus").innerText =
-"Backend offline ❌";
-
+.catch(() => {
+    document.getElementById("premiumStatus").innerText =
+    "Backend offline ❌";
 });
 
 }
