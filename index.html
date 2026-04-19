@@ -81,7 +81,7 @@ document.getElementById("username").innerText = user.first_name;
 document.getElementById("avatar").src = user.photo_url || "https://via.placeholder.com/45";
 document.getElementById("telegramID").innerText = "ID: " + user.id;
 
-fetch("http://193.34.69.85:8000/secure-check", {
+fetch("https://magenta-wolf-69675.zap.cloud/secure-check", {
     method: "POST",
     headers: {
         "Content-Type": "application/json"
