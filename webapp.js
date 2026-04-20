@@ -604,6 +604,12 @@ async function loadTradingPage(tg, user) {
                         Wunsch: ${offer.requested_card_name} (${offer.requested_card_rarity})<br>
                         Status: ${offer.status}<br>
                         <span class="muted">Erstellt: ${formatDate(offer.created_at)}</span>
+                        ${offer.to_user_id === user.id && offer.status === "pending" ? `
+                            <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+                                <button class="shop-btn trade-response-btn" data-trade-id="${offer.id}" data-action="accept">Annehmen<small>Karten tauschen</small></button>
+                                <button class="shop-btn trade-response-btn" data-trade-id="${offer.id}" data-action="reject">Ablehnen<small>Angebot schliessen</small></button>
+                            </div>
+                        ` : ""}
                     </div>
                 `).join("");
             }
@@ -687,6 +693,39 @@ async function loadTradingPage(tg, user) {
                 }
             });
         }
+
+        document.querySelectorAll(".trade-response-btn").forEach(button => {
+            if (button.dataset.bound) {
+                return;
+            }
+
+            button.dataset.bound = "1";
+            button.addEventListener("click", async () => {
+                button.disabled = true;
+
+                try {
+                    const result = await postJson("/trade-offer/respond", {
+                        initData: tg.initData,
+                        user_id: user.id,
+                        trade_id: button.dataset.tradeId,
+                        action: button.dataset.action
+                    });
+
+                    if (!result.ok) {
+                        alert("Trade konnte nicht verarbeitet werden.");
+                        return;
+                    }
+
+                    renderCardInventory(result.card_inventory || []);
+                    await loadTradingPage(tg, user);
+                } catch (error) {
+                    console.log(error);
+                    alert("Fehler beim Bearbeiten des Trades.");
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        });
     } catch (error) {
         console.log(error);
     }
