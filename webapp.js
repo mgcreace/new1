@@ -222,7 +222,7 @@ function renderCardCollection(items, targetElement, emptyMessage, options = {}) 
             <div class="card-slot">${options.slotLabel || item.rarity || "CARD"}</div>
             <div class="card-name">${item.card_name}</div>
             <div class="card-rarity">${item.rarity}</div>
-            <div class="card-qty">Menge: ${item.quantity || 1}</div>
+            <div class="card-qty">${options.qtyLabel || "Menge"}: ${options.displayQuantity || item.quantity || 1}</div>
             <div class="card-pack-label">${item.pack_key || options.packLabel || "Collection"}</div>
         </div>
     `).join("");
@@ -945,6 +945,19 @@ async function loadTradingPage(tg, user) {
             selectElement.innerHTML = options.join("");
         }
 
+        function updateTradePreview(targetElement, selectedCard, emptyMessage, slotLabel, quantityValue, qtyLabel) {
+            renderCardCollection(
+                selectedCard ? [selectedCard] : [],
+                targetElement,
+                emptyMessage,
+                {
+                    slotLabel,
+                    displayQuantity: Number(quantityValue || 1),
+                    qtyLabel
+                }
+            );
+        }
+
         if (traderList) {
             if (!traderData.traders.length) {
                 traderList.innerHTML = "<div class='inventory-item'>Noch keine oeffentlichen Trader gefunden.</div>";
@@ -1009,12 +1022,15 @@ async function loadTradingPage(tg, user) {
             myTradeCardSelect.addEventListener("change", () => {
                 const selectedCard = findCardById(myCardInventory, myTradeCardSelect.value);
                 fillQuantitySelect(myTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Deine Menge");
-                renderCardCollection(
-                    selectedCard ? [selectedCard] : [],
-                    myTradePreview,
-                    "Deine ausgewaehlte Karte erscheint hier.",
-                    { slotLabel: "DEIN" }
-                );
+                updateTradePreview(myTradePreview, selectedCard, "Deine ausgewaehlte Karte erscheint hier.", "DEIN", myTradeQuantity ? myTradeQuantity.value : 1, "Du gibst");
+            });
+        }
+
+        if (myTradeQuantity && !myTradeQuantity.dataset.bound) {
+            myTradeQuantity.dataset.bound = "1";
+            myTradeQuantity.addEventListener("change", () => {
+                const selectedCard = findCardById(myCardInventory, myTradeCardSelect ? myTradeCardSelect.value : "");
+                updateTradePreview(myTradePreview, selectedCard, "Deine ausgewaehlte Karte erscheint hier.", "DEIN", myTradeQuantity.value, "Du gibst");
             });
         }
 
@@ -1053,12 +1069,15 @@ async function loadTradingPage(tg, user) {
             wantedTradeCardSelect.addEventListener("change", () => {
                 const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect.value);
                 fillQuantitySelect(wantedTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Wunsch-Menge");
-                renderCardCollection(
-                    selectedCard ? [selectedCard] : [],
-                    wantedTradePreview,
-                    "Die Wunschkarte des Traders erscheint hier.",
-                    { slotLabel: "WUNSCH" }
-                );
+                updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity ? wantedTradeQuantity.value : 1, "Du willst");
+            });
+        }
+
+        if (wantedTradeQuantity && !wantedTradeQuantity.dataset.bound) {
+            wantedTradeQuantity.dataset.bound = "1";
+            wantedTradeQuantity.addEventListener("change", () => {
+                const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect ? wantedTradeCardSelect.value : "");
+                updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity.value, "Du willst");
             });
         }
 
