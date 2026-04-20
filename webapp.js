@@ -99,6 +99,44 @@ function renderCardInventory(items) {
     `).join("");
 }
 
+function getRarityClass(rarity) {
+    const normalized = String(rarity || "N").toUpperCase();
+
+    if (normalized === "SEC") {
+        return "card-face-sec";
+    }
+    if (normalized === "SR") {
+        return "card-face-sr";
+    }
+    if (normalized === "R") {
+        return "card-face-r";
+    }
+
+    return "card-face-n";
+}
+
+function renderOpenedCards(items, packName) {
+    const openedCardsList = document.getElementById("openedCardsList");
+
+    if (!openedCardsList) {
+        return;
+    }
+
+    if (!items || !items.length) {
+        openedCardsList.innerHTML = "<div class='inventory-item'>Noch keine Karten gezogen.</div>";
+        return;
+    }
+
+    openedCardsList.innerHTML = items.map(card => `
+        <div class="card-face ${getRarityClass(card.rarity)}">
+            <div class="card-slot">Slot ${card.slot_number}</div>
+            <div class="card-name">${card.card_name}</div>
+            <div class="card-rarity">${card.rarity}</div>
+            <div class="card-pack-label">${packName || "Booster Reveal"}</div>
+        </div>
+    `).join("");
+}
+
 function renderFavoriteOptions(items, selectedId) {
     const favoriteSelect = document.getElementById("favoriteCardId");
 
@@ -374,9 +412,23 @@ async function loadOpenBoosterPage(tg, user) {
         renderCardInventory(data.card_inventory || []);
         renderOpenHistory(data.open_history || []);
 
+        const rewardBox = document.getElementById("openReward");
+        const openedCardsList = document.getElementById("openedCardsList");
         const openBoosterList = document.getElementById("openBoosterList");
         if (!openBoosterList) {
             return;
+        }
+
+        if (rewardBox && !rewardBox.innerHTML.trim()) {
+            rewardBox.innerHTML = `
+                <div class="history-item">
+                    Waehle einen Booster aus deinem Inventar und starte den Reveal hier.
+                </div>
+            `;
+        }
+
+        if (openedCardsList && !openedCardsList.innerHTML.trim()) {
+            openedCardsList.innerHTML = "<div class='inventory-item'>Dein letzter Booster-Reveal erscheint hier.</div>";
         }
 
         const ownedBoosters = (data.inventory || []).filter(item => Number(item.amount) > 0);
@@ -387,12 +439,18 @@ async function loadOpenBoosterPage(tg, user) {
         }
 
         openBoosterList.innerHTML = ownedBoosters.map(item => `
-            <div class="inventory-item">
-                <strong>${item.pack_name}</strong><br>
-                Menge: ${item.amount}<br><br>
+            <div class="booster-pack-card">
+                <div class="booster-pack-header">
+                    <div class="booster-pack-title">${item.pack_name}</div>
+                    <div class="booster-pack-count">${item.amount}x</div>
+                </div>
+                <div class="booster-pack-meta">
+                    <span>Pack Key: ${item.pack_key}</span>
+                    <span>Bereit fuer 12 Karten</span>
+                </div>
                 <button class="shop-btn open-booster-btn" data-pack-key="${item.pack_key}">
                     Booster oeffnen
-                    <small>Jetzt benutzen</small>
+                    <small>12 Karten Reveal starten</small>
                 </button>
             </div>
         `).join("");
@@ -425,22 +483,15 @@ async function loadOpenBoosterPage(tg, user) {
                     const rewardBox = document.getElementById("openReward");
                     if (rewardBox) {
                         rewardBox.innerHTML = `
-                            <div class="history-item">
+                            <div class="reward-banner">
                                 <strong>${result.pack_name}</strong><br>
                                 Du hast ${result.opened_cards.length} Karten gezogen.
+                                <div class="card-pack-label">9 Normal, 1 Rare, 2 Bonus-Slots</div>
                             </div>
                         `;
                     }
 
-                    const openedCardsList = document.getElementById("openedCardsList");
-                    if (openedCardsList) {
-                        openedCardsList.innerHTML = result.opened_cards.map(card => `
-                            <div class="inventory-item">
-                                <strong>Slot ${card.slot_number}: ${card.card_name}</strong><br>
-                                Seltenheit: ${card.rarity}
-                            </div>
-                        `).join("");
-                    }
+                    renderOpenedCards(result.opened_cards || [], result.pack_name);
 
                     renderInventory(result.inventory || []);
                     renderCardInventory(result.card_inventory || []);

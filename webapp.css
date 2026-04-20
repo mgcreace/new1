@@ -154,6 +154,150 @@ h2{
     margin:10px 0;
 }
 
+.booster-pack-card{
+    background:linear-gradient(180deg, rgba(30,41,59,.92), rgba(15,23,42,.98));
+    border:1px solid #334155;
+    border-radius:18px;
+    padding:18px;
+}
+
+.booster-pack-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    gap:12px;
+    margin-bottom:10px;
+}
+
+.booster-pack-title{
+    font-size:22px;
+    font-weight:700;
+}
+
+.booster-pack-count{
+    background:#1d4ed8;
+    color:#eff6ff;
+    border-radius:999px;
+    padding:6px 12px;
+    font-size:14px;
+    font-weight:700;
+    white-space:nowrap;
+}
+
+.booster-pack-meta{
+    display:grid;
+    gap:6px;
+    color:#cbd5e1;
+    margin-bottom:16px;
+}
+
+.reward-banner{
+    background:linear-gradient(135deg, #1d4ed8, #0f766e);
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:18px;
+    padding:18px;
+    text-align:left;
+}
+
+.reward-banner strong{
+    display:block;
+    font-size:24px;
+    margin-bottom:8px;
+}
+
+.card-reveal-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+    gap:14px;
+    margin-top:16px;
+}
+
+.card-face{
+    position:relative;
+    overflow:hidden;
+    min-height:150px;
+    border-radius:18px;
+    padding:18px 16px;
+    text-align:left;
+    color:#f8fafc;
+    border:1px solid rgba(255,255,255,.14);
+    box-shadow:0 14px 30px rgba(2,6,23,.28);
+}
+
+.card-face::after{
+    content:"";
+    position:absolute;
+    inset:auto -20px -32px auto;
+    width:92px;
+    height:92px;
+    border-radius:999px;
+    background:rgba(255,255,255,.12);
+    filter:blur(2px);
+}
+
+.card-face-n{
+    background:linear-gradient(160deg, #334155, #0f172a);
+}
+
+.card-face-r{
+    background:linear-gradient(160deg, #2563eb, #1e3a8a);
+}
+
+.card-face-sr{
+    background:linear-gradient(160deg, #7c3aed, #312e81);
+}
+
+.card-face-sec{
+    background:linear-gradient(160deg, #f59e0b, #b45309);
+}
+
+.card-slot{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-width:38px;
+    height:30px;
+    padding:0 10px;
+    border-radius:999px;
+    background:rgba(255,255,255,.14);
+    font-size:13px;
+    font-weight:700;
+    letter-spacing:.04em;
+}
+
+.card-name{
+    font-size:23px;
+    font-weight:800;
+    line-height:1.15;
+    margin:14px 0 10px;
+}
+
+.card-rarity{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    font-size:14px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+}
+
+.card-rarity::before{
+    content:"";
+    width:10px;
+    height:10px;
+    border-radius:999px;
+    background:rgba(255,255,255,.88);
+}
+
+.card-pack-label{
+    position:relative;
+    z-index:1;
+    margin-top:26px;
+    color:rgba(255,255,255,.92);
+    font-size:14px;
+}
+
 @media (max-width: 700px){
     header{
         flex-direction:column;
@@ -230,6 +374,24 @@ h2{
         padding:15px;
         font-size:16px;
     }
+
+    .card-reveal-grid{
+        grid-template-columns:1fr;
+        gap:12px;
+    }
+
+    .card-face{
+        min-height:138px;
+        padding:16px 14px;
+    }
+
+    .card-name{
+        font-size:21px;
+    }
+
+    .booster-pack-title{
+        font-size:20px;
+    }
 }
 
 @media (max-width: 420px){
@@ -266,5 +428,17 @@ h2{
     .shop-btn{
         font-size:19px;
         min-height:78px;
+    }
+
+    .booster-pack-card{
+        padding:16px 14px;
+    }
+
+    .reward-banner strong{
+        font-size:22px;
+    }
+
+    .card-name{
+        font-size:20px;
     }
 }
