@@ -298,6 +298,61 @@ h2{
     font-size:14px;
 }
 
+.card-qty{
+    position:relative;
+    z-index:1;
+    margin-top:10px;
+    font-size:15px;
+    color:rgba(255,255,255,.92);
+    font-weight:700;
+}
+
+.app-select{
+    width:100%;
+    padding:14px 16px;
+    border-radius:14px;
+    border:1px solid #334155;
+    background:#0b1220;
+    color:white;
+    font-size:16px;
+}
+
+.trade-preview-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:14px;
+}
+
+.trade-offer-card{
+    background:linear-gradient(180deg, rgba(15,23,42,.96), rgba(2,6,23,.98));
+    border:1px solid #22304a;
+    border-radius:18px;
+    padding:18px;
+}
+
+.trade-offer-row{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:14px;
+    margin:14px 0;
+}
+
+.trade-side-label{
+    color:#93c5fd;
+    font-size:13px;
+    font-weight:700;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+    margin-bottom:8px;
+}
+
+.trader-card{
+    background:linear-gradient(180deg, rgba(30,41,59,.92), rgba(15,23,42,.98));
+    border:1px solid #334155;
+    border-radius:18px;
+    padding:18px;
+}
+
 @media (max-width: 700px){
     header{
         flex-direction:column;
@@ -391,6 +446,11 @@ h2{
 
     .booster-pack-title{
         font-size:20px;
+    }
+
+    .trade-preview-grid,
+    .trade-offer-row{
+        grid-template-columns:1fr;
     }
 }
 

@@ -34,10 +34,15 @@
 
 <div class="card">
 <h2>Trade erstellen</h2>
+<p class="hint">Waehle einen Trader, dann deine Karte und die Wunschkarte. Unten siehst du beide Karten direkt als Vorschau.</p>
 <form id="tradeForm" class="stack">
-<select id="targetTraderId" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:white;"></select>
-<select id="myTradeCardId" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:white;"></select>
-<select id="wantedTradeCardId" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:white;"></select>
+<select id="targetTraderId" class="app-select"></select>
+<select id="myTradeCardId" class="app-select"></select>
+<select id="wantedTradeCardId" class="app-select"></select>
+<div class="trade-preview-grid">
+<div id="myTradePreview" class="card-reveal-grid"></div>
+<div id="wantedTradePreview" class="card-reveal-grid"></div>
+</div>
 <button id="createTradeButton" class="shop-btn" type="submit">Trade anbieten<small>Erstes Angebot erstellen</small></button>
 </form>
 </div>

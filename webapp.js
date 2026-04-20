@@ -84,19 +84,7 @@ function renderCardInventory(items) {
         return;
     }
 
-    if (!items || !items.length) {
-        cardInventoryList.innerHTML = "<div class='inventory-item'>Noch keine Karten gesammelt.</div>";
-        return;
-    }
-
-    cardInventoryList.innerHTML = items.map(item => `
-        <div class="inventory-item">
-            <strong>${item.card_name}</strong><br>
-            Seltenheit: ${item.rarity}<br>
-            Menge: ${item.quantity}<br>
-            <span class="muted">Zuletzt erhalten: ${formatDate(item.last_acquired_at)}</span>
-        </div>
-    `).join("");
+    renderCardCollection(items, cardInventoryList, "Noch keine Karten gesammelt.");
 }
 
 function getRarityClass(rarity) {
@@ -135,6 +123,31 @@ function renderOpenedCards(items, packName) {
             <div class="card-pack-label">${packName || "Booster Reveal"}</div>
         </div>
     `).join("");
+}
+
+function renderCardCollection(items, targetElement, emptyMessage, options = {}) {
+    if (!targetElement) {
+        return;
+    }
+
+    if (!items || !items.length) {
+        targetElement.innerHTML = `<div class='inventory-item'>${emptyMessage}</div>`;
+        return;
+    }
+
+    targetElement.innerHTML = items.map(item => `
+        <div class="card-face ${getRarityClass(item.rarity)}">
+            <div class="card-slot">${options.slotLabel || item.rarity || "CARD"}</div>
+            <div class="card-name">${item.card_name}</div>
+            <div class="card-rarity">${item.rarity}</div>
+            <div class="card-qty">Menge: ${item.quantity || 1}</div>
+            <div class="card-pack-label">${item.pack_key || options.packLabel || "Collection"}</div>
+        </div>
+    `).join("");
+}
+
+function findCardById(items, cardId) {
+    return (items || []).find(card => String(card.card_id) === String(cardId));
 }
 
 function renderFavoriteOptions(items, selectedId) {
@@ -629,13 +642,16 @@ async function loadTradingPage(tg, user) {
         const targetTraderSelect = document.getElementById("targetTraderId");
         const myTradeCardSelect = document.getElementById("myTradeCardId");
         const wantedTradeCardSelect = document.getElementById("wantedTradeCardId");
+        const myTradePreview = document.getElementById("myTradePreview");
+        const wantedTradePreview = document.getElementById("wantedTradePreview");
+        let selectedTargetCards = [];
 
         if (traderList) {
             if (!traderData.traders.length) {
                 traderList.innerHTML = "<div class='inventory-item'>Noch keine oeffentlichen Trader gefunden.</div>";
             } else {
                 traderList.innerHTML = traderData.traders.map(trader => `
-                    <div class="inventory-item">
+                    <div class="trader-card">
                         <strong>${trader.display_name}</strong><br>
                         ${trader.bio || "Keine Bio"}<br>
                         <span class="muted">Lieblingskarte: ${trader.favorite_card_name || "Keine"}</span><br><br>
@@ -653,12 +669,22 @@ async function loadTradingPage(tg, user) {
                 tradeOffersList.innerHTML = "<div class='history-item'>Noch keine Trade-Angebote.</div>";
             } else {
                 tradeOffersList.innerHTML = traderData.trade_offers.map(offer => `
-                    <div class="history-item">
+                    <div class="trade-offer-card">
                         <strong>Trade #${offer.id}</strong><br>
-                        Angebot: ${offer.offered_card_name} (${offer.offered_card_rarity})<br>
-                        Wunsch: ${offer.requested_card_name} (${offer.requested_card_rarity})<br>
                         Status: ${offer.status}<br>
                         <span class="muted">Erstellt: ${formatDate(offer.created_at)}</span>
+                        <div class="trade-offer-row">
+                            <div class="card-face ${getRarityClass(offer.offered_card_rarity)}">
+                                <div class="trade-side-label">Angebot</div>
+                                <div class="card-name">${offer.offered_card_name}</div>
+                                <div class="card-rarity">${offer.offered_card_rarity}</div>
+                            </div>
+                            <div class="card-face ${getRarityClass(offer.requested_card_rarity)}">
+                                <div class="trade-side-label">Wunsch</div>
+                                <div class="card-name">${offer.requested_card_name}</div>
+                                <div class="card-rarity">${offer.requested_card_rarity}</div>
+                            </div>
+                        </div>
                         ${offer.to_user_id === user.id && offer.status === "pending" ? `
                             <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
                                 <button class="shop-btn trade-response-btn" data-trade-id="${offer.id}" data-action="accept">Annehmen<small>Karten tauschen</small></button>
@@ -684,17 +710,41 @@ async function loadTradingPage(tg, user) {
             initData: tg.initData,
             user_id: user.id
         });
+        const myCardInventory = myCards.card_inventory || [];
 
         if (myTradeCardSelect) {
-            myTradeCardSelect.innerHTML = "<option value=''>Deine Karte waehlen</option>" + (myCards.card_inventory || []).map(card => (
+            myTradeCardSelect.innerHTML = "<option value=''>Deine Karte waehlen</option>" + myCardInventory.map(card => (
                 `<option value="${card.card_id}">${card.card_name} (${card.rarity}) x${card.quantity}</option>`
             )).join("");
+        }
+
+        if (myTradePreview) {
+            myTradePreview.innerHTML = "<div class='inventory-item'>Deine ausgewaehlte Karte erscheint hier.</div>";
+        }
+
+        if (wantedTradePreview) {
+            wantedTradePreview.innerHTML = "<div class='inventory-item'>Die Wunschkarte des Traders erscheint hier.</div>";
+        }
+
+        if (myTradeCardSelect && !myTradeCardSelect.dataset.bound) {
+            myTradeCardSelect.dataset.bound = "1";
+            myTradeCardSelect.addEventListener("change", () => {
+                const selectedCard = findCardById(myCardInventory, myTradeCardSelect.value);
+                renderCardCollection(
+                    selectedCard ? [selectedCard] : [],
+                    myTradePreview,
+                    "Deine ausgewaehlte Karte erscheint hier.",
+                    { slotLabel: "DEIN" }
+                );
+            });
         }
 
         if (targetTraderSelect && !targetTraderSelect.dataset.bound) {
             targetTraderSelect.dataset.bound = "1";
             targetTraderSelect.addEventListener("change", async () => {
                 wantedTradeCardSelect.innerHTML = "<option value=''>Karte waehlen</option>";
+                selectedTargetCards = [];
+                renderCardCollection([], wantedTradePreview, "Die Wunschkarte des Traders erscheint hier.", { slotLabel: "WUNSCH" });
 
                 if (!targetTraderSelect.value) {
                     return;
@@ -710,9 +760,24 @@ async function loadTradingPage(tg, user) {
                     return;
                 }
 
-                wantedTradeCardSelect.innerHTML = "<option value=''>Karte waehlen</option>" + (targetCards.cards || []).map(card => (
+                selectedTargetCards = targetCards.cards || [];
+
+                wantedTradeCardSelect.innerHTML = "<option value=''>Karte waehlen</option>" + selectedTargetCards.map(card => (
                     `<option value="${card.card_id}">${card.card_name} (${card.rarity}) x${card.quantity}</option>`
                 )).join("");
+            });
+        }
+
+        if (wantedTradeCardSelect && !wantedTradeCardSelect.dataset.bound) {
+            wantedTradeCardSelect.dataset.bound = "1";
+            wantedTradeCardSelect.addEventListener("change", () => {
+                const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect.value);
+                renderCardCollection(
+                    selectedCard ? [selectedCard] : [],
+                    wantedTradePreview,
+                    "Die Wunschkarte des Traders erscheint hier.",
+                    { slotLabel: "WUNSCH" }
+                );
             });
         }
 
@@ -824,23 +889,25 @@ async function loadTradingPage(tg, user) {
                     const profile = result.profile;
 
                     publicProfileView.innerHTML = `
-                        <div class="inventory-item">
+                        <div class="trader-card">
                             <strong>${profile.display_name || "User " + profile.user_id}</strong><br>
                             ${profile.bio || "Keine Bio"}<br>
                             Trading: ${profile.trading_enabled ? "aktiv" : "aus"}<br>
                             Inventar: ${profile.inventory_visibility}<br>
                             Lieblingskarte: ${profile.favorite_card_name || "Keine"}
                         </div>
-                        <div class="inventory-list">
+                        <div class="card-reveal-grid">
                             ${
                                 profile.inventory_visibility === "public"
                                     ? (
                                         profile.visible_cards.length
                                             ? profile.visible_cards.map(card => `
-                                                <div class="inventory-item">
-                                                    <strong>${card.card_name}</strong><br>
-                                                    Seltenheit: ${card.rarity}<br>
-                                                    Menge: ${card.quantity}
+                                                <div class="card-face ${getRarityClass(card.rarity)}">
+                                                    <div class="card-slot">${card.rarity}</div>
+                                                    <div class="card-name">${card.card_name}</div>
+                                                    <div class="card-rarity">${card.rarity}</div>
+                                                    <div class="card-qty">Menge: ${card.quantity}</div>
+                                                    <div class="card-pack-label">${card.pack_key || "Public Collection"}</div>
                                                 </div>
                                             `).join("")
                                             : "<div class='inventory-item'>Keine sichtbaren Karten vorhanden.</div>"
