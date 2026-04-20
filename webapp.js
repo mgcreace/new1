@@ -1,4 +1,10 @@
 const API_BASE = "https://magenta-wolf-69675.zap.cloud";
+const INVENTORY_STATE = {
+    items: [],
+    filter: "ALL",
+    sort: "rarity_desc",
+    selectedCardId: null
+};
 
 function formatDate(value) {
     if (!value) {
@@ -84,6 +90,13 @@ function renderCardInventory(items) {
         return;
     }
 
+    if (document.getElementById("inventorySort")) {
+        INVENTORY_STATE.items = Array.isArray(items) ? items.slice() : [];
+        renderInventoryCollectionView();
+        bindInventoryCollectionControls();
+        return;
+    }
+
     renderCardCollection(items, cardInventoryList, "Noch keine Karten gesammelt.");
 }
 
@@ -136,7 +149,7 @@ function renderCardCollection(items, targetElement, emptyMessage, options = {}) 
     }
 
     targetElement.innerHTML = items.map(item => `
-        <div class="card-face ${getRarityClass(item.rarity)}">
+        <div class="card-face ${getRarityClass(item.rarity)} ${options.clickable ? "clickable" : ""} ${String(options.selectedCardId || "") === String(item.card_id || "") ? "is-selected" : ""}" ${options.clickable ? `data-card-id="${item.card_id}"` : ""}>
             <div class="card-slot">${options.slotLabel || item.rarity || "CARD"}</div>
             <div class="card-name">${item.card_name}</div>
             <div class="card-rarity">${item.rarity}</div>
@@ -148,6 +161,144 @@ function renderCardCollection(items, targetElement, emptyMessage, options = {}) 
 
 function findCardById(items, cardId) {
     return (items || []).find(card => String(card.card_id) === String(cardId));
+}
+
+function rarityWeight(rarity) {
+    const normalized = String(rarity || "N").toUpperCase();
+    if (normalized === "SEC") {
+        return 4;
+    }
+    if (normalized === "SR") {
+        return 3;
+    }
+    if (normalized === "R") {
+        return 2;
+    }
+    return 1;
+}
+
+function sortInventoryCards(items, sortMode) {
+    const sorted = (items || []).slice();
+
+    if (sortMode === "name_asc") {
+        sorted.sort((a, b) => String(a.card_name || "").localeCompare(String(b.card_name || "")));
+        return sorted;
+    }
+
+    if (sortMode === "newest_desc") {
+        sorted.sort((a, b) => new Date(b.last_acquired_at || 0) - new Date(a.last_acquired_at || 0));
+        return sorted;
+    }
+
+    if (sortMode === "quantity_desc") {
+        sorted.sort((a, b) => Number(b.quantity || 0) - Number(a.quantity || 0) || String(a.card_name || "").localeCompare(String(b.card_name || "")));
+        return sorted;
+    }
+
+    sorted.sort((a, b) => rarityWeight(b.rarity) - rarityWeight(a.rarity) || String(a.card_name || "").localeCompare(String(b.card_name || "")));
+    return sorted;
+}
+
+function renderInventoryCardDetail(card) {
+    const detailElement = document.getElementById("inventoryCardDetail");
+    if (!detailElement) {
+        return;
+    }
+
+    if (!card) {
+        detailElement.innerHTML = "Tippe auf eine Karte, um Details zu sehen.";
+        return;
+    }
+
+    detailElement.innerHTML = `
+        <div class="detail-panel">
+            <div class="detail-title">${card.card_name}</div>
+            <div class="detail-meta">
+                Seltenheit: ${card.rarity}<br>
+                Pack: ${card.pack_key || "-"}<br>
+                Menge: ${card.quantity || 1}<br>
+                Zuletzt erhalten: ${formatDate(card.last_acquired_at)}
+            </div>
+        </div>
+    `;
+}
+
+function renderInventoryCollectionView() {
+    const cardInventoryList = document.getElementById("cardInventoryList");
+    if (!cardInventoryList) {
+        return;
+    }
+
+    let items = INVENTORY_STATE.items.slice();
+
+    if (INVENTORY_STATE.filter !== "ALL") {
+        items = items.filter(item => String(item.rarity || "").toUpperCase() === INVENTORY_STATE.filter);
+    }
+
+    items = sortInventoryCards(items, INVENTORY_STATE.sort);
+
+    if (!INVENTORY_STATE.selectedCardId && items.length) {
+        INVENTORY_STATE.selectedCardId = items[0].card_id;
+    }
+
+    if (INVENTORY_STATE.selectedCardId && !items.some(item => String(item.card_id) === String(INVENTORY_STATE.selectedCardId))) {
+        INVENTORY_STATE.selectedCardId = items.length ? items[0].card_id : null;
+    }
+
+    renderCardCollection(items, cardInventoryList, "Keine Karten fuer diesen Filter gefunden.", {
+        clickable: true,
+        selectedCardId: INVENTORY_STATE.selectedCardId
+    });
+
+    renderInventoryCardDetail(findCardById(items, INVENTORY_STATE.selectedCardId));
+
+    cardInventoryList.querySelectorAll("[data-card-id]").forEach(cardElement => {
+        if (cardElement.dataset.bound) {
+            return;
+        }
+
+        cardElement.dataset.bound = "1";
+        cardElement.addEventListener("click", () => {
+            INVENTORY_STATE.selectedCardId = cardElement.dataset.cardId;
+            renderInventoryCollectionView();
+        });
+    });
+}
+
+function bindInventoryCollectionControls() {
+    document.querySelectorAll("[data-rarity-filter]").forEach(button => {
+        if (button.dataset.bound) {
+            button.classList.toggle("active", button.dataset.rarityFilter === INVENTORY_STATE.filter);
+            return;
+        }
+
+        button.dataset.bound = "1";
+        button.classList.toggle("active", button.dataset.rarityFilter === INVENTORY_STATE.filter);
+        button.addEventListener("click", () => {
+            INVENTORY_STATE.filter = button.dataset.rarityFilter || "ALL";
+            document.querySelectorAll("[data-rarity-filter]").forEach(chip => {
+                chip.classList.toggle("active", chip.dataset.rarityFilter === INVENTORY_STATE.filter);
+            });
+            renderInventoryCollectionView();
+        });
+    });
+
+    const sortSelect = document.getElementById("inventorySort");
+    if (!sortSelect) {
+        return;
+    }
+
+    sortSelect.value = INVENTORY_STATE.sort;
+
+    if (sortSelect.dataset.bound) {
+        return;
+    }
+
+    sortSelect.dataset.bound = "1";
+    sortSelect.addEventListener("change", () => {
+        INVENTORY_STATE.sort = sortSelect.value || "rarity_desc";
+        renderInventoryCollectionView();
+    });
 }
 
 function renderFavoriteOptions(items, selectedId) {

@@ -40,7 +40,27 @@
 <div class="card">
 <h2>Deine Karten</h2>
 <p class="hint">Deine Sammlung wird hier als Kartenansicht angezeigt. Seltene Karten stechen farblich direkt heraus.</p>
+<div class="inventory-toolbar">
+<div class="filter-row">
+<button class="filter-chip active" type="button" data-rarity-filter="ALL">Alle</button>
+<button class="filter-chip" type="button" data-rarity-filter="N">N</button>
+<button class="filter-chip" type="button" data-rarity-filter="R">R</button>
+<button class="filter-chip" type="button" data-rarity-filter="SR">SR</button>
+<button class="filter-chip" type="button" data-rarity-filter="SEC">SEC</button>
+</div>
+<select id="inventorySort" class="app-select">
+<option value="rarity_desc">Sortierung: Seltenheit</option>
+<option value="name_asc">Sortierung: Name</option>
+<option value="newest_desc">Sortierung: Neueste zuerst</option>
+<option value="quantity_desc">Sortierung: Hoechste Menge</option>
+</select>
+</div>
 <div id="cardInventoryList" class="card-reveal-grid"></div>
+</div>
+
+<div class="card">
+<h2>Karten-Details</h2>
+<div id="inventoryCardDetail" class="inventory-item">Tippe auf eine Karte, um Details zu sehen.</div>
 </div>
 
 <div class="card">
