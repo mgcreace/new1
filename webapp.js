@@ -77,6 +77,28 @@ function renderOpenHistory(items) {
     `).join("");
 }
 
+function renderCardInventory(items) {
+    const cardInventoryList = document.getElementById("cardInventoryList");
+
+    if (!cardInventoryList) {
+        return;
+    }
+
+    if (!items || !items.length) {
+        cardInventoryList.innerHTML = "<div class='inventory-item'>Noch keine Karten gesammelt.</div>";
+        return;
+    }
+
+    cardInventoryList.innerHTML = items.map(item => `
+        <div class="inventory-item">
+            <strong>${item.card_name}</strong><br>
+            Seltenheit: ${item.rarity}<br>
+            Menge: ${item.quantity}<br>
+            <span class="muted">Zuletzt erhalten: ${formatDate(item.last_acquired_at)}</span>
+        </div>
+    `).join("");
+}
+
 async function postJson(path, payload) {
     const res = await fetch(`${API_BASE}${path}`, {
         method: "POST",
@@ -186,6 +208,7 @@ async function initTelegramApp(pageName) {
     }
 
     renderInventory(data.inventory || []);
+    renderCardInventory(data.card_inventory || []);
 
     if (pageName === "shop") {
         setupStarShop(tg, user);
@@ -296,6 +319,7 @@ async function loadBoosterShop(tg, user) {
         }
 
         renderInventory(data.inventory || []);
+        renderCardInventory(data.card_inventory || []);
         renderHistory(data.history || []);
         renderOpenHistory(data.open_history || []);
     } catch (error) {
@@ -320,6 +344,7 @@ async function loadOpenBoosterPage(tg, user) {
         }
 
         renderInventory(data.inventory || []);
+        renderCardInventory(data.card_inventory || []);
         renderOpenHistory(data.open_history || []);
 
         const openBoosterList = document.getElementById("openBoosterList");
@@ -374,13 +399,24 @@ async function loadOpenBoosterPage(tg, user) {
                     if (rewardBox) {
                         rewardBox.innerHTML = `
                             <div class="history-item">
-                                <strong>${result.reward.pack_name}</strong><br>
-                                Du hast ${result.reward.value} ${result.reward.type} erhalten.
+                                <strong>${result.pack_name}</strong><br>
+                                Du hast ${result.opened_cards.length} Karten gezogen.
                             </div>
                         `;
                     }
 
+                    const openedCardsList = document.getElementById("openedCardsList");
+                    if (openedCardsList) {
+                        openedCardsList.innerHTML = result.opened_cards.map(card => `
+                            <div class="inventory-item">
+                                <strong>Slot ${card.slot_number}: ${card.card_name}</strong><br>
+                                Seltenheit: ${card.rarity}
+                            </div>
+                        `).join("");
+                    }
+
                     renderInventory(result.inventory || []);
+                    renderCardInventory(result.card_inventory || []);
                     renderOpenHistory(result.open_history || []);
                     await loadOpenBoosterPage(tg, user);
                 } catch (error) {
