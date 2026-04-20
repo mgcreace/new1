@@ -69,6 +69,11 @@ async function postJson(path, payload) {
 }
 
 async function initTelegramApp(pageName) {
+    if (!window.Telegram || !window.Telegram.WebApp) {
+        document.body.innerHTML = "<h2 style='color:red;text-align:center;margin-top:100px'>Telegram WebApp script not available</h2>";
+        return;
+    }
+
     const tg = window.Telegram.WebApp;
     tg.expand();
     tg.ready();
@@ -79,6 +84,12 @@ async function initTelegramApp(pageName) {
             link.classList.add("active");
         }
     });
+
+    let attempts = 0;
+    while (attempts < 10 && (!tg.initDataUnsafe || !tg.initDataUnsafe.user)) {
+        await new Promise(resolve => setTimeout(resolve, 150));
+        attempts += 1;
+    }
 
     if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
         document.body.innerHTML = "<h2 style='color:red;text-align:center;margin-top:100px'>Open in Telegram</h2>";
