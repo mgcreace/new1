@@ -11,6 +11,29 @@ const BOOSTER_REVEAL_STATE = {
     isAnimating: false
 };
 
+function ensureToastStack() {
+    let stack = document.getElementById("toastStack");
+    if (!stack) {
+        stack = document.createElement("div");
+        stack.id = "toastStack";
+        stack.className = "toast-stack";
+        document.body.appendChild(stack);
+    }
+    return stack;
+}
+
+function showToast(message, mode = "info", duration = 2600) {
+    const stack = ensureToastStack();
+    const toast = document.createElement("div");
+    toast.className = `toast toast-${mode}`;
+    toast.innerHTML = message;
+    stack.appendChild(toast);
+
+    window.setTimeout(() => {
+        toast.remove();
+    }, duration);
+}
+
 function formatDate(value) {
     if (!value) {
         return "-";
@@ -602,7 +625,7 @@ function setupStarShop(tg, user) {
                 });
 
                 if (!data.ok || !data.invoice_url) {
-                    alert("Kauf konnte nicht gestartet werden.");
+                    showToast("Kauf konnte nicht gestartet werden.", "error");
                     return;
                 }
 
@@ -613,7 +636,7 @@ function setupStarShop(tg, user) {
                 });
             } catch (error) {
                 console.log(error);
-                alert("Fehler beim Starten des Kaufs.");
+                showToast("Fehler beim Starten des Kaufs.", "error");
             } finally {
                 button.disabled = false;
             }
@@ -659,9 +682,9 @@ async function loadBoosterShop(tg, user) {
 
                         if (!buyData.ok) {
                             if (buyData.error === "not enough coins") {
-                                alert("Nicht genug Coins fuer diesen Booster.");
+                                showToast("Nicht genug Coins fuer diesen Booster.", "error");
                             } else {
-                                alert("Booster-Kauf fehlgeschlagen.");
+                                showToast("Booster-Kauf fehlgeschlagen.", "error");
                             }
                             return;
                         }
@@ -675,7 +698,7 @@ async function loadBoosterShop(tg, user) {
                         renderHistory(buyData.history || []);
                     } catch (error) {
                         console.log(error);
-                        alert("Fehler beim Booster-Kauf.");
+                        showToast("Fehler beim Booster-Kauf.", "error");
                     } finally {
                         button.disabled = false;
                     }
@@ -771,9 +794,9 @@ async function loadOpenBoosterPage(tg, user) {
 
                     if (!result.ok) {
                         if (result.error === "booster not owned") {
-                            alert("Diesen Booster besitzt du nicht mehr.");
+                            showToast("Diesen Booster besitzt du nicht mehr.", "error");
                         } else {
-                            alert("Booster konnte nicht geoeffnet werden.");
+                            showToast("Booster konnte nicht geoeffnet werden.", "error");
                         }
                         return;
                     }
@@ -795,7 +818,7 @@ async function loadOpenBoosterPage(tg, user) {
                     await loadOpenBoosterPage(tg, user);
                 } catch (error) {
                     console.log(error);
-                    alert("Fehler beim Oeffnen.");
+                    showToast("Fehler beim Oeffnen.", "error");
                 } finally {
                     button.disabled = false;
                 }
@@ -889,14 +912,14 @@ async function loadProfilePage(tg, user, secureData) {
                     });
 
                     if (!result.ok) {
-                        alert("Profil konnte nicht gespeichert werden.");
+                        showToast("Profil konnte nicht gespeichert werden.", "error");
                         return;
                     }
 
                     await loadProfilePage(tg, user, secureData);
                 } catch (error) {
                     console.log(error);
-                    alert("Fehler beim Speichern des Profils.");
+                    showToast("Fehler beim Speichern des Profils.", "error");
                 } finally {
                     if (saveButton) {
                         saveButton.disabled = false;
@@ -1094,7 +1117,7 @@ async function loadTradingPage(tg, user) {
                 const requestedQuantity = document.getElementById("wantedTradeQuantity").value;
 
                 if (!targetTraderId || !offeredCardId || !requestedCardId || !offeredQuantity || !requestedQuantity) {
-                    alert("Bitte waehle Trader, Karten und Mengen aus.");
+                    showToast("Bitte waehle Trader, Karten und Mengen aus.", "error");
                     return;
                 }
 
@@ -1115,7 +1138,7 @@ async function loadTradingPage(tg, user) {
                     });
 
                     if (!result.ok) {
-                        alert(result.error || "Trade-Angebot konnte nicht erstellt werden.");
+                        showToast(result.error || "Trade-Angebot konnte nicht erstellt werden.", "error");
                         return;
                     }
 
@@ -1123,7 +1146,7 @@ async function loadTradingPage(tg, user) {
                     await loadTradingPage(tg, user);
                 } catch (error) {
                     console.log(error);
-                    alert("Fehler beim Erstellen des Trade-Angebots.");
+                    showToast("Fehler beim Erstellen des Trade-Angebots.", "error");
                 } finally {
                     if (createButton) {
                         createButton.disabled = false;
@@ -1150,7 +1173,7 @@ async function loadTradingPage(tg, user) {
                     });
 
                     if (!result.ok) {
-                        alert("Trade konnte nicht verarbeitet werden.");
+                        showToast("Trade konnte nicht verarbeitet werden.", "error");
                         return;
                     }
 
@@ -1164,7 +1187,7 @@ async function loadTradingPage(tg, user) {
                     await loadTradingPage(tg, user);
                 } catch (error) {
                     console.log(error);
-                    alert("Fehler beim Bearbeiten des Trades.");
+                    showToast("Fehler beim Bearbeiten des Trades.", "error");
                 } finally {
                     button.disabled = false;
                 }
@@ -1188,7 +1211,7 @@ async function loadTradingPage(tg, user) {
                     });
 
                     if (!result.ok) {
-                        alert("Profil konnte nicht geladen werden.");
+                        showToast("Profil konnte nicht geladen werden.", "error");
                         return;
                     }
 
@@ -1229,7 +1252,7 @@ async function loadTradingPage(tg, user) {
                     `;
                 } catch (error) {
                     console.log(error);
-                    alert("Fehler beim Laden des Profils.");
+                    showToast("Fehler beim Laden des Profils.", "error");
                 } finally {
                     button.disabled = false;
                 }
@@ -1253,7 +1276,7 @@ async function loadTradingPage(tg, user) {
                     });
 
                     if (!result.ok) {
-                        alert(result.error || "Debug Accept fehlgeschlagen.");
+                        showToast(result.error || "Debug Accept fehlgeschlagen.", "error");
                         return;
                     }
 
@@ -1262,7 +1285,7 @@ async function loadTradingPage(tg, user) {
                     await loadTradingPage(tg, user);
                 } catch (error) {
                     console.log(error);
-                    alert("Fehler bei Debug Accept.");
+                    showToast("Fehler bei Debug Accept.", "error");
                 } finally {
                     button.disabled = false;
                 }
