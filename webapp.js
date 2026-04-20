@@ -5,6 +5,11 @@ const INVENTORY_STATE = {
     sort: "rarity_desc",
     selectedCardId: null
 };
+const BOOSTER_REVEAL_STATE = {
+    lastPackName: "",
+    lastCards: [],
+    isAnimating: false
+};
 
 function formatDate(value) {
     if (!value) {
@@ -136,6 +141,70 @@ function renderOpenedCards(items, packName) {
             <div class="card-pack-label">${packName || "Booster Reveal"}</div>
         </div>
     `).join("");
+}
+
+function getRevealSummary(items) {
+    const summary = {
+        N: 0,
+        R: 0,
+        SR: 0,
+        SEC: 0
+    };
+
+    (items || []).forEach(card => {
+        const rarity = String(card.rarity || "N").toUpperCase();
+        if (summary[rarity] !== undefined) {
+            summary[rarity] += 1;
+        }
+    });
+
+    return summary;
+}
+
+function renderRevealBanner(packName, items) {
+    const rewardBox = document.getElementById("openReward");
+    if (!rewardBox) {
+        return;
+    }
+
+    const summary = getRevealSummary(items);
+    rewardBox.innerHTML = `
+        <div class="reward-banner">
+            <strong>${packName}</strong><br>
+            Du hast ${items.length} Karten gezogen.
+            <div class="reveal-summary">
+                <span class="summary-pill">R: ${summary.R}</span>
+                <span class="summary-pill">SR: ${summary.SR}</span>
+                <span class="summary-pill">SEC: ${summary.SEC}</span>
+            </div>
+            <div class="card-pack-label">9 Normal, 1 Rare, 2 Bonus-Slots</div>
+        </div>
+    `;
+}
+
+async function animateOpenedCards(items, packName) {
+    const openedCardsList = document.getElementById("openedCardsList");
+    if (!openedCardsList) {
+        return;
+    }
+
+    BOOSTER_REVEAL_STATE.isAnimating = true;
+    openedCardsList.innerHTML = "";
+
+    for (const card of items || []) {
+        const cardHtml = `
+            <div class="card-face ${getRarityClass(card.rarity)} reveal-enter ${["SR", "SEC"].includes(String(card.rarity || "").toUpperCase()) ? "reveal-hit" : ""}">
+                <div class="card-slot">Slot ${card.slot_number}</div>
+                <div class="card-name">${card.card_name}</div>
+                <div class="card-rarity">${card.rarity}</div>
+                <div class="card-pack-label">${packName || "Booster Reveal"}</div>
+            </div>
+        `;
+        openedCardsList.insertAdjacentHTML("beforeend", cardHtml);
+        await new Promise(resolve => setTimeout(resolve, 180));
+    }
+
+    BOOSTER_REVEAL_STATE.isAnimating = false;
 }
 
 function renderCardCollection(items, targetElement, emptyMessage, options = {}) {
@@ -583,7 +652,7 @@ async function loadOpenBoosterPage(tg, user) {
             return;
         }
 
-        if (rewardBox && !rewardBox.innerHTML.trim()) {
+        if (rewardBox && !rewardBox.innerHTML.trim() && !BOOSTER_REVEAL_STATE.lastCards.length) {
             rewardBox.innerHTML = `
                 <div class="history-item">
                     Waehle einen Booster aus deinem Inventar und starte den Reveal hier.
@@ -591,7 +660,10 @@ async function loadOpenBoosterPage(tg, user) {
             `;
         }
 
-        if (openedCardsList && !openedCardsList.innerHTML.trim()) {
+        if (BOOSTER_REVEAL_STATE.lastCards.length && !BOOSTER_REVEAL_STATE.isAnimating) {
+            renderRevealBanner(BOOSTER_REVEAL_STATE.lastPackName, BOOSTER_REVEAL_STATE.lastCards);
+            renderOpenedCards(BOOSTER_REVEAL_STATE.lastCards, BOOSTER_REVEAL_STATE.lastPackName);
+        } else if (openedCardsList && !openedCardsList.innerHTML.trim()) {
             openedCardsList.innerHTML = "<div class='inventory-item'>Dein letzter Booster-Reveal erscheint hier.</div>";
         }
 
@@ -644,18 +716,11 @@ async function loadOpenBoosterPage(tg, user) {
                         coinsLabel.innerText = "Coins: " + (result.coins || 0);
                     }
 
-                    const rewardBox = document.getElementById("openReward");
-                    if (rewardBox) {
-                        rewardBox.innerHTML = `
-                            <div class="reward-banner">
-                                <strong>${result.pack_name}</strong><br>
-                                Du hast ${result.opened_cards.length} Karten gezogen.
-                                <div class="card-pack-label">9 Normal, 1 Rare, 2 Bonus-Slots</div>
-                            </div>
-                        `;
-                    }
+                    BOOSTER_REVEAL_STATE.lastPackName = result.pack_name || "Booster Reveal";
+                    BOOSTER_REVEAL_STATE.lastCards = result.opened_cards || [];
 
-                    renderOpenedCards(result.opened_cards || [], result.pack_name);
+                    renderRevealBanner(BOOSTER_REVEAL_STATE.lastPackName, BOOSTER_REVEAL_STATE.lastCards);
+                    await animateOpenedCards(BOOSTER_REVEAL_STATE.lastCards, BOOSTER_REVEAL_STATE.lastPackName);
 
                     renderInventory(result.inventory || []);
                     renderCardInventory(result.card_inventory || []);

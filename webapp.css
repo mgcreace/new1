@@ -205,6 +205,26 @@ h2{
     margin-bottom:8px;
 }
 
+.reveal-summary{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    margin-top:14px;
+}
+
+.summary-pill{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:34px;
+    padding:0 14px;
+    border-radius:999px;
+    background:rgba(255,255,255,.14);
+    font-size:14px;
+    font-weight:800;
+    color:#f8fafc;
+}
+
 .card-reveal-grid{
     display:grid;
     grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
@@ -222,6 +242,14 @@ h2{
     color:#f8fafc;
     border:1px solid rgba(255,255,255,.14);
     box-shadow:0 14px 30px rgba(2,6,23,.28);
+}
+
+.reveal-enter{
+    animation:revealDrop .35s ease both;
+}
+
+.reveal-hit{
+    box-shadow:0 0 0 1px rgba(255,255,255,.25), 0 0 24px rgba(255,255,255,.16), 0 14px 30px rgba(2,6,23,.28);
 }
 
 .card-face::after{
@@ -373,6 +401,17 @@ h2{
     color:#cbd5e1;
     font-size:16px;
     line-height:1.6;
+}
+
+@keyframes revealDrop{
+    from{
+        opacity:0;
+        transform:translateY(20px) scale(.96);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
 }
 
 .trade-preview-grid{
