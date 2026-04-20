@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Shop</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="../webapp.css">
+</head>
+<body>
+<header>
+<div id="profile">
+<img id="avatar" alt="avatar">
+<span id="username"></span>
+<span id="premiumBadge" class="badge" style="display:none;">PREMIUM</span>
+</div>
+<nav class="topnav">
+<a href="../home/" data-page="home">Home</a>
+<a href="../shop/" data-page="shop">Shop</a>
+<a href="../inventory/" data-page="inventory">Inventory</a>
+<a href="../account/" data-page="account">Account</a>
+</nav>
+</header>
+
+<main>
+<h1>Shop</h1>
+<div class="card">
+<p id="telegramID"></p>
+<p id="status">Loading...</p>
+<p id="coins">Coins: 0</p>
+</div>
+
+<div class="card">
+<h2>Coins kaufen</h2>
+<p class="hint">Falls Telegram Desktop beim Checkout Probleme macht, versuche den Kauf bitte in der mobilen Telegram-App.</p>
+<div class="grid">
+<button class="shop-btn" data-item="coins_100">100 Coins<small>50 Stars</small></button>
+<button class="shop-btn" data-item="coins_500">500 Coins<small>200 Stars</small></button>
+<button class="shop-btn" data-item="coins_1000">1000 Coins<small>350 Stars</small></button>
+</div>
+</div>
+
+<div class="card" id="premiumShopCard">
+<h2>Premium kaufen</h2>
+<div class="grid">
+<button class="shop-btn" data-item="premium_week">7 Tage<small>100 Stars</small></button>
+<button class="shop-btn" data-item="premium_month">30 Tage<small>300 Stars</small></button>
+<button class="shop-btn" data-item="premium_lifetime">Lifetime<small>1000 Stars</small></button>
+</div>
+</div>
+
+<div class="card">
+<h2>Booster Shop</h2>
+<p class="hint">Diese Packs kaufst du mit deinen Coins. Jeder Kauf wird gespeichert und landet direkt in deinem Inventar.</p>
+<div class="grid" id="boosterShop"></div>
+</div>
+</main>
+
+<script src="../webapp.js"></script>
+<script>
+initTelegramApp("shop");
+</script>
+</body>
+</html>

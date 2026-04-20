@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Inventory</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="../webapp.css">
+</head>
+<body>
+<header>
+<div id="profile">
+<img id="avatar" alt="avatar">
+<span id="username"></span>
+<span id="premiumBadge" class="badge" style="display:none;">PREMIUM</span>
+</div>
+<nav class="topnav">
+<a href="../home/" data-page="home">Home</a>
+<a href="../shop/" data-page="shop">Shop</a>
+<a href="../inventory/" data-page="inventory">Inventory</a>
+<a href="../account/" data-page="account">Account</a>
+</nav>
+</header>
+
+<main>
+<h1>Inventory</h1>
+<div class="card">
+<p id="telegramID"></p>
+<p id="status">Loading...</p>
+<p id="coins">Coins: 0</p>
+</div>
+
+<div class="card">
+<h2>Dein Inventar</h2>
+<div id="inventoryList" class="inventory-list"></div>
+</div>
+
+<div class="card">
+<h2>Letzte Booster-Kaeufe</h2>
+<div id="historyList" class="history-list"></div>
+</div>
+</main>
+
+<script src="../webapp.js"></script>
+<script>
+initTelegramApp("inventory");
+</script>
+</body>
+</html>

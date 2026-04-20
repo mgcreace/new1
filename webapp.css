@@ -1,0 +1,146 @@
+body{
+    margin:0;
+    font-family:Arial;
+    background:#0f172a;
+    color:white;
+}
+
+header{
+    min-height:70px;
+    background:#020617;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:12px 20px;
+    gap:16px;
+}
+
+#profile{
+    display:flex;
+    align-items:center;
+    gap:10px;
+}
+
+#avatar{
+    width:45px;
+    height:45px;
+    border-radius:50%;
+}
+
+.badge{
+    background:gold;
+    color:black;
+    padding:5px 10px;
+    border-radius:10px;
+}
+
+.topnav{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.topnav a{
+    color:white;
+    text-decoration:none;
+    background:#172036;
+    border:1px solid #263249;
+    padding:8px 12px;
+    border-radius:10px;
+    font-size:14px;
+}
+
+.topnav a.active{
+    background:#2952cc;
+    border-color:#2952cc;
+}
+
+main{
+    text-align:center;
+    margin:40px auto 0;
+    max-width:900px;
+    padding:0 20px 40px;
+}
+
+.card{
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:18px;
+    padding:18px;
+    margin-top:22px;
+    box-shadow:0 12px 30px rgba(0,0,0,.22);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+    gap:14px;
+    margin-top:16px;
+}
+
+.shop-btn{
+    border:none;
+    border-radius:14px;
+    padding:16px 14px;
+    background:linear-gradient(180deg, #1d4ed8, #1e3a8a);
+    color:white;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:700;
+}
+
+.shop-btn:disabled{
+    opacity:.7;
+    cursor:wait;
+}
+
+.shop-btn small{
+    display:block;
+    margin-top:6px;
+    font-size:12px;
+    font-weight:400;
+    opacity:.9;
+}
+
+.hint{
+    color:#cbd5e1;
+    font-size:14px;
+    line-height:1.5;
+}
+
+.inventory-list,
+.history-list{
+    text-align:left;
+    margin-top:16px;
+    display:grid;
+    gap:10px;
+}
+
+.inventory-item,
+.history-item{
+    background:#0b1220;
+    border:1px solid #1e293b;
+    border-radius:14px;
+    padding:14px;
+}
+
+.muted{
+    color:#94a3b8;
+    font-size:13px;
+}
+
+.stat{
+    font-size:18px;
+    margin:8px 0;
+}
+
+@media (max-width: 700px){
+    header{
+        flex-direction:column;
+        align-items:flex-start;
+    }
+
+    .topnav{
+        width:100%;
+    }
+}
