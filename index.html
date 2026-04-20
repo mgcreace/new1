@@ -2,10 +2,37 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta http-equiv="refresh" content="0; url=./home/">
-<title>Telegram WebApp</title>
+<title>Home</title>
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
+<link rel="stylesheet" href="./webapp.css">
 </head>
 <body>
-<p>Weiterleitung zu <a href="./home/">Home</a>...</p>
+<header>
+<div id="profile">
+<img id="avatar" alt="avatar">
+<span id="username"></span>
+<span id="premiumBadge" class="badge" style="display:none;">PREMIUM</span>
+</div>
+<nav class="topnav">
+<a href="./" data-page="home">Home</a>
+<a href="./shop/" data-page="shop">Shop</a>
+<a href="./inventory/" data-page="inventory">Inventory</a>
+<a href="./account/" data-page="account">Account</a>
+</nav>
+</header>
+
+<main>
+<h1>Dashboard</h1>
+<div class="card">
+<p id="telegramID"></p>
+<p id="status">Loading...</p>
+<p id="coins">Coins: 0</p>
+</div>
+</main>
+
+<script src="./webapp.js"></script>
+<script>
+initTelegramApp("home");
+</script>
 </body>
 </html>
