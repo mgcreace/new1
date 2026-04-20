@@ -587,7 +587,11 @@ async function loadTradingPage(tg, user) {
                     <div class="inventory-item">
                         <strong>${trader.display_name}</strong><br>
                         ${trader.bio || "Keine Bio"}<br>
-                        <span class="muted">Lieblingskarte: ${trader.favorite_card_name || "Keine"}</span>
+                        <span class="muted">Lieblingskarte: ${trader.favorite_card_name || "Keine"}</span><br><br>
+                        <button class="shop-btn trader-profile-btn" data-target-user-id="${trader.user_id}">
+                            Profil ansehen
+                            <small>Sammlung und Profil ansehen</small>
+                        </button>
                     </div>
                 `).join("");
             }
@@ -721,6 +725,69 @@ async function loadTradingPage(tg, user) {
                 } catch (error) {
                     console.log(error);
                     alert("Fehler beim Bearbeiten des Trades.");
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        });
+
+        document.querySelectorAll(".trader-profile-btn").forEach(button => {
+            if (button.dataset.bound) {
+                return;
+            }
+
+            button.dataset.bound = "1";
+            button.addEventListener("click", async () => {
+                button.disabled = true;
+
+                try {
+                    const result = await postJson("/public-profile", {
+                        initData: tg.initData,
+                        user_id: user.id,
+                        target_user_id: button.dataset.targetUserId
+                    });
+
+                    if (!result.ok) {
+                        alert("Profil konnte nicht geladen werden.");
+                        return;
+                    }
+
+                    const publicProfileView = document.getElementById("publicProfileView");
+                    if (!publicProfileView) {
+                        return;
+                    }
+
+                    const profile = result.profile;
+
+                    publicProfileView.innerHTML = `
+                        <div class="inventory-item">
+                            <strong>${profile.display_name || "User " + profile.user_id}</strong><br>
+                            ${profile.bio || "Keine Bio"}<br>
+                            Trading: ${profile.trading_enabled ? "aktiv" : "aus"}<br>
+                            Inventar: ${profile.inventory_visibility}<br>
+                            Lieblingskarte: ${profile.favorite_card_name || "Keine"}
+                        </div>
+                        <div class="inventory-list">
+                            ${
+                                profile.inventory_visibility === "public"
+                                    ? (
+                                        profile.visible_cards.length
+                                            ? profile.visible_cards.map(card => `
+                                                <div class="inventory-item">
+                                                    <strong>${card.card_name}</strong><br>
+                                                    Seltenheit: ${card.rarity}<br>
+                                                    Menge: ${card.quantity}
+                                                </div>
+                                            `).join("")
+                                            : "<div class='inventory-item'>Keine sichtbaren Karten vorhanden.</div>"
+                                      )
+                                    : "<div class='inventory-item'>Dieses Inventar ist privat.</div>"
+                            }
+                        </div>
+                    `;
+                } catch (error) {
+                    console.log(error);
+                    alert("Fehler beim Laden des Profils.");
                 } finally {
                     button.disabled = false;
                 }
