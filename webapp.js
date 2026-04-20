@@ -284,6 +284,15 @@ function getRarityClass(rarity) {
     return "card-face-n";
 }
 
+function getCardArtMarkup(card) {
+    if (card && card.image_url) {
+        return `<img class="card-art" src="${card.image_url}" alt="${card.card_name || "Card"}">`;
+    }
+
+    const rarity = String((card && card.rarity) || "N").toUpperCase();
+    return `<div class="card-art-fallback">${rarity}</div>`;
+}
+
 function renderOpenedCards(items, packName) {
     const openedCardsList = document.getElementById("openedCardsList");
 
@@ -298,6 +307,7 @@ function renderOpenedCards(items, packName) {
 
     openedCardsList.innerHTML = items.map(card => `
         <div class="card-face ${getRarityClass(card.rarity)}">
+            ${getCardArtMarkup(card)}
             <div class="card-slot">Slot ${card.slot_number}</div>
             <div class="card-name">${card.card_name}</div>
             <div class="card-rarity">${card.rarity}</div>
@@ -357,6 +367,7 @@ async function animateOpenedCards(items, packName) {
     for (const card of items || []) {
         const cardHtml = `
             <div class="card-face ${getRarityClass(card.rarity)} reveal-enter ${["SR", "SEC"].includes(String(card.rarity || "").toUpperCase()) ? "reveal-hit" : ""}">
+                ${getCardArtMarkup(card)}
                 <div class="card-slot">Slot ${card.slot_number}</div>
                 <div class="card-name">${card.card_name}</div>
                 <div class="card-rarity">${card.rarity}</div>
@@ -382,6 +393,7 @@ function renderCardCollection(items, targetElement, emptyMessage, options = {}) 
 
     targetElement.innerHTML = items.map(item => `
         <div class="card-face ${getRarityClass(item.rarity)} ${options.clickable ? "clickable" : ""} ${String(options.selectedCardId || "") === String(item.card_id || "") ? "is-selected" : ""}" ${options.clickable ? `data-card-id="${item.card_id}"` : ""}>
+            ${getCardArtMarkup(item)}
             <div class="card-slot">${options.slotLabel || item.rarity || "CARD"}</div>
             <div class="card-name">${item.card_name}</div>
             <div class="card-rarity">${item.rarity}</div>
@@ -436,12 +448,14 @@ function renderTradeOfferCards(targetElement, offers, userId) {
             ${offer.responded_at ? `<br><span class="muted">Bearbeitet: ${formatDate(offer.responded_at)}</span>` : ""}
             <div class="trade-offer-row">
                 <div class="card-face ${getRarityClass(offer.offered_card_rarity)}">
+                    ${getCardArtMarkup({ image_url: offer.offered_card_image_url, card_name: offer.offered_card_name, rarity: offer.offered_card_rarity })}
                     <div class="trade-side-label">${offer.from_user_id === userId ? "Dein Angebot" : "Angeboten an dich"}</div>
                     <div class="card-name">${offer.offered_card_name}</div>
                     <div class="card-rarity">${offer.offered_card_rarity}</div>
                     <div class="card-qty">Menge: ${offer.offered_quantity || 1}</div>
                 </div>
                 <div class="card-face ${getRarityClass(offer.requested_card_rarity)}">
+                    ${getCardArtMarkup({ image_url: offer.requested_card_image_url, card_name: offer.requested_card_name, rarity: offer.requested_card_rarity })}
                     <div class="trade-side-label">${offer.to_user_id === userId ? "Dein Erhalt" : "Dein Wunsch"}</div>
                     <div class="card-name">${offer.requested_card_name}</div>
                     <div class="card-rarity">${offer.requested_card_rarity}</div>
