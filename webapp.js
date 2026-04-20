@@ -56,6 +56,27 @@ function renderHistory(items) {
     `).join("");
 }
 
+function renderOpenHistory(items) {
+    const openHistoryList = document.getElementById("openHistoryList");
+
+    if (!openHistoryList) {
+        return;
+    }
+
+    if (!items || !items.length) {
+        openHistoryList.innerHTML = "<div class='history-item'>Noch keine Booster geoeffnet.</div>";
+        return;
+    }
+
+    openHistoryList.innerHTML = items.map(item => `
+        <div class="history-item">
+            <strong>${item.pack_name}</strong><br>
+            Reward: ${item.reward_value} ${item.reward_type}<br>
+            <span class="muted">Geoeffnet am: ${formatDate(item.opened_at)}</span>
+        </div>
+    `).join("");
+}
+
 async function postJson(path, payload) {
     const res = await fetch(`${API_BASE}${path}`, {
         method: "POST",
@@ -174,6 +195,10 @@ async function initTelegramApp(pageName) {
     if (pageName === "inventory") {
         await loadBoosterShop(tg, user);
     }
+
+    if (pageName === "openbooster") {
+        await loadOpenBoosterPage(tg, user);
+    }
 }
 
 function setupStarShop(tg, user) {
@@ -272,6 +297,100 @@ async function loadBoosterShop(tg, user) {
 
         renderInventory(data.inventory || []);
         renderHistory(data.history || []);
+        renderOpenHistory(data.open_history || []);
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function loadOpenBoosterPage(tg, user) {
+    try {
+        const data = await postJson("/booster-shop", {
+            initData: tg.initData,
+            user_id: user.id
+        });
+
+        if (!data.ok) {
+            return;
+        }
+
+        const coins = document.getElementById("coins");
+        if (coins) {
+            coins.innerText = "Coins: " + (data.coins || 0);
+        }
+
+        renderInventory(data.inventory || []);
+        renderOpenHistory(data.open_history || []);
+
+        const openBoosterList = document.getElementById("openBoosterList");
+        if (!openBoosterList) {
+            return;
+        }
+
+        const ownedBoosters = (data.inventory || []).filter(item => Number(item.amount) > 0);
+
+        if (!ownedBoosters.length) {
+            openBoosterList.innerHTML = "<div class='inventory-item'>Du hast keine Booster zum Oeffnen.</div>";
+            return;
+        }
+
+        openBoosterList.innerHTML = ownedBoosters.map(item => `
+            <div class="inventory-item">
+                <strong>${item.pack_name}</strong><br>
+                Menge: ${item.amount}<br><br>
+                <button class="shop-btn open-booster-btn" data-pack-key="${item.pack_key}">
+                    Booster oeffnen
+                    <small>Jetzt benutzen</small>
+                </button>
+            </div>
+        `).join("");
+
+        document.querySelectorAll(".open-booster-btn").forEach(button => {
+            button.addEventListener("click", async () => {
+                button.disabled = true;
+
+                try {
+                    const result = await postJson("/open-booster", {
+                        initData: tg.initData,
+                        user_id: user.id,
+                        pack_key: button.dataset.packKey
+                    });
+
+                    if (!result.ok) {
+                        if (result.error === "booster not owned") {
+                            alert("Diesen Booster besitzt du nicht mehr.");
+                        } else {
+                            alert("Booster konnte nicht geoeffnet werden.");
+                        }
+                        return;
+                    }
+
+                    const coinsLabel = document.getElementById("coins");
+                    if (coinsLabel) {
+                        coinsLabel.innerText = "Coins: " + (result.coins || 0);
+                    }
+
+                    const rewardBox = document.getElementById("openReward");
+                    if (rewardBox) {
+                        rewardBox.innerHTML = `
+                            <div class="history-item">
+                                <strong>${result.reward.pack_name}</strong><br>
+                                Du hast ${result.reward.value} ${result.reward.type} erhalten.
+                            </div>
+                        `;
+                    }
+
+                    renderInventory(result.inventory || []);
+                    renderOpenHistory(result.open_history || []);
+                    await loadOpenBoosterPage(tg, user);
+                } catch (error) {
+                    console.log(error);
+                    alert("Fehler beim Oeffnen.");
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        });
     } catch (error) {
         console.log(error);
     }

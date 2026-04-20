@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Home</title>
+<title>Open Booster</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="stylesheet" href="../webapp.css">
 </head>
@@ -24,17 +24,33 @@
 </header>
 
 <main>
-<h1>Dashboard</h1>
+<h1>Booster oeffnen</h1>
 <div class="card">
 <p id="telegramID"></p>
 <p id="status">Loading...</p>
 <p id="coins">Coins: 0</p>
 </div>
+
+<div class="card">
+<h2>Bereit zum Oeffnen</h2>
+<div id="openReward"></div>
+<div id="openBoosterList" class="inventory-list"></div>
+</div>
+
+<div class="card">
+<h2>Dein Inventar</h2>
+<div id="inventoryList" class="inventory-list"></div>
+</div>
+
+<div class="card">
+<h2>Letzte Oeffnungen</h2>
+<div id="openHistoryList" class="history-list"></div>
+</div>
 </main>
 
 <script src="../webapp.js"></script>
 <script>
-initTelegramApp("home");
+initTelegramApp("openbooster");
 </script>
 </body>
 </html>
