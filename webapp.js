@@ -134,6 +134,81 @@ function renderDashboardStats(inventoryItems, cardItems, coinAmount) {
     }
 }
 
+async function loadHomeDashboard(tg, user) {
+    try {
+        const [shopData, traderData] = await Promise.all([
+            postJson("/booster-shop", {
+                initData: tg.initData,
+                user_id: user.id
+            }),
+            postJson("/traders", {
+                initData: tg.initData,
+                user_id: user.id
+            })
+        ]);
+
+        const recentActivity = document.getElementById("recentActivity");
+        const tradeSummary = document.getElementById("tradeSummary");
+
+        const purchases = (shopData.history || []).slice(0, 2);
+        const openings = (shopData.open_history || []).slice(0, 2);
+        const allTrades = traderData.trade_offers || [];
+        const pendingIncoming = allTrades.filter(offer => Number(offer.to_user_id) === Number(user.id) && offer.status === "pending").length;
+        const pendingOutgoing = allTrades.filter(offer => Number(offer.from_user_id) === Number(user.id) && offer.status === "pending").length;
+
+        if (recentActivity) {
+            const activityItems = [];
+
+            purchases.forEach(item => {
+                activityItems.push(`
+                    <div class="activity-card">
+                        <strong>Booster gekauft</strong><br>
+                        ${item.pack_name}<br>
+                        <span class="muted">${item.coins_spent} Coins | ${formatDate(item.purchased_at)}</span>
+                    </div>
+                `);
+            });
+
+            openings.forEach(item => {
+                activityItems.push(`
+                    <div class="activity-card">
+                        <strong>Booster geoeffnet</strong><br>
+                        ${item.pack_name}<br>
+                        <span class="muted">${item.reward_value} ${item.reward_type} | ${formatDate(item.opened_at)}</span>
+                    </div>
+                `);
+            });
+
+            recentActivity.innerHTML = activityItems.length
+                ? activityItems.join("")
+                : "<div class='inventory-item'>Noch keine Aktivitaet vorhanden.</div>";
+        }
+
+        if (tradeSummary) {
+            tradeSummary.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-label">Offen eingehend</div>
+                    <div class="stat-value">${pendingIncoming}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Offen gesendet</div>
+                    <div class="stat-value">${pendingOutgoing}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Alle Trades</div>
+                    <div class="stat-value">${allTrades.length}</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Trader sichtbar</div>
+                    <div class="stat-value">${(traderData.traders || []).length}</div>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 function renderHistory(items) {
     const historyList = document.getElementById("historyList");
 
@@ -663,6 +738,10 @@ async function initTelegramApp(pageName) {
 
     if (pageName === "inventory") {
         await loadBoosterShop(tg, user);
+    }
+
+    if (pageName === "home") {
+        await loadHomeDashboard(tg, user);
     }
 
     if (pageName === "openbooster") {
@@ -1361,3 +1440,5 @@ async function loadTradingPage(tg, user) {
         console.log(error);
     }
 }
+
+
