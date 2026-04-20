@@ -36,16 +36,50 @@
 <p class="stat">Name: <span id="accountName">-</span></p>
 <p class="stat">Telegram ID: <span id="accountId">-</span></p>
 </div>
+
+<div class="card">
+<h2>Profil bearbeiten</h2>
+<form id="profileForm">
+<p class="stat">Display Name</p>
+<input id="displayName" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:white;">
+
+<p class="stat">Bio</p>
+<textarea id="bio" rows="4" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:white;"></textarea>
+
+<p class="stat">Inventar Sichtbarkeit</p>
+<select id="inventoryVisibility" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:white;">
+<option value="public">public</option>
+<option value="private">private</option>
+</select>
+
+<p class="stat">Lieblingskarte</p>
+<select id="favoriteCardId" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:white;"></select>
+
+<p class="stat">
+<label>
+<input type="checkbox" id="tradingEnabled">
+ Trading aktivieren
+</label>
+</p>
+
+<button id="saveProfileButton" class="shop-btn" type="submit">Profil speichern<small>Privacy und Profil aktualisieren</small></button>
+</form>
+</div>
+
+<div class="card">
+<h2>Profil Status</h2>
+<div id="profileSummary" class="inventory-list"></div>
+</div>
+
+<div class="card">
+<h2>Deine Karten</h2>
+<div id="cardInventoryList" class="inventory-list"></div>
+</div>
 </main>
 
 <script src="../webapp.js"></script>
 <script>
-initTelegramApp("account").then(() => {
-    if (window.__tgApp && window.__tgApp.user) {
-        document.getElementById("accountName").innerText = window.__tgApp.user.first_name || "User";
-        document.getElementById("accountId").innerText = window.__tgApp.user.id;
-    }
-});
+initTelegramApp("account");
 </script>
 </body>
 </html>

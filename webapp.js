@@ -99,6 +99,25 @@ function renderCardInventory(items) {
     `).join("");
 }
 
+function renderFavoriteOptions(items, selectedId) {
+    const favoriteSelect = document.getElementById("favoriteCardId");
+
+    if (!favoriteSelect) {
+        return;
+    }
+
+    const options = ["<option value=''>Keine Lieblingskarte</option>"];
+
+    (items || []).forEach(item => {
+        const selected = String(selectedId || "") === String(item.card_id || "") ? "selected" : "";
+        options.push(
+            `<option value="${item.card_id}" ${selected}>${item.card_name} (${item.rarity})</option>`
+        );
+    });
+
+    favoriteSelect.innerHTML = options.join("");
+}
+
 async function postJson(path, payload) {
     const res = await fetch(`${API_BASE}${path}`, {
         method: "POST",
@@ -221,6 +240,10 @@ async function initTelegramApp(pageName) {
 
     if (pageName === "openbooster") {
         await loadOpenBoosterPage(tg, user);
+    }
+
+    if (pageName === "account") {
+        await loadProfilePage(tg, user, data);
     }
 }
 
@@ -427,6 +450,109 @@ async function loadOpenBoosterPage(tg, user) {
                 }
             });
         });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function loadProfilePage(tg, user, secureData) {
+    try {
+        const profileData = await postJson("/profile", {
+            initData: tg.initData,
+            user_id: user.id
+        });
+
+        if (!profileData.ok) {
+            return;
+        }
+
+        const profile = profileData.profile || {};
+        const cardInventory = profileData.card_inventory || [];
+
+        const accountName = document.getElementById("accountName");
+        const accountId = document.getElementById("accountId");
+        const displayName = document.getElementById("displayName");
+        const bio = document.getElementById("bio");
+        const visibility = document.getElementById("inventoryVisibility");
+        const tradingEnabled = document.getElementById("tradingEnabled");
+        const profileSummary = document.getElementById("profileSummary");
+
+        if (accountName) {
+            accountName.innerText = profile.display_name || user.first_name || "User";
+        }
+
+        if (accountId) {
+            accountId.innerText = user.id;
+        }
+
+        if (displayName) {
+            displayName.value = profile.display_name || "";
+        }
+
+        if (bio) {
+            bio.value = profile.bio || "";
+        }
+
+        if (visibility) {
+            visibility.value = profile.inventory_visibility || "public";
+        }
+
+        if (tradingEnabled) {
+            tradingEnabled.checked = Boolean(profile.trading_enabled);
+        }
+
+        renderFavoriteOptions(cardInventory, profile.favorite_card_id);
+        renderCardInventory(cardInventory);
+
+        if (profileSummary) {
+            profileSummary.innerHTML = `
+                <div class="inventory-item">
+                    <strong>Aktuelle Einstellungen</strong><br>
+                    Inventar: ${profile.inventory_visibility || "public"}<br>
+                    Trading: ${profile.trading_enabled ? "aktiv" : "aus"}<br>
+                    Lieblingskarte: ${profile.favorite_card_name || "Keine"}
+                </div>
+            `;
+        }
+
+        const profileForm = document.getElementById("profileForm");
+        if (profileForm && !profileForm.dataset.bound) {
+            profileForm.dataset.bound = "1";
+            profileForm.addEventListener("submit", async event => {
+                event.preventDefault();
+
+                const saveButton = document.getElementById("saveProfileButton");
+                if (saveButton) {
+                    saveButton.disabled = true;
+                }
+
+                try {
+                    const result = await postJson("/profile/update", {
+                        initData: tg.initData,
+                        user_id: user.id,
+                        display_name: document.getElementById("displayName").value,
+                        bio: document.getElementById("bio").value,
+                        inventory_visibility: document.getElementById("inventoryVisibility").value,
+                        trading_enabled: document.getElementById("tradingEnabled").checked,
+                        favorite_card_id: document.getElementById("favoriteCardId").value || null
+                    });
+
+                    if (!result.ok) {
+                        alert("Profil konnte nicht gespeichert werden.");
+                        return;
+                    }
+
+                    await loadProfilePage(tg, user, secureData);
+                } catch (error) {
+                    console.log(error);
+                    alert("Fehler beim Speichern des Profils.");
+                } finally {
+                    if (saveButton) {
+                        saveButton.disabled = false;
+                    }
+                }
+            });
+        }
     } catch (error) {
         console.log(error);
     }
