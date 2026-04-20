@@ -667,6 +667,15 @@ async function loadTradingPage(tg, user) {
             tradeForm.addEventListener("submit", async event => {
                 event.preventDefault();
 
+                const targetTraderId = document.getElementById("targetTraderId").value;
+                const offeredCardId = document.getElementById("myTradeCardId").value;
+                const requestedCardId = document.getElementById("wantedTradeCardId").value;
+
+                if (!targetTraderId || !offeredCardId || !requestedCardId) {
+                    alert("Bitte waehle Trader, eigene Karte und Wunschkarte aus.");
+                    return;
+                }
+
                 const createButton = document.getElementById("createTradeButton");
                 if (createButton) {
                     createButton.disabled = true;
@@ -676,13 +685,13 @@ async function loadTradingPage(tg, user) {
                     const result = await postJson("/trade-offer/create", {
                         initData: tg.initData,
                         user_id: user.id,
-                        target_user_id: document.getElementById("targetTraderId").value,
-                        offered_card_id: document.getElementById("myTradeCardId").value,
-                        requested_card_id: document.getElementById("wantedTradeCardId").value
+                        target_user_id: targetTraderId,
+                        offered_card_id: offeredCardId,
+                        requested_card_id: requestedCardId
                     });
 
                     if (!result.ok) {
-                        alert("Trade-Angebot konnte nicht erstellt werden.");
+                        alert(result.error || "Trade-Angebot konnte nicht erstellt werden.");
                         return;
                     }
 
