@@ -15,12 +15,12 @@ body{
 }
 
 header{
-    height:70px;
+    min-height:70px;
     background:#020617;
     display:flex;
     justify-content:flex-end;
     align-items:center;
-    padding:0 20px;
+    padding:12px 20px;
 }
 
 #profile{
@@ -37,7 +37,9 @@ header{
 
 main{
     text-align:center;
-    margin-top:60px;
+    margin:40px auto 0;
+    max-width:720px;
+    padding:0 20px 40px;
 }
 
 .badge{
@@ -46,6 +48,52 @@ main{
     padding:5px 10px;
     border-radius:10px;
 }
+
+.card{
+    background:#111827;
+    border:1px solid #1f2937;
+    border-radius:18px;
+    padding:18px;
+    margin-top:22px;
+    box-shadow:0 12px 30px rgba(0,0,0,.22);
+}
+
+.grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(180px, 1fr));
+    gap:14px;
+    margin-top:16px;
+}
+
+.shop-btn{
+    border:none;
+    border-radius:14px;
+    padding:16px 14px;
+    background:linear-gradient(180deg, #1d4ed8, #1e3a8a);
+    color:white;
+    cursor:pointer;
+    font-size:15px;
+    font-weight:700;
+}
+
+.shop-btn:disabled{
+    opacity:.7;
+    cursor:wait;
+}
+
+.shop-btn small{
+    display:block;
+    margin-top:6px;
+    font-size:12px;
+    font-weight:400;
+    opacity:.9;
+}
+
+.hint{
+    color:#cbd5e1;
+    font-size:14px;
+    line-height:1.5;
+}
 </style>
 </head>
 
@@ -53,7 +101,7 @@ main{
 
 <header>
 <div id="profile">
-<img id="avatar">
+<img id="avatar" alt="avatar">
 <span id="username"></span>
 <span id="premiumBadge" class="badge" style="display:none;">PREMIUM</span>
 </div>
@@ -63,67 +111,118 @@ main{
 <h1>Dashboard</h1>
 <p id="telegramID"></p>
 <p id="status">Loading...</p>
+<p id="coins">Coins: 0</p>
+
+<div class="card">
+<h2>Coins kaufen</h2>
+<p class="hint">Falls Telegram Desktop beim Checkout Probleme macht, versuche den Kauf bitte in der mobilen Telegram-App.</p>
+<div class="grid">
+<button class="shop-btn" data-item="coins_100">100 Coins<small>50 Stars</small></button>
+<button class="shop-btn" data-item="coins_500">500 Coins<small>200 Stars</small></button>
+<button class="shop-btn" data-item="coins_1000">1000 Coins<small>350 Stars</small></button>
+</div>
+</div>
+
+<div class="card">
+<h2>Premium kaufen</h2>
+<div class="grid">
+<button class="shop-btn" data-item="premium_week">7 Tage<small>100 Stars</small></button>
+<button class="shop-btn" data-item="premium_month">30 Tage<small>300 Stars</small></button>
+<button class="shop-btn" data-item="premium_lifetime">Lifetime<small>1000 Stars</small></button>
+</div>
+</div>
 </main>
 
 <script>
-
-// 🧠 prevent double load bug
 if (window.__APP_LOADED) {
     console.log("App already loaded");
 } else {
-window.__APP_LOADED = true;
+    window.__APP_LOADED = true;
 
-let tg = window.Telegram.WebApp;
-tg.expand();
+    const tg = window.Telegram.WebApp;
+    tg.expand();
+    tg.ready();
 
-// ❌ NOT IN TELEGRAM
-if(!tg.initDataUnsafe || !tg.initDataUnsafe.user){
-    document.body.innerHTML = "<h2 style='color:red;text-align:center;margin-top:100px'>Open in Telegram</h2>";
-} else {
-
-let user = tg.initDataUnsafe.user;
-
-// UI
-document.getElementById("username").innerText = user.first_name;
-document.getElementById("avatar").src = user.photo_url || "https://via.placeholder.com/45";
-document.getElementById("telegramID").innerText = "ID: " + user.id;
-
-// STATUS
-document.getElementById("status").innerText = "Checking...";
-
-// 🔐 BACKEND CHECK
-fetch("https://magenta-wolf-69675.zap.cloud/secure-check", {
-    method: "POST",
-    headers: {
-        "Content-Type": "application/json"
-    },
-    body: JSON.stringify({
-        initData: tg.initData,
-        user_id: user.id
-    })
-})
-.then(res => res.json())
-.then(data => {
-
-    if(data.error){
-        document.getElementById("status").innerText = "Auth failed ❌";
-        return;
-    }
-
-    if(data.premium){
-        document.getElementById("status").innerText = "Premium aktiv ✅";
-        document.getElementById("premiumBadge").style.display = "inline-block";
+    if (!tg.initDataUnsafe || !tg.initDataUnsafe.user) {
+        document.body.innerHTML = "<h2 style='color:red;text-align:center;margin-top:100px'>Open in Telegram</h2>";
     } else {
-        document.getElementById("status").innerText = "Kein Premium ❌";
+        const user = tg.initDataUnsafe.user;
+
+        document.getElementById("username").innerText = user.first_name || "User";
+        document.getElementById("avatar").src = user.photo_url || "https://via.placeholder.com/45";
+        document.getElementById("telegramID").innerText = "ID: " + user.id;
+        document.getElementById("status").innerText = "Checking...";
+
+        fetch("https://magenta-wolf-69675.zap.cloud/secure-check", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                initData: tg.initData,
+                user_id: user.id
+            })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.error) {
+                document.getElementById("status").innerText = "Auth failed";
+                return;
+            }
+
+            document.getElementById("coins").innerText = "Coins: " + (data.coins || 0);
+
+            if (data.premium) {
+                document.getElementById("status").innerText = "Premium aktiv";
+                document.getElementById("premiumBadge").style.display = "inline-block";
+            } else {
+                document.getElementById("status").innerText = "Kein Premium";
+            }
+        })
+        .catch(() => {
+            document.getElementById("status").innerText = "Backend offline";
+        });
+
+        document.querySelectorAll(".shop-btn").forEach(button => {
+            button.addEventListener("click", async () => {
+                button.disabled = true;
+
+                try {
+                    const res = await fetch("https://magenta-wolf-69675.zap.cloud/create-invoice", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json"
+                        },
+                        body: JSON.stringify({
+                            initData: tg.initData,
+                            user_id: user.id,
+                            item: button.dataset.item
+                        })
+                    });
+
+                    const data = await res.json();
+
+                    if (!data.ok || !data.invoice_url) {
+                        alert("Kauf konnte nicht gestartet werden.");
+                        return;
+                    }
+
+                    tg.openInvoice(data.invoice_url, function(status) {
+                        console.log("Invoice closed with status:", status);
+
+                        if (status === "paid") {
+                            window.location.reload();
+                        }
+                    });
+                } catch (error) {
+                    console.log(error);
+                    alert("Fehler beim Starten des Kaufs.");
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        });
     }
-
-})
-.catch(() => {
-    document.getElementById("status").innerText = "Backend offline ❌";
-});
-
-}
-
 }
 </script>
 
