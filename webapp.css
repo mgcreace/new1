@@ -3,6 +3,7 @@ body{
     font-family:Arial;
     background:#0f172a;
     color:white;
+    font-size:16px;
 }
 
 header{
@@ -62,11 +63,23 @@ main{
     padding:0 20px 40px;
 }
 
+h1{
+    font-size:42px;
+    line-height:1.1;
+    margin:0 0 18px;
+}
+
+h2{
+    font-size:30px;
+    line-height:1.15;
+    margin:0 0 10px;
+}
+
 .card{
     background:#111827;
     border:1px solid #1f2937;
     border-radius:18px;
-    padding:18px;
+    padding:22px;
     margin-top:22px;
     box-shadow:0 12px 30px rgba(0,0,0,.22);
 }
@@ -81,12 +94,13 @@ main{
 .shop-btn{
     border:none;
     border-radius:14px;
-    padding:16px 14px;
+    padding:20px 16px;
     background:linear-gradient(180deg, #1d4ed8, #1e3a8a);
     color:white;
     cursor:pointer;
-    font-size:15px;
+    font-size:18px;
     font-weight:700;
+    min-height:74px;
 }
 
 .shop-btn:disabled{
@@ -97,15 +111,15 @@ main{
 .shop-btn small{
     display:block;
     margin-top:6px;
-    font-size:12px;
+    font-size:14px;
     font-weight:400;
     opacity:.9;
 }
 
 .hint{
     color:#cbd5e1;
-    font-size:14px;
-    line-height:1.5;
+    font-size:17px;
+    line-height:1.6;
 }
 
 .inventory-list,
@@ -121,26 +135,131 @@ main{
     background:#0b1220;
     border:1px solid #1e293b;
     border-radius:14px;
-    padding:14px;
+    padding:16px;
+    font-size:17px;
 }
 
 .muted{
     color:#94a3b8;
-    font-size:13px;
+    font-size:14px;
 }
 
 .stat{
-    font-size:18px;
-    margin:8px 0;
+    font-size:20px;
+    margin:10px 0;
 }
 
 @media (max-width: 700px){
     header{
         flex-direction:column;
         align-items:flex-start;
+        padding:16px;
     }
 
     .topnav{
         width:100%;
+        display:grid;
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+        gap:10px;
+    }
+
+    .topnav a{
+        text-align:center;
+        padding:12px 10px;
+        font-size:16px;
+        border-radius:12px;
+    }
+
+    main{
+        margin-top:24px;
+        padding:0 14px 28px;
+    }
+
+    #profile{
+        width:100%;
+        gap:12px;
+    }
+
+    #avatar{
+        width:52px;
+        height:52px;
+    }
+
+    .badge{
+        padding:7px 12px;
+        font-size:15px;
+    }
+
+    h1{
+        font-size:36px;
+    }
+
+    h2{
+        font-size:26px;
+    }
+
+    .card{
+        padding:18px 16px;
+        border-radius:16px;
+        margin-top:18px;
+    }
+
+    .grid{
+        grid-template-columns:1fr;
+        gap:12px;
+    }
+
+    .shop-btn{
+        width:100%;
+        font-size:20px;
+        min-height:82px;
+        border-radius:16px;
+    }
+
+    .hint{
+        font-size:16px;
+    }
+
+    .inventory-item,
+    .history-item{
+        padding:15px;
+        font-size:16px;
+    }
+}
+
+@media (max-width: 420px){
+    body{
+        font-size:15px;
+    }
+
+    header{
+        padding:14px 12px;
+    }
+
+    .topnav{
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+    }
+
+    .topnav a{
+        font-size:15px;
+        padding:11px 8px;
+    }
+
+    main{
+        padding:0 12px 24px;
+    }
+
+    h1{
+        font-size:32px;
+    }
+
+    h2{
+        font-size:24px;
+    }
+
+    .shop-btn{
+        font-size:19px;
+        min-height:78px;
     }
 }
