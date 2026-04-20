@@ -94,6 +94,27 @@ main{
     font-size:14px;
     line-height:1.5;
 }
+
+.inventory-list,
+.history-list{
+    text-align:left;
+    margin-top:16px;
+    display:grid;
+    gap:10px;
+}
+
+.inventory-item,
+.history-item{
+    background:#0b1220;
+    border:1px solid #1e293b;
+    border-radius:14px;
+    padding:14px;
+}
+
+.muted{
+    color:#94a3b8;
+    font-size:13px;
+}
 </style>
 </head>
 
@@ -131,6 +152,22 @@ main{
 <button class="shop-btn" data-item="premium_lifetime">Lifetime<small>1000 Stars</small></button>
 </div>
 </div>
+
+<div class="card">
+<h2>Booster Shop</h2>
+<p class="hint">Diese Packs kaufst du mit deinen Coins. Jeder Kauf wird gespeichert und landet direkt in deinem Inventar.</p>
+<div class="grid" id="boosterShop"></div>
+</div>
+
+<div class="card">
+<h2>Dein Inventar</h2>
+<div id="inventoryList" class="inventory-list"></div>
+</div>
+
+<div class="card">
+<h2>Letzte Booster-Kaeufe</h2>
+<div id="historyList" class="history-list"></div>
+</div>
 </main>
 
 <script>
@@ -152,6 +189,116 @@ if (window.__APP_LOADED) {
         document.getElementById("avatar").src = user.photo_url || "https://via.placeholder.com/45";
         document.getElementById("telegramID").innerText = "ID: " + user.id;
         document.getElementById("status").innerText = "Checking...";
+
+        function renderInventory(items) {
+            const inventoryList = document.getElementById("inventoryList");
+
+            if (!items || !items.length) {
+                inventoryList.innerHTML = "<div class='inventory-item'>Noch keine Booster im Inventar.</div>";
+                return;
+            }
+
+            inventoryList.innerHTML = items.map(item => `
+                <div class="inventory-item">
+                    <strong>${item.pack_name}</strong><br>
+                    Menge: ${item.amount}<br>
+                    <span class="muted">Zuletzt gekauft: ${item.last_purchased_at || "-"}</span>
+                </div>
+            `).join("");
+        }
+
+        function renderHistory(items) {
+            const historyList = document.getElementById("historyList");
+
+            if (!items || !items.length) {
+                historyList.innerHTML = "<div class='history-item'>Noch keine Booster-Kaeufe vorhanden.</div>";
+                return;
+            }
+
+            historyList.innerHTML = items.map(item => `
+                <div class="history-item">
+                    <strong>${item.pack_name}</strong><br>
+                    Kosten: ${item.coins_spent} Coins<br>
+                    <span class="muted">Gekauft am: ${item.purchased_at || "-"}</span>
+                </div>
+            `).join("");
+        }
+
+        async function loadBoosterShop() {
+            try {
+                const res = await fetch("https://magenta-wolf-69675.zap.cloud/booster-shop", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        initData: tg.initData,
+                        user_id: user.id
+                    })
+                });
+
+                const data = await res.json();
+
+                if (!data.ok) {
+                    return;
+                }
+
+                document.getElementById("coins").innerText = "Coins: " + (data.coins || 0);
+
+                const boosterShop = document.getElementById("boosterShop");
+                boosterShop.innerHTML = data.packs.map(pack => `
+                    <button class="shop-btn booster-buy-btn" data-pack-key="${pack.pack_key}">
+                        ${pack.name}
+                        <small>${pack.price} Coins</small>
+                    </button>
+                `).join("");
+
+                renderInventory(data.inventory || []);
+                renderHistory(data.history || []);
+
+                document.querySelectorAll(".booster-buy-btn").forEach(button => {
+                    button.addEventListener("click", async () => {
+                        button.disabled = true;
+
+                        try {
+                            const buyRes = await fetch("https://magenta-wolf-69675.zap.cloud/buy-booster", {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json"
+                                },
+                                body: JSON.stringify({
+                                    initData: tg.initData,
+                                    user_id: user.id,
+                                    pack_key: button.dataset.packKey
+                                })
+                            });
+
+                            const buyData = await buyRes.json();
+
+                            if (!buyData.ok) {
+                                if (buyData.error === "not enough coins") {
+                                    alert("Nicht genug Coins fuer diesen Booster.");
+                                } else {
+                                    alert("Booster-Kauf fehlgeschlagen.");
+                                }
+                                return;
+                            }
+
+                            document.getElementById("coins").innerText = "Coins: " + (buyData.coins || 0);
+                            renderInventory(buyData.inventory || []);
+                            renderHistory(buyData.history || []);
+                        } catch (error) {
+                            console.log(error);
+                            alert("Fehler beim Booster-Kauf.");
+                        } finally {
+                            button.disabled = false;
+                        }
+                    });
+                });
+            } catch (error) {
+                console.log(error);
+            }
+        }
 
         fetch("https://magenta-wolf-69675.zap.cloud/secure-check", {
             method: "POST",
@@ -187,10 +334,14 @@ if (window.__APP_LOADED) {
                 document.getElementById("status").innerText = "Kein Premium";
                 document.getElementById("premiumBadge").style.display = "none";
             }
+
+            renderInventory(data.inventory || []);
         })
         .catch(() => {
             document.getElementById("status").innerText = "Backend offline";
         });
+
+        loadBoosterShop();
 
         document.querySelectorAll(".shop-btn").forEach(button => {
             button.addEventListener("click", async () => {
