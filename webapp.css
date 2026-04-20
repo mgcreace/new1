@@ -144,6 +144,11 @@ h2{
     font-size:14px;
 }
 
+.stack{
+    display:grid;
+    gap:12px;
+}
+
 .stat{
     font-size:20px;
     margin:10px 0;

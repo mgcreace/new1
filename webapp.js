@@ -245,6 +245,10 @@ async function initTelegramApp(pageName) {
     if (pageName === "account") {
         await loadProfilePage(tg, user, data);
     }
+
+    if (pageName === "trading") {
+        await loadTradingPage(tg, user);
+    }
 }
 
 function setupStarShop(tg, user) {
@@ -549,6 +553,136 @@ async function loadProfilePage(tg, user, secureData) {
                 } finally {
                     if (saveButton) {
                         saveButton.disabled = false;
+                    }
+                }
+            });
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function loadTradingPage(tg, user) {
+    try {
+        const traderData = await postJson("/traders", {
+            initData: tg.initData,
+            user_id: user.id
+        });
+
+        if (!traderData.ok) {
+            return;
+        }
+
+        const traderList = document.getElementById("traderList");
+        const tradeOffersList = document.getElementById("tradeOffersList");
+        const targetTraderSelect = document.getElementById("targetTraderId");
+        const myTradeCardSelect = document.getElementById("myTradeCardId");
+        const wantedTradeCardSelect = document.getElementById("wantedTradeCardId");
+
+        if (traderList) {
+            if (!traderData.traders.length) {
+                traderList.innerHTML = "<div class='inventory-item'>Noch keine oeffentlichen Trader gefunden.</div>";
+            } else {
+                traderList.innerHTML = traderData.traders.map(trader => `
+                    <div class="inventory-item">
+                        <strong>${trader.display_name}</strong><br>
+                        ${trader.bio || "Keine Bio"}<br>
+                        <span class="muted">Lieblingskarte: ${trader.favorite_card_name || "Keine"}</span>
+                    </div>
+                `).join("");
+            }
+        }
+
+        if (tradeOffersList) {
+            if (!traderData.trade_offers.length) {
+                tradeOffersList.innerHTML = "<div class='history-item'>Noch keine Trade-Angebote.</div>";
+            } else {
+                tradeOffersList.innerHTML = traderData.trade_offers.map(offer => `
+                    <div class="history-item">
+                        <strong>Trade #${offer.id}</strong><br>
+                        Angebot: ${offer.offered_card_name} (${offer.offered_card_rarity})<br>
+                        Wunsch: ${offer.requested_card_name} (${offer.requested_card_rarity})<br>
+                        Status: ${offer.status}<br>
+                        <span class="muted">Erstellt: ${formatDate(offer.created_at)}</span>
+                    </div>
+                `).join("");
+            }
+        }
+
+        if (targetTraderSelect) {
+            targetTraderSelect.innerHTML = "<option value=''>Trader waehlen</option>" + traderData.traders.map(trader => (
+                `<option value="${trader.user_id}">${trader.display_name}</option>`
+            )).join("");
+        }
+
+        const myCards = await postJson("/profile", {
+            initData: tg.initData,
+            user_id: user.id
+        });
+
+        if (myTradeCardSelect) {
+            myTradeCardSelect.innerHTML = "<option value=''>Deine Karte waehlen</option>" + (myCards.card_inventory || []).map(card => (
+                `<option value="${card.card_id}">${card.card_name} (${card.rarity}) x${card.quantity}</option>`
+            )).join("");
+        }
+
+        if (targetTraderSelect && !targetTraderSelect.dataset.bound) {
+            targetTraderSelect.dataset.bound = "1";
+            targetTraderSelect.addEventListener("change", async () => {
+                wantedTradeCardSelect.innerHTML = "<option value=''>Karte waehlen</option>";
+
+                if (!targetTraderSelect.value) {
+                    return;
+                }
+
+                const targetCards = await postJson("/trader-cards", {
+                    initData: tg.initData,
+                    user_id: user.id,
+                    target_user_id: targetTraderSelect.value
+                });
+
+                if (!targetCards.ok) {
+                    return;
+                }
+
+                wantedTradeCardSelect.innerHTML = "<option value=''>Karte waehlen</option>" + (targetCards.cards || []).map(card => (
+                    `<option value="${card.card_id}">${card.card_name} (${card.rarity}) x${card.quantity}</option>`
+                )).join("");
+            });
+        }
+
+        const tradeForm = document.getElementById("tradeForm");
+        if (tradeForm && !tradeForm.dataset.bound) {
+            tradeForm.dataset.bound = "1";
+            tradeForm.addEventListener("submit", async event => {
+                event.preventDefault();
+
+                const createButton = document.getElementById("createTradeButton");
+                if (createButton) {
+                    createButton.disabled = true;
+                }
+
+                try {
+                    const result = await postJson("/trade-offer/create", {
+                        initData: tg.initData,
+                        user_id: user.id,
+                        target_user_id: document.getElementById("targetTraderId").value,
+                        offered_card_id: document.getElementById("myTradeCardId").value,
+                        requested_card_id: document.getElementById("wantedTradeCardId").value
+                    });
+
+                    if (!result.ok) {
+                        alert("Trade-Angebot konnte nicht erstellt werden.");
+                        return;
+                    }
+
+                    await loadTradingPage(tg, user);
+                } catch (error) {
+                    console.log(error);
+                    alert("Fehler beim Erstellen des Trade-Angebots.");
+                } finally {
+                    if (createButton) {
+                        createButton.disabled = false;
                     }
                 }
             });
