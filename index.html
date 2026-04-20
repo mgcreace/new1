@@ -172,6 +172,11 @@ if (window.__APP_LOADED) {
 
             document.getElementById("coins").innerText = "Coins: " + (data.coins || 0);
 
+            const premiumCard = document.querySelectorAll(".card")[1];
+            if (premiumCard) {
+                premiumCard.style.display = data.premium_enabled ? "block" : "none";
+            }
+
             if (data.premium) {
                 document.getElementById("status").innerText = "Premium aktiv";
                 document.getElementById("premiumBadge").style.display = "inline-block";
