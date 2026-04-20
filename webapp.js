@@ -613,6 +613,10 @@ async function loadTradingPage(tg, user) {
                                 <button class="shop-btn trade-response-btn" data-trade-id="${offer.id}" data-action="accept">Annehmen<small>Karten tauschen</small></button>
                                 <button class="shop-btn trade-response-btn" data-trade-id="${offer.id}" data-action="reject">Ablehnen<small>Angebot schliessen</small></button>
                             </div>
+                        ` : offer.to_user_id === 999000111 && offer.from_user_id === user.id && offer.status === "pending" ? `
+                            <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+                                <button class="shop-btn trade-debug-accept-btn" data-trade-id="${offer.id}">Debug Accept<small>Test Trader simulieren</small></button>
+                            </div>
                         ` : ""}
                     </div>
                 `).join("");
@@ -797,6 +801,38 @@ async function loadTradingPage(tg, user) {
                 } catch (error) {
                     console.log(error);
                     alert("Fehler beim Laden des Profils.");
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        });
+
+        document.querySelectorAll(".trade-debug-accept-btn").forEach(button => {
+            if (button.dataset.bound) {
+                return;
+            }
+
+            button.dataset.bound = "1";
+            button.addEventListener("click", async () => {
+                button.disabled = true;
+
+                try {
+                    const result = await postJson("/trade-offer/debug-accept", {
+                        initData: tg.initData,
+                        user_id: user.id,
+                        trade_id: button.dataset.tradeId
+                    });
+
+                    if (!result.ok) {
+                        alert(result.error || "Debug Accept fehlgeschlagen.");
+                        return;
+                    }
+
+                    renderCardInventory(result.card_inventory || []);
+                    await loadTradingPage(tg, user);
+                } catch (error) {
+                    console.log(error);
+                    alert("Fehler bei Debug Accept.");
                 } finally {
                     button.disabled = false;
                 }
