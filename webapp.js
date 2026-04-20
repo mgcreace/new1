@@ -232,6 +232,71 @@ function findCardById(items, cardId) {
     return (items || []).find(card => String(card.card_id) === String(cardId));
 }
 
+function getTradeStatusClass(status) {
+    const normalized = String(status || "pending").toLowerCase();
+    if (normalized === "accepted") {
+        return "trade-status trade-status-accepted";
+    }
+    if (normalized === "rejected") {
+        return "trade-status trade-status-rejected";
+    }
+    return "trade-status trade-status-pending";
+}
+
+function renderTradeFeedback(message, mode = "info") {
+    const feedbackBox = document.getElementById("tradeFeedback");
+    if (!feedbackBox) {
+        return;
+    }
+
+    feedbackBox.className = mode === "success"
+        ? "inventory-item trade-feedback-success"
+        : "inventory-item trade-feedback-info";
+    feedbackBox.innerHTML = message;
+}
+
+function renderTradeOfferCards(targetElement, offers, userId) {
+    if (!targetElement) {
+        return;
+    }
+
+    if (!offers.length) {
+        targetElement.innerHTML = "<div class='history-item'>Noch keine Trades in diesem Bereich.</div>";
+        return;
+    }
+
+    targetElement.innerHTML = offers.map(offer => `
+        <div class="trade-offer-card">
+            <strong>Trade #${offer.id}</strong><br>
+            <div class="${getTradeStatusClass(offer.status)}">${offer.status}</div><br>
+            <span class="muted">Erstellt: ${formatDate(offer.created_at)}</span>
+            ${offer.responded_at ? `<br><span class="muted">Bearbeitet: ${formatDate(offer.responded_at)}</span>` : ""}
+            <div class="trade-offer-row">
+                <div class="card-face ${getRarityClass(offer.offered_card_rarity)}">
+                    <div class="trade-side-label">${offer.from_user_id === userId ? "Dein Angebot" : "Angeboten an dich"}</div>
+                    <div class="card-name">${offer.offered_card_name}</div>
+                    <div class="card-rarity">${offer.offered_card_rarity}</div>
+                </div>
+                <div class="card-face ${getRarityClass(offer.requested_card_rarity)}">
+                    <div class="trade-side-label">${offer.to_user_id === userId ? "Dein Erhalt" : "Dein Wunsch"}</div>
+                    <div class="card-name">${offer.requested_card_name}</div>
+                    <div class="card-rarity">${offer.requested_card_rarity}</div>
+                </div>
+            </div>
+            ${offer.to_user_id === userId && offer.status === "pending" ? `
+                <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+                    <button class="shop-btn trade-response-btn" data-trade-id="${offer.id}" data-action="accept">Annehmen<small>Karten tauschen</small></button>
+                    <button class="shop-btn trade-response-btn" data-trade-id="${offer.id}" data-action="reject">Ablehnen<small>Angebot schliessen</small></button>
+                </div>
+            ` : offer.to_user_id === 999000111 && offer.from_user_id === userId && offer.status === "pending" ? `
+                <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
+                    <button class="shop-btn trade-debug-accept-btn" data-trade-id="${offer.id}">Debug Accept<small>Test Trader simulieren</small></button>
+                </div>
+            ` : ""}
+        </div>
+    `).join("");
+}
+
 function rarityWeight(rarity) {
     const normalized = String(rarity || "N").toUpperCase();
     if (normalized === "SEC") {
@@ -854,7 +919,8 @@ async function loadTradingPage(tg, user) {
         }
 
         const traderList = document.getElementById("traderList");
-        const tradeOffersList = document.getElementById("tradeOffersList");
+        const incomingTradeOffersList = document.getElementById("incomingTradeOffersList");
+        const outgoingTradeOffersList = document.getElementById("outgoingTradeOffersList");
         const targetTraderSelect = document.getElementById("targetTraderId");
         const myTradeCardSelect = document.getElementById("myTradeCardId");
         const wantedTradeCardSelect = document.getElementById("wantedTradeCardId");
@@ -880,40 +946,16 @@ async function loadTradingPage(tg, user) {
             }
         }
 
-        if (tradeOffersList) {
-            if (!traderData.trade_offers.length) {
-                tradeOffersList.innerHTML = "<div class='history-item'>Noch keine Trade-Angebote.</div>";
-            } else {
-                tradeOffersList.innerHTML = traderData.trade_offers.map(offer => `
-                    <div class="trade-offer-card">
-                        <strong>Trade #${offer.id}</strong><br>
-                        Status: ${offer.status}<br>
-                        <span class="muted">Erstellt: ${formatDate(offer.created_at)}</span>
-                        <div class="trade-offer-row">
-                            <div class="card-face ${getRarityClass(offer.offered_card_rarity)}">
-                                <div class="trade-side-label">Angebot</div>
-                                <div class="card-name">${offer.offered_card_name}</div>
-                                <div class="card-rarity">${offer.offered_card_rarity}</div>
-                            </div>
-                            <div class="card-face ${getRarityClass(offer.requested_card_rarity)}">
-                                <div class="trade-side-label">Wunsch</div>
-                                <div class="card-name">${offer.requested_card_name}</div>
-                                <div class="card-rarity">${offer.requested_card_rarity}</div>
-                            </div>
-                        </div>
-                        ${offer.to_user_id === user.id && offer.status === "pending" ? `
-                            <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
-                                <button class="shop-btn trade-response-btn" data-trade-id="${offer.id}" data-action="accept">Annehmen<small>Karten tauschen</small></button>
-                                <button class="shop-btn trade-response-btn" data-trade-id="${offer.id}" data-action="reject">Ablehnen<small>Angebot schliessen</small></button>
-                            </div>
-                        ` : offer.to_user_id === 999000111 && offer.from_user_id === user.id && offer.status === "pending" ? `
-                            <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
-                                <button class="shop-btn trade-debug-accept-btn" data-trade-id="${offer.id}">Debug Accept<small>Test Trader simulieren</small></button>
-                            </div>
-                        ` : ""}
-                    </div>
-                `).join("");
-            }
+        const allTradeOffers = traderData.trade_offers || [];
+        const incomingOffers = allTradeOffers.filter(offer => Number(offer.to_user_id) === Number(user.id));
+        const outgoingOffers = allTradeOffers.filter(offer => Number(offer.from_user_id) === Number(user.id));
+
+        renderTradeOfferCards(incomingTradeOffersList, incomingOffers, user.id);
+        renderTradeOfferCards(outgoingTradeOffersList, outgoingOffers, user.id);
+
+        if (document.getElementById("tradeFeedback") && !document.getElementById("tradeFeedback").dataset.initialized) {
+            document.getElementById("tradeFeedback").dataset.initialized = "1";
+            renderTradeFeedback("Hier siehst du gleich, ob ein Trade erstellt, angenommen oder abgelehnt wurde.", "info");
         }
 
         if (targetTraderSelect) {
@@ -1031,6 +1073,7 @@ async function loadTradingPage(tg, user) {
                         return;
                     }
 
+                    renderTradeFeedback("Trade-Angebot erfolgreich erstellt. Es ist jetzt im Bereich <strong>Gesendete Trades</strong> sichtbar.", "success");
                     await loadTradingPage(tg, user);
                 } catch (error) {
                     console.log(error);
@@ -1065,6 +1108,12 @@ async function loadTradingPage(tg, user) {
                         return;
                     }
 
+                    renderTradeFeedback(
+                        button.dataset.action === "accept"
+                            ? "Trade erfolgreich angenommen. Die Karten wurden getauscht."
+                            : "Trade wurde abgelehnt und geschlossen.",
+                        "success"
+                    );
                     renderCardInventory(result.card_inventory || []);
                     await loadTradingPage(tg, user);
                 } catch (error) {
@@ -1162,6 +1211,7 @@ async function loadTradingPage(tg, user) {
                         return;
                     }
 
+                    renderTradeFeedback("Debug Accept erfolgreich. Der Test-Trade wurde simuliert und die Karten wurden getauscht.", "success");
                     renderCardInventory(result.card_inventory || []);
                     await loadTradingPage(tg, user);
                 } catch (error) {

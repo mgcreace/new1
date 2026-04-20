@@ -427,6 +427,48 @@ h2{
     padding:18px;
 }
 
+.trade-feedback-success{
+    background:linear-gradient(135deg, rgba(22,163,74,.2), rgba(13,148,136,.18));
+    border:1px solid rgba(74,222,128,.25);
+}
+
+.trade-feedback-info{
+    background:linear-gradient(135deg, rgba(29,78,216,.18), rgba(30,64,175,.16));
+    border:1px solid rgba(147,197,253,.2);
+}
+
+.trade-status{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:32px;
+    padding:0 12px;
+    border-radius:999px;
+    font-size:13px;
+    font-weight:800;
+    letter-spacing:.05em;
+    text-transform:uppercase;
+    margin:8px 0 4px;
+}
+
+.trade-status-pending{
+    background:rgba(245,158,11,.18);
+    color:#fde68a;
+    border:1px solid rgba(245,158,11,.25);
+}
+
+.trade-status-accepted{
+    background:rgba(34,197,94,.16);
+    color:#86efac;
+    border:1px solid rgba(34,197,94,.24);
+}
+
+.trade-status-rejected{
+    background:rgba(239,68,68,.16);
+    color:#fca5a5;
+    border:1px solid rgba(239,68,68,.24);
+}
+
 .trade-offer-row{
     display:grid;
     grid-template-columns:repeat(2, minmax(0, 1fr));
