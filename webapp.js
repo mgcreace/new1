@@ -276,11 +276,13 @@ function renderTradeOfferCards(targetElement, offers, userId) {
                     <div class="trade-side-label">${offer.from_user_id === userId ? "Dein Angebot" : "Angeboten an dich"}</div>
                     <div class="card-name">${offer.offered_card_name}</div>
                     <div class="card-rarity">${offer.offered_card_rarity}</div>
+                    <div class="card-qty">Menge: ${offer.offered_quantity || 1}</div>
                 </div>
                 <div class="card-face ${getRarityClass(offer.requested_card_rarity)}">
                     <div class="trade-side-label">${offer.to_user_id === userId ? "Dein Erhalt" : "Dein Wunsch"}</div>
                     <div class="card-name">${offer.requested_card_name}</div>
                     <div class="card-rarity">${offer.requested_card_rarity}</div>
+                    <div class="card-qty">Menge: ${offer.requested_quantity || 1}</div>
                 </div>
             </div>
             ${offer.to_user_id === userId && offer.status === "pending" ? `
@@ -923,10 +925,25 @@ async function loadTradingPage(tg, user) {
         const outgoingTradeOffersList = document.getElementById("outgoingTradeOffersList");
         const targetTraderSelect = document.getElementById("targetTraderId");
         const myTradeCardSelect = document.getElementById("myTradeCardId");
+        const myTradeQuantity = document.getElementById("myTradeQuantity");
         const wantedTradeCardSelect = document.getElementById("wantedTradeCardId");
+        const wantedTradeQuantity = document.getElementById("wantedTradeQuantity");
         const myTradePreview = document.getElementById("myTradePreview");
         const wantedTradePreview = document.getElementById("wantedTradePreview");
         let selectedTargetCards = [];
+
+        function fillQuantitySelect(selectElement, maxAmount, labelPrefix) {
+            if (!selectElement) {
+                return;
+            }
+
+            const safeMax = Math.max(1, Number(maxAmount || 1));
+            const options = [];
+            for (let i = 1; i <= safeMax; i += 1) {
+                options.push(`<option value="${i}">${labelPrefix}: ${i}</option>`);
+            }
+            selectElement.innerHTML = options.join("");
+        }
 
         if (traderList) {
             if (!traderData.traders.length) {
@@ -976,6 +993,9 @@ async function loadTradingPage(tg, user) {
             )).join("");
         }
 
+        fillQuantitySelect(myTradeQuantity, 1, "Deine Menge");
+        fillQuantitySelect(wantedTradeQuantity, 1, "Wunsch-Menge");
+
         if (myTradePreview) {
             myTradePreview.innerHTML = "<div class='inventory-item'>Deine ausgewaehlte Karte erscheint hier.</div>";
         }
@@ -988,6 +1008,7 @@ async function loadTradingPage(tg, user) {
             myTradeCardSelect.dataset.bound = "1";
             myTradeCardSelect.addEventListener("change", () => {
                 const selectedCard = findCardById(myCardInventory, myTradeCardSelect.value);
+                fillQuantitySelect(myTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Deine Menge");
                 renderCardCollection(
                     selectedCard ? [selectedCard] : [],
                     myTradePreview,
@@ -1001,6 +1022,7 @@ async function loadTradingPage(tg, user) {
             targetTraderSelect.dataset.bound = "1";
             targetTraderSelect.addEventListener("change", async () => {
                 wantedTradeCardSelect.innerHTML = "<option value=''>Karte waehlen</option>";
+                fillQuantitySelect(wantedTradeQuantity, 1, "Wunsch-Menge");
                 selectedTargetCards = [];
                 renderCardCollection([], wantedTradePreview, "Die Wunschkarte des Traders erscheint hier.", { slotLabel: "WUNSCH" });
 
@@ -1030,6 +1052,7 @@ async function loadTradingPage(tg, user) {
             wantedTradeCardSelect.dataset.bound = "1";
             wantedTradeCardSelect.addEventListener("change", () => {
                 const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect.value);
+                fillQuantitySelect(wantedTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Wunsch-Menge");
                 renderCardCollection(
                     selectedCard ? [selectedCard] : [],
                     wantedTradePreview,
@@ -1047,10 +1070,12 @@ async function loadTradingPage(tg, user) {
 
                 const targetTraderId = document.getElementById("targetTraderId").value;
                 const offeredCardId = document.getElementById("myTradeCardId").value;
+                const offeredQuantity = document.getElementById("myTradeQuantity").value;
                 const requestedCardId = document.getElementById("wantedTradeCardId").value;
+                const requestedQuantity = document.getElementById("wantedTradeQuantity").value;
 
-                if (!targetTraderId || !offeredCardId || !requestedCardId) {
-                    alert("Bitte waehle Trader, eigene Karte und Wunschkarte aus.");
+                if (!targetTraderId || !offeredCardId || !requestedCardId || !offeredQuantity || !requestedQuantity) {
+                    alert("Bitte waehle Trader, Karten und Mengen aus.");
                     return;
                 }
 
@@ -1065,7 +1090,9 @@ async function loadTradingPage(tg, user) {
                         user_id: user.id,
                         target_user_id: targetTraderId,
                         offered_card_id: offeredCardId,
-                        requested_card_id: requestedCardId
+                        offered_quantity: offeredQuantity,
+                        requested_card_id: requestedCardId,
+                        requested_quantity: requestedQuantity
                     });
 
                     if (!result.ok) {
