@@ -69,6 +69,71 @@ function renderInventory(items) {
     `).join("");
 }
 
+function renderDashboardStats(inventoryItems, cardItems, coinAmount) {
+    const dashboardStats = document.getElementById("dashboardStats");
+    const rarityStats = document.getElementById("rarityStats");
+
+    if (!dashboardStats && !rarityStats) {
+        return;
+    }
+
+    const inventory = inventoryItems || [];
+    const cards = cardItems || [];
+    const totalBoosters = inventory.reduce((sum, item) => sum + Number(item.amount || 0), 0);
+    const totalCards = cards.reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+    const uniqueCards = cards.length;
+    const rarityCounts = { N: 0, R: 0, SR: 0, SEC: 0 };
+
+    cards.forEach(card => {
+        const rarity = String(card.rarity || "N").toUpperCase();
+        if (rarityCounts[rarity] !== undefined) {
+            rarityCounts[rarity] += Number(card.quantity || 0);
+        }
+    });
+
+    if (dashboardStats) {
+        dashboardStats.innerHTML = `
+            <div class="stat-card">
+                <div class="stat-label">Coins</div>
+                <div class="stat-value">${Number(coinAmount || 0)}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Booster</div>
+                <div class="stat-value">${totalBoosters}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Alle Karten</div>
+                <div class="stat-value">${totalCards}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Unique Cards</div>
+                <div class="stat-value">${uniqueCards}</div>
+            </div>
+        `;
+    }
+
+    if (rarityStats) {
+        rarityStats.innerHTML = `
+            <div class="stat-card">
+                <div class="stat-label">Normal</div>
+                <div class="stat-value">${rarityCounts.N}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">Rare</div>
+                <div class="stat-value">${rarityCounts.R}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">SR</div>
+                <div class="stat-value">${rarityCounts.SR}</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-label">SEC</div>
+                <div class="stat-value">${rarityCounts.SEC}</div>
+            </div>
+        `;
+    }
+}
+
 function renderHistory(items) {
     const historyList = document.getElementById("historyList");
 
@@ -589,6 +654,7 @@ async function initTelegramApp(pageName) {
 
     renderInventory(data.inventory || []);
     renderCardInventory(data.card_inventory || []);
+    renderDashboardStats(data.inventory || [], data.card_inventory || [], data.coins || 0);
 
     if (pageName === "shop") {
         setupStarShop(tg, user);
