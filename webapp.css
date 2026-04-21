@@ -1008,6 +1008,56 @@ h2{
     font-size:21px;
 }
 
+.mail-panel-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.mail-panel-head h2{
+    margin:0;
+}
+
+.mail-panel-head span{
+    min-width:34px;
+    height:34px;
+    border-radius:999px;
+    display:grid;
+    place-items:center;
+    background:#fb3f68;
+    color:white;
+    font-size:14px;
+    font-weight:950;
+    box-shadow:0 0 0 2px rgba(2,6,23,.90);
+}
+
+.mail-filter-row{
+    display:flex;
+    gap:8px;
+    margin:12px 0 4px;
+    overflow-x:auto;
+    padding-bottom:4px;
+}
+
+.mail-filter{
+    flex:0 0 auto;
+    min-height:36px;
+    padding:0 13px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:999px;
+    background:rgba(2,6,23,.42);
+    color:#cbd5e1;
+    font-size:12px;
+    font-weight:900;
+}
+
+.mail-filter.active{
+    background:linear-gradient(135deg, #67e8f9, #fff 46%, #fb7185);
+    color:#02040b;
+    border-color:transparent;
+}
+
 .trade-panel h2{
     margin:0 0 10px;
     font-size:21px;

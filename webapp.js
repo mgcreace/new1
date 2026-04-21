@@ -2331,9 +2331,44 @@ async function loadMailPage(tg, user) {
         const allTradeOffers = traderData.trade_offers || [];
         const incomingOffers = allTradeOffers.filter(offer => Number(offer.to_user_id) === Number(user.id));
         const outgoingOffers = allTradeOffers.filter(offer => Number(offer.from_user_id) === Number(user.id));
+        const pendingIncomingOffers = incomingOffers.filter(offer => offer.status === "pending");
+        const pendingOutgoingOffers = outgoingOffers.filter(offer => offer.status === "pending");
+        const doneOffers = allTradeOffers.filter(offer => offer.status !== "pending");
+        let currentMailFilter = document.querySelector(".mail-filter.active")?.dataset.mailFilter || "incoming";
 
-        renderTradeOfferCards(document.getElementById("incomingTradeOffersList"), incomingOffers, user.id);
-        renderTradeOfferCards(document.getElementById("outgoingTradeOffersList"), outgoingOffers, user.id);
+        function renderMailFilter() {
+            const mailTradeOffersList = document.getElementById("mailTradeOffersList");
+            const mailTradeCount = document.getElementById("mailTradeCount");
+            let offers = pendingIncomingOffers;
+
+            if (currentMailFilter === "outgoing") {
+                offers = pendingOutgoingOffers;
+            } else if (currentMailFilter === "done") {
+                offers = doneOffers;
+            }
+
+            if (mailTradeCount) {
+                mailTradeCount.innerText = String(offers.length);
+            }
+
+            renderTradeOfferCards(mailTradeOffersList, offers, user.id);
+        }
+
+        document.querySelectorAll(".mail-filter").forEach(button => {
+            if (!button.dataset.bound) {
+                button.dataset.bound = "1";
+                button.addEventListener("click", () => {
+                    currentMailFilter = button.dataset.mailFilter || "incoming";
+                    document.querySelectorAll(".mail-filter").forEach(item => {
+                        item.classList.toggle("active", item === button);
+                    });
+                    renderMailFilter();
+                });
+            }
+            button.classList.toggle("active", button.dataset.mailFilter === currentMailFilter);
+        });
+
+        renderMailFilter();
 
         if (document.getElementById("tradeFeedback") && !document.getElementById("tradeFeedback").dataset.initialized) {
             document.getElementById("tradeFeedback").dataset.initialized = "1";

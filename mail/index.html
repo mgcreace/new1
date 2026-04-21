@@ -39,13 +39,16 @@
 </section>
 
 <section class="mail-panel">
-<h2>Eingehende Trade-Angebote</h2>
-<div id="incomingTradeOffersList" class="history-list"></div>
-</section>
-
-<section class="mail-panel">
-<h2>Gesendete Trade-Angebote</h2>
-<div id="outgoingTradeOffersList" class="history-list"></div>
+<div class="mail-panel-head">
+<h2>Trade Inbox</h2>
+<span id="mailTradeCount">0</span>
+</div>
+<div class="mail-filter-row">
+<button type="button" class="mail-filter active" data-mail-filter="incoming">Eingehend</button>
+<button type="button" class="mail-filter" data-mail-filter="outgoing">Gesendet</button>
+<button type="button" class="mail-filter" data-mail-filter="done">Erledigt</button>
+</div>
+<div id="mailTradeOffersList" class="history-list"></div>
 </section>
 
 <section class="mail-panel">
