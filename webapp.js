@@ -713,7 +713,7 @@ function getRevealSummary(items) {
     };
 
     (items || []).forEach(card => {
-        const rarity = String(card.rarity || "N").toUpperCase();
+        const rarity = normalizeRarity(card.rarity);
         if (summary[rarity] !== undefined) {
             summary[rarity] += 1;
         }
@@ -722,18 +722,34 @@ function getRevealSummary(items) {
     return summary;
 }
 
+function normalizeRarity(rarity) {
+    const value = String(rarity || "N").trim().toUpperCase();
+
+    if (["SEC", "SRC", "SECRET", "S"].includes(value)) {
+        return "SEC";
+    }
+    if (["SR", "SUPER RARE"].includes(value)) {
+        return "SR";
+    }
+    if (["R", "RARE"].includes(value)) {
+        return "R";
+    }
+    return "N";
+}
+
 function renderRevealBanner(packName, items) {
     const rewardBox = document.getElementById("openReward");
     if (!rewardBox) {
         return;
     }
 
-    const summary = getRevealSummary(items);
+    const cards = items || [];
+    const summary = getRevealSummary(cards);
     const hasHit = summary.SR > 0 || summary.SEC > 0;
     rewardBox.innerHTML = `
         <div class="reward-banner ${hasHit ? "has-hit" : ""}">
             <strong>${packName}</strong><br>
-            Du hast ${items.length} Karten gezogen.
+            Du hast ${cards.length} Karten gezogen.
             <div class="reveal-summary">
                 <span class="summary-pill">N: ${summary.N}</span>
                 <span class="summary-pill">R: ${summary.R}</span>
@@ -772,7 +788,7 @@ async function animateOpenedCards(items, packName) {
     openedCardsList.innerHTML = "";
 
     for (const card of items || []) {
-        const rarity = String(card.rarity || "N").toUpperCase();
+        const rarity = normalizeRarity(card.rarity);
         const isBigHit = ["SR", "SEC"].includes(rarity);
         const isRare = rarity === "R";
         const cardHtml = `
@@ -1307,6 +1323,23 @@ function renderBoosterBuyFeedback(packName, coins, packKey) {
     `;
 }
 
+function getOwnedPackAmount(inventory, packKey) {
+    const item = (inventory || []).find(entry => entry.pack_key === packKey);
+    return item ? Number(item.amount || 0) : 0;
+}
+
+function updateShopOwnedBadge(packKey, inventory) {
+    const button = document.querySelector(`.booster-buy-btn[data-pack-key="${packKey}"]`);
+    if (!button) {
+        return;
+    }
+
+    const badge = button.querySelector(".shop-pack-owned");
+    if (badge) {
+        badge.innerText = `Besitz: ${getOwnedPackAmount(inventory, packKey)}`;
+    }
+}
+
 function renderOpenV3Stage(pack) {
     if (!pack) {
         return `
@@ -1395,6 +1428,7 @@ async function loadBoosterShop(tg, user) {
                         const boughtPackName = boughtPack ? boughtPack.name : "Booster";
                         showToast(`${boughtPackName} gekauft!`, "success");
                         renderBoosterBuyFeedback(boughtPackName, buyData.coins, button.dataset.packKey);
+                        updateShopOwnedBadge(button.dataset.packKey, buyData.inventory || []);
                         renderInventory(buyData.inventory || []);
                         renderHistory(buyData.history || []);
                     } catch (error) {
