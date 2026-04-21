@@ -729,18 +729,37 @@ function renderRevealBanner(packName, items) {
     }
 
     const summary = getRevealSummary(items);
+    const hasHit = summary.SR > 0 || summary.SEC > 0;
     rewardBox.innerHTML = `
-        <div class="reward-banner">
+        <div class="reward-banner ${hasHit ? "has-hit" : ""}">
             <strong>${packName}</strong><br>
             Du hast ${items.length} Karten gezogen.
             <div class="reveal-summary">
+                <span class="summary-pill">N: ${summary.N}</span>
                 <span class="summary-pill">R: ${summary.R}</span>
                 <span class="summary-pill">SR: ${summary.SR}</span>
                 <span class="summary-pill">SEC: ${summary.SEC}</span>
             </div>
             <div class="card-pack-label">9 Normal, 1 Rare, 2 Bonus-Slots</div>
+            <div class="reveal-actions">
+                <a href="../inventory/">Zur Sammlung</a>
+                <button type="button" id="openAgainButton">Nochmal oeffnen</button>
+            </div>
         </div>
     `;
+
+    const openAgainButton = document.getElementById("openAgainButton");
+    if (openAgainButton) {
+        openAgainButton.addEventListener("click", () => {
+            const firstOpenButton = document.querySelector(".open-booster-btn:not(:disabled)");
+            if (firstOpenButton) {
+                firstOpenButton.scrollIntoView({ behavior: "smooth", block: "center" });
+                firstOpenButton.click();
+                return;
+            }
+            showToast("Kein Booster mehr zum Oeffnen.", "error");
+        });
+    }
 }
 
 async function animateOpenedCards(items, packName) {

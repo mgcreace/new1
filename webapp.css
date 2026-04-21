@@ -1946,6 +1946,8 @@ h2{
 }
 
 .reward-banner{
+    position:relative;
+    overflow:hidden;
     background:
         radial-gradient(circle at 88% 8%, rgba(255,255,255,.18), transparent 30%),
         linear-gradient(135deg, rgba(34,211,238,.34), rgba(244,63,94,.24));
@@ -1954,6 +1956,27 @@ h2{
     padding:15px;
     text-align:left;
     margin-bottom:14px;
+}
+
+.reward-banner.has-hit{
+    border-color:rgba(250,204,21,.45);
+    box-shadow:
+        0 0 0 1px rgba(250,204,21,.16),
+        0 24px 54px rgba(250,204,21,.12);
+}
+
+.reward-banner.has-hit::before{
+    content:"";
+    position:absolute;
+    inset:-45%;
+    background:conic-gradient(from 90deg, transparent, rgba(250,204,21,.26), transparent, rgba(167,139,250,.22), transparent);
+    animation:openStageSpin 5s linear infinite;
+    pointer-events:none;
+}
+
+.reward-banner > *{
+    position:relative;
+    z-index:1;
 }
 
 .reward-banner strong{
@@ -1980,6 +2003,37 @@ h2{
     font-size:14px;
     font-weight:800;
     color:#f8fafc;
+}
+
+.reveal-actions{
+    display:flex;
+    gap:10px;
+    margin-top:14px;
+}
+
+.reveal-actions a,
+.reveal-actions button{
+    flex:1;
+    min-height:42px;
+    border:0;
+    border-radius:999px;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    padding:10px 12px;
+    font-size:13px;
+    font-weight:900;
+    text-decoration:none;
+}
+
+.reveal-actions a{
+    background:rgba(255,255,255,.12);
+    color:#fff;
+}
+
+.reveal-actions button{
+    background:linear-gradient(135deg, #67e8f9, #fff 46%, #fb7185);
+    color:#02040b;
 }
 
 .open-reveal-grid{
