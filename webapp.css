@@ -2702,6 +2702,20 @@ h2{
     gap:10px;
 }
 
+.trade-preview-panel{
+    position:relative;
+    overflow:hidden;
+}
+
+.trade-preview-panel::after{
+    content:"";
+    position:absolute;
+    inset:auto 12px 9px;
+    height:2px;
+    border-radius:999px;
+    background:linear-gradient(90deg, transparent, rgba(103,232,249,.55), transparent);
+}
+
 .trade-tap-section{
     display:grid;
     grid-template-columns:repeat(2, minmax(0, 1fr));
@@ -2724,20 +2738,23 @@ h2{
 }
 
 .trade-tap-grid{
-    display:grid;
-    grid-template-columns:repeat(2, minmax(0, 1fr));
+    display:flex;
     gap:8px;
-    max-height:330px;
-    overflow:auto;
+    overflow-x:auto;
+    overflow-y:hidden;
     padding:8px;
     border-radius:18px;
     background:rgba(2,6,23,.38);
     border:1px solid rgba(148,163,184,.14);
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
 }
 
 .trade-tap-card{
+    flex:0 0 104px;
     position:relative;
     overflow:hidden;
+    scroll-snap-align:start;
     border:1px solid rgba(255,255,255,.12);
     border-radius:14px;
     padding:7px;
@@ -2752,6 +2769,19 @@ h2{
     border-color:rgba(103,232,249,.78);
     box-shadow:0 0 0 1px rgba(103,232,249,.25), 0 16px 34px rgba(34,211,238,.16);
     transform:translateY(-2px);
+}
+
+.trade-tap-card.is-selected::after{
+    content:"SELECT";
+    position:absolute;
+    top:7px;
+    right:7px;
+    padding:3px 5px;
+    border-radius:999px;
+    background:linear-gradient(135deg, #67e8f9, #fff 46%, #fb7185);
+    color:#02040b;
+    font-size:8px;
+    font-weight:950;
 }
 
 .trade-tap-card .card-art,
@@ -3654,6 +3684,18 @@ h2{
     .trade-preview-grid,
     .trade-offer-row{
         grid-template-columns:1fr;
+    }
+
+    .trade-preview-grid{
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+    }
+
+    .trade-tap-section{
+        grid-template-columns:1fr;
+    }
+
+    .trade-tap-card{
+        flex-basis:96px;
     }
 
     .filter-row{
