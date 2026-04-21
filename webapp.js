@@ -63,7 +63,8 @@ function updateAccountHero(user, secureData = {}, profile = {}) {
         accountBoosters: boosterCount,
         accountBioText: profile.bio || "Baue dein Deck, oeffne Booster und trade mit anderen Spielern.",
         accountTradingStatus: profile.trading_enabled ? "Trading aktiv" : "Trading aus",
-        accountVisibilityStatus: `Inventar ${profile.inventory_visibility || "public"}`
+        accountVisibilityStatus: `Inventar ${profile.inventory_visibility || "public"}`,
+        accountOpeningStatus: `Openings ${profile.opening_visibility || "public"}`
     };
 
     Object.entries(fields).forEach(([id, value]) => {
@@ -1184,6 +1185,7 @@ async function loadProfilePage(tg, user, secureData) {
         const displayName = document.getElementById("displayName");
         const bio = document.getElementById("bio");
         const visibility = document.getElementById("inventoryVisibility");
+        const openingVisibility = document.getElementById("openingVisibility");
         const tradingEnabled = document.getElementById("tradingEnabled");
         const profileSummary = document.getElementById("profileSummary");
 
@@ -1207,6 +1209,10 @@ async function loadProfilePage(tg, user, secureData) {
             visibility.value = profile.inventory_visibility || "public";
         }
 
+        if (openingVisibility) {
+            openingVisibility.value = profile.opening_visibility || "public";
+        }
+
         if (tradingEnabled) {
             tradingEnabled.checked = Boolean(profile.trading_enabled);
         }
@@ -1223,6 +1229,10 @@ async function loadProfilePage(tg, user, secureData) {
                 <div class="profile-status-card">
                     <span>Trading</span>
                     <strong>${profile.trading_enabled ? "aktiv" : "aus"}</strong>
+                </div>
+                <div class="profile-status-card">
+                    <span>Openings</span>
+                    <strong>${profile.opening_visibility || "public"}</strong>
                 </div>
                 <div class="profile-status-card wide">
                     <span>Lieblingskarte</span>
@@ -1249,6 +1259,7 @@ async function loadProfilePage(tg, user, secureData) {
                         display_name: document.getElementById("displayName").value,
                         bio: document.getElementById("bio").value,
                         inventory_visibility: document.getElementById("inventoryVisibility").value,
+                        opening_visibility: document.getElementById("openingVisibility").value,
                         trading_enabled: document.getElementById("tradingEnabled").checked,
                         favorite_card_id: document.getElementById("favoriteCardId").value || null
                     });
