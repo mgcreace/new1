@@ -56,6 +56,12 @@ header{
     border-color:#2952cc;
 }
 
+body.form-focus-mode .topnav{
+    transform:translateY(120%);
+    opacity:0;
+    pointer-events:none;
+}
+
 main{
     text-align:center;
     margin:40px auto 0;
@@ -1201,6 +1207,7 @@ h2{
         background:#02040b;
         border-top:1px solid rgba(255,255,255,.10);
         pointer-events:auto;
+        transition:transform .2s ease, opacity .2s ease;
     }
 
     .topnav a{

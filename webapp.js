@@ -107,6 +107,36 @@ function setupProfileTabs() {
     });
 }
 
+function setupKeyboardFriendlyForms() {
+    const focusableSelector = "input, textarea, select";
+
+    document.addEventListener("focusin", event => {
+        if (!event.target.matches(focusableSelector)) {
+            return;
+        }
+
+        document.body.classList.add("form-focus-mode");
+        window.setTimeout(() => {
+            event.target.scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+        }, 120);
+    });
+
+    document.addEventListener("focusout", event => {
+        if (!event.target.matches(focusableSelector)) {
+            return;
+        }
+
+        window.setTimeout(() => {
+            if (!document.activeElement || !document.activeElement.matches(focusableSelector)) {
+                document.body.classList.remove("form-focus-mode");
+            }
+        }, 120);
+    });
+}
+
 function renderInventory(items) {
     const inventoryList = document.getElementById("inventoryList");
 
@@ -735,6 +765,7 @@ async function initTelegramApp(pageName) {
     const user = tg.initDataUnsafe.user;
     window.__tgApp = { tg, user };
     setupProfileTabs();
+    setupKeyboardFriendlyForms();
 
     const username = document.getElementById("username");
     const heroUsername = document.getElementById("heroUsername");
