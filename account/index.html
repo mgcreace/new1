@@ -67,25 +67,58 @@
 <section class="profile-edit-panel profile-tab-panel active" data-profile-panel="edit">
 <h2>Profil bearbeiten</h2>
 <form id="profileForm">
+<div class="edit-profile-card">
+<div class="edit-card-head">
+<span class="edit-card-icon">ID</span>
+<div>
+<strong>Dein Auftritt</strong>
+<small>Name und Bio fuer dein Trading-Profil</small>
+</div>
+</div>
+
 <label class="form-label" for="displayName">Display Name</label>
-<input id="displayName" class="form-control">
+<input id="displayName" class="form-control" placeholder="Dein Name">
 
 <label class="form-label" for="bio">Bio</label>
-<textarea id="bio" class="form-control" rows="4"></textarea>
+<textarea id="bio" class="form-control" rows="3" placeholder="Kurzer Text ueber dich oder deine Sammlung"></textarea>
+</div>
+
+<div class="edit-profile-card">
+<div class="edit-card-head">
+<span class="edit-card-icon">PV</span>
+<div>
+<strong>Privatsphaere</strong>
+<small>Bestimme, was andere Spieler sehen</small>
+</div>
+</div>
 
 <label class="form-label" for="inventoryVisibility">Inventar Sichtbarkeit</label>
 <select id="inventoryVisibility" class="form-control">
-<option value="public">public</option>
-<option value="private">private</option>
+<option value="public">Oeffentlich</option>
+<option value="private">Privat</option>
 </select>
-
-<label class="form-label" for="favoriteCardId">Lieblingskarte</label>
-<select id="favoriteCardId" class="form-control"></select>
 
 <label class="toggle-row">
 <input type="checkbox" id="tradingEnabled">
-<span>Trading aktivieren</span>
+<span>
+<strong>Trading aktivieren</strong>
+<small>Andere Spieler duerfen dir Angebote senden</small>
+</span>
 </label>
+</div>
+
+<div class="edit-profile-card">
+<div class="edit-card-head">
+<span class="edit-card-icon">FC</span>
+<div>
+<strong>Lieblingskarte</strong>
+<small>Zeige deine beste Karte im Profil</small>
+</div>
+</div>
+
+<label class="form-label" for="favoriteCardId">Karte auswaehlen</label>
+<select id="favoriteCardId" class="form-control"></select>
+</div>
 
 <button id="saveProfileButton" class="shop-btn" type="submit">Profil speichern<small>Privacy und Profil aktualisieren</small></button>
 </form>

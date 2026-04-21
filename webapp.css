@@ -568,6 +568,72 @@ h2{
     font-size:21px;
 }
 
+.edit-profile-card{
+    position:relative;
+    overflow:hidden;
+    padding:13px;
+    margin-bottom:11px;
+    border-radius:18px;
+    background:
+        radial-gradient(circle at 88% 8%, rgba(34,211,238,.15), transparent 30%),
+        linear-gradient(180deg, rgba(15,23,42,.96), rgba(2,6,23,.92));
+    border:1px solid rgba(148,163,184,.18);
+    text-align:left;
+}
+
+.edit-profile-card::after{
+    content:"";
+    position:absolute;
+    right:-20px;
+    bottom:-26px;
+    width:86px;
+    height:86px;
+    border-radius:999px;
+    background:rgba(255,255,255,.06);
+    pointer-events:none;
+}
+
+.edit-card-head{
+    position:relative;
+    z-index:1;
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin-bottom:10px;
+}
+
+.edit-card-icon{
+    width:36px;
+    height:36px;
+    flex:0 0 36px;
+    border-radius:13px;
+    display:grid;
+    place-items:center;
+    color:#02040b;
+    background:linear-gradient(135deg, #67e8f9, #fda4af);
+    font-size:12px;
+    font-weight:950;
+    letter-spacing:.04em;
+    box-shadow:0 10px 24px rgba(34,211,238,.16);
+}
+
+.edit-card-head strong{
+    display:block;
+    color:white;
+    font-size:16px;
+    line-height:1.1;
+}
+
+.edit-card-head small,
+.toggle-row small{
+    display:block;
+    margin-top:3px;
+    color:rgba(255,255,255,.52);
+    font-size:12px;
+    line-height:1.25;
+    font-weight:600;
+}
+
 .form-label{
     display:block;
     margin:11px 0 6px;
@@ -605,6 +671,12 @@ h2{
     color:rgba(255,255,255,.88);
     font-weight:800;
     text-align:left;
+}
+
+.toggle-row input{
+    width:20px;
+    height:20px;
+    accent-color:#22d3ee;
 }
 
 .profile-status-grid{
@@ -1337,6 +1409,29 @@ h2{
     .account-screen .shop-btn small{
         font-size:11px;
         margin-top:2px;
+    }
+
+    .edit-profile-card{
+        padding:12px;
+        margin-bottom:9px;
+        border-radius:16px;
+    }
+
+    .edit-card-icon{
+        width:32px;
+        height:32px;
+        flex-basis:32px;
+        border-radius:11px;
+        font-size:11px;
+    }
+
+    .edit-card-head strong{
+        font-size:15px;
+    }
+
+    .edit-card-head small,
+    .toggle-row small{
+        font-size:11px;
     }
 
     .profile-card-grid{
