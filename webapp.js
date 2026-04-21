@@ -614,6 +614,51 @@ function setupGlobalCardModal() {
     });
 }
 
+function updateTradeBadge(summary = {}) {
+    const tradeLink = document.querySelector('.topnav a[data-page="trading"]');
+    if (!tradeLink) {
+        return;
+    }
+
+    const incoming = Number(summary.incoming_pending || 0);
+    let badge = tradeLink.querySelector(".trade-nav-badge");
+    if (!badge) {
+        badge = document.createElement("span");
+        badge.className = "trade-nav-badge";
+        tradeLink.appendChild(badge);
+    }
+
+    badge.innerText = incoming > 0 ? String(incoming > 9 ? "9+" : incoming) : "";
+    badge.style.display = incoming > 0 ? "grid" : "none";
+    tradeLink.classList.toggle("has-badge", incoming > 0);
+
+    const tradeNotice = document.getElementById("tradeNotice");
+    if (tradeNotice) {
+        if (incoming > 0) {
+            tradeNotice.innerHTML = `<strong>${incoming}</strong> offene Trade-Anfrage${incoming === 1 ? "" : "n"} warten auf dich.`;
+            tradeNotice.style.display = "block";
+        } else {
+            tradeNotice.innerHTML = "Keine offenen eingehenden Trade-Anfragen.";
+            tradeNotice.style.display = "block";
+        }
+    }
+}
+
+async function loadTradeSummary(tg, user) {
+    try {
+        const summary = await postJson("/trade-summary", {
+            initData: tg.initData,
+            user_id: user.id
+        });
+
+        if (summary.ok) {
+            updateTradeBadge(summary);
+        }
+    } catch (error) {
+        console.log(error);
+    }
+}
+
 function renderOpenedCards(items, packName) {
     const openedCardsList = document.getElementById("openedCardsList");
 
@@ -1121,6 +1166,7 @@ async function initTelegramApp(pageName) {
     renderCardInventory(data.card_inventory || []);
     renderDashboardStats(data.inventory || [], data.card_inventory || [], data.coins || 0);
     updateAccountHero(user, data);
+    await loadTradeSummary(tg, user);
 
     if (pageName === "shop") {
         setupStarShop(tg, user);
@@ -1813,6 +1859,7 @@ async function loadTradingPage(tg, user) {
                         "success"
                     );
                     renderCardInventory(result.card_inventory || []);
+                    await loadTradeSummary(tg, user);
                     await loadTradingPage(tg, user);
                 } catch (error) {
                     console.log(error);
@@ -1931,6 +1978,7 @@ async function loadTradingPage(tg, user) {
 
                     renderTradeFeedback("Debug Accept erfolgreich. Der Test-Trade wurde simuliert und die Karten wurden getauscht.", "success");
                     renderCardInventory(result.card_inventory || []);
+                    await loadTradeSummary(tg, user);
                     await loadTradingPage(tg, user);
                 } catch (error) {
                     console.log(error);
