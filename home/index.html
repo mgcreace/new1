@@ -24,57 +24,73 @@
 </nav>
 </header>
 
-<main>
-<section class="feed-hero">
-<div class="feed-tabs">
-<span>Decks</span>
-<span>Booster</span>
-<span class="active">For You</span>
-</div>
-<div class="feed-search">Search</div>
-<div class="hero-card-preview">
-<div class="hero-glow"></div>
-<div class="hero-pack">CARD PACK</div>
-<div class="hero-title">Open. Collect. Trade.</div>
-<div class="hero-subtitle">Baue dein Deck, oeffne Booster und trade Karten mit anderen Spielern.</div>
-</div>
-<div class="hero-caption">
-<strong id="heroUsername">Dashboard</strong>
+<main class="news-screen">
+<section class="news-hero">
+<p class="eyebrow">Krolium News</p>
+<h1>Updates & Events</h1>
+<p class="hint">Hier kommen spaeter neue Booster, Top-Pulls, Events und App-News rein.</p>
+<div class="inventory-summary-row">
 <span id="telegramID"></span>
 <span id="status">Loading...</span>
 <span id="coins">Coins: 0</span>
 </div>
 </section>
 
-<div class="card app-card-over-hero">
-<h2>Heute bereit</h2>
-<p class="hint">Starte direkt mit Booster oeffnen, Shop oder deiner Sammlung.</p>
-<div class="grid">
-<a class="shop-btn quick-link-btn" href="../shop/">Shop<small>Coins ausgeben</small></a>
-<a class="shop-btn quick-link-btn" href="../openbooster/">Open<small>Booster revealen</small></a>
-<a class="shop-btn quick-link-btn" href="../inventory/">Cards<small>Sammlung ansehen</small></a>
+<section class="news-panel news-featured">
+<span class="news-tag">Coming Soon</span>
+<h2>Neues Booster Pack im Shop</h2>
+<p>Platzhalter fuer ein neues Pack-Banner mit Release-Datum, Pack-Art und Karten-Vorschau.</p>
+<div class="news-pack-preview">
+<span>PK</span>
 </div>
-</div>
+</section>
 
-<div class="card">
-<h2>Sammlungs-Stats</h2>
-<div id="dashboardStats" class="stats-grid"></div>
+<section class="news-panel">
+<div class="news-section-head">
+<h2>Beste Booster Opens</h2>
+<span>Placeholder</span>
 </div>
+<div class="news-list">
+<article class="news-card">
+<strong>Top Pull der Woche</strong>
+<p>Hier spaeter: User zieht SEC Karte aus einem Booster.</p>
+</article>
+<article class="news-card">
+<strong>Rare Streak</strong>
+<p>Hier spaeter: beste Serie oder besondere Pull-Statistik.</p>
+</article>
+</div>
+</section>
 
-<div class="card">
-<h2>Rarity Uebersicht</h2>
-<div id="rarityStats" class="stats-grid"></div>
+<section class="news-panel">
+<div class="news-section-head">
+<h2>Shop News</h2>
+<span>Placeholder</span>
 </div>
+<div class="news-list">
+<article class="news-card">
+<strong>Coin Bonus Event</strong>
+<p>Platzhalter fuer spaetere Angebote, Bonus-Coins oder Rabattaktionen.</p>
+</article>
+<article class="news-card">
+<strong>Premium Update</strong>
+<p>Platzhalter fuer Premium-Funktionen, falls Premium wieder aktiv genutzt wird.</p>
+</article>
+</div>
+</section>
 
-<div class="card">
-<h2>Letzte Aktivitaet</h2>
-<div id="recentActivity" class="activity-grid"></div>
+<section class="news-panel">
+<div class="news-section-head">
+<h2>Roadmap</h2>
+<span>Info</span>
 </div>
-
-<div class="card">
-<h2>Trade Uebersicht</h2>
-<div id="tradeSummary" class="stats-grid"></div>
+<div class="news-roadmap">
+<span>Trading verbessern</span>
+<span>User Profile erweitern</span>
+<span>Booster Events</span>
+<span>Card Showcase</span>
 </div>
+</section>
 </main>
 
 <script src="../webapp.js"></script>
