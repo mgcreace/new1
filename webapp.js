@@ -570,13 +570,13 @@ function renderTradeOfferCards(targetElement, offers, userId) {
                 </div>
             </div>
             ${offer.to_user_id === userId && offer.status === "pending" ? `
-                <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
-                    <button class="shop-btn trade-response-btn" data-trade-id="${offer.id}" data-action="accept">Annehmen<small>Karten tauschen</small></button>
-                    <button class="shop-btn trade-response-btn" data-trade-id="${offer.id}" data-action="reject">Ablehnen<small>Angebot schliessen</small></button>
+                <div class="trade-action-row">
+                    <button class="shop-btn trade-response-btn trade-accept-btn" data-trade-id="${offer.id}" data-action="accept">Annehmen<small>Karten tauschen</small></button>
+                    <button class="shop-btn trade-response-btn trade-reject-btn" data-trade-id="${offer.id}" data-action="reject">Ablehnen<small>Angebot schliessen</small></button>
                 </div>
             ` : offer.to_user_id === 999000111 && offer.from_user_id === userId && offer.status === "pending" ? `
-                <div style="margin-top:12px;display:flex;gap:10px;flex-wrap:wrap;">
-                    <button class="shop-btn trade-debug-accept-btn" data-trade-id="${offer.id}">Debug Accept<small>Test Trader simulieren</small></button>
+                <div class="trade-action-row">
+                    <button class="shop-btn trade-debug-accept-btn trade-debug-btn" data-trade-id="${offer.id}">Debug Accept<small>Test Trader simulieren</small></button>
                 </div>
             ` : ""}
         </div>
@@ -949,9 +949,10 @@ async function loadBoosterShop(tg, user) {
         const boosterShop = document.getElementById("boosterShop");
         if (boosterShop) {
             boosterShop.innerHTML = data.packs.map(pack => `
-                <button class="shop-btn booster-buy-btn" data-pack-key="${pack.pack_key}">
-                    ${pack.name}
-                    <small>${pack.price} Coins</small>
+                <button class="shop-btn booster-buy-btn booster-product-card" data-pack-key="${pack.pack_key}">
+                    <span class="shop-pack-art">${String(pack.name || "PK").slice(0, 2).toUpperCase()}</span>
+                    <span class="shop-product-name">${pack.name}</span>
+                    <small>${pack.price} Coins | 12 Karten</small>
                 </button>
             `).join("");
 
