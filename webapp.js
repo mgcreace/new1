@@ -10,6 +10,7 @@ const BOOSTER_REVEAL_STATE = {
     lastCards: [],
     isAnimating: false
 };
+const INVENTORY_NOTICE_KEY = "krolium_inventory_has_new_cards";
 
 function ensureToastStack() {
     let stack = document.getElementById("toastStack");
@@ -674,6 +675,34 @@ function updateTradeBadge(summary = {}) {
     }
 }
 
+function updateInventoryBadge() {
+    const inventoryLink = document.querySelector('.topnav a[data-page="inventory"]');
+    if (!inventoryLink) {
+        return;
+    }
+
+    let badge = inventoryLink.querySelector(".inventory-nav-badge");
+    if (!badge) {
+        badge = document.createElement("span");
+        badge.className = "inventory-nav-badge";
+        inventoryLink.appendChild(badge);
+    }
+
+    const hasNewCards = localStorage.getItem(INVENTORY_NOTICE_KEY) === "1";
+    badge.style.display = hasNewCards ? "grid" : "none";
+    inventoryLink.classList.toggle("has-badge", hasNewCards);
+}
+
+function markInventoryHasNewCards() {
+    localStorage.setItem(INVENTORY_NOTICE_KEY, "1");
+    updateInventoryBadge();
+}
+
+function clearInventoryNewCardsNotice() {
+    localStorage.removeItem(INVENTORY_NOTICE_KEY);
+    updateInventoryBadge();
+}
+
 async function loadTradeSummary(tg, user) {
     try {
         const summary = await postJson("/trade-summary", {
@@ -1234,6 +1263,7 @@ async function initTelegramApp(pageName) {
     renderCardInventory(data.card_inventory || []);
     renderDashboardStats(data.inventory || [], data.card_inventory || [], data.coins || 0);
     updateAccountHero(user, data);
+    updateInventoryBadge();
     await loadTradeSummary(tg, user);
 
     if (pageName === "shop") {
@@ -1242,6 +1272,7 @@ async function initTelegramApp(pageName) {
     }
 
     if (pageName === "inventory") {
+        clearInventoryNewCardsNotice();
         await loadBoosterShop(tg, user);
     }
 
@@ -2147,6 +2178,9 @@ async function loadTradingPage(tg, user) {
                             : "Trade wurde abgelehnt und geschlossen.",
                         "success"
                     );
+                    if (button.dataset.action === "accept") {
+                        markInventoryHasNewCards();
+                    }
                     renderCardInventory(result.card_inventory || []);
                     await loadTradeSummary(tg, user);
                     await loadTradingPage(tg, user);
@@ -2266,6 +2300,7 @@ async function loadTradingPage(tg, user) {
                     }
 
                     renderTradeFeedback("Debug Accept erfolgreich. Der Test-Trade wurde simuliert und die Karten wurden getauscht.", "success");
+                    markInventoryHasNewCards();
                     renderCardInventory(result.card_inventory || []);
                     await loadTradeSummary(tg, user);
                     await loadTradingPage(tg, user);
@@ -2333,6 +2368,9 @@ async function loadMailPage(tg, user) {
                             : "Trade wurde abgelehnt und geschlossen.",
                         "success"
                     );
+                    if (button.dataset.action === "accept") {
+                        markInventoryHasNewCards();
+                    }
                     await loadTradeSummary(tg, user);
                     await loadMailPage(tg, user);
                 } catch (error) {
@@ -2366,6 +2404,7 @@ async function loadMailPage(tg, user) {
                     }
 
                     renderTradeFeedback("Debug Accept erfolgreich. Der Test-Trade wurde simuliert und die Karten wurden getauscht.", "success");
+                    markInventoryHasNewCards();
                     await loadTradeSummary(tg, user);
                     await loadMailPage(tg, user);
                 } catch (error) {
