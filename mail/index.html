@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Open Booster</title>
+<title>Mail</title>
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
 <link rel="stylesheet" href="../webapp.css">
 </head>
@@ -25,48 +25,38 @@
 </nav>
 </header>
 
-<main class="open-screen">
-<section class="open-hero">
-<p class="eyebrow">Booster Lab</p>
-<h1>Booster oeffnen</h1>
-<p class="hint">12 Karten pro Pack: 9 Normal, 1 garantierte Rare und 2 Bonus-Slots.</p>
+<main class="mail-screen">
+<section class="mail-hero">
+<p class="eyebrow">Inbox</p>
+<h1>Mail</h1>
+<p class="hint">Hier landen deine Trade-Angebote. Spaeter koennen hier Nachrichten, Rewards und System-Mails rein.</p>
 <div class="inventory-summary-row">
 <span id="telegramID"></span>
 <span id="status">Loading...</span>
 <span id="coins">Coins: 0</span>
 </div>
+<div id="mailNotice" class="trade-notice" style="display:none;"></div>
 </section>
 
-<section class="open-stage-panel">
-<h2>Bereit zum Oeffnen</h2>
-<div id="openReward"></div>
-<div id="openBoosterList" class="inventory-list"></div>
+<section class="mail-panel">
+<h2>Eingehende Trade-Angebote</h2>
+<div id="incomingTradeOffersList" class="history-list"></div>
 </section>
 
-<section class="open-stage-panel">
-<h2>Letzter Reveal</h2>
-<div id="openedCardsList" class="card-reveal-grid open-reveal-grid"></div>
+<section class="mail-panel">
+<h2>Gesendete Trade-Angebote</h2>
+<div id="outgoingTradeOffersList" class="history-list"></div>
 </section>
 
-<section class="open-stage-panel">
-<h2>Dein Inventar</h2>
-<div id="inventoryList" class="inventory-list"></div>
-</section>
-
-<section class="open-stage-panel">
-<h2>Deine Karten</h2>
-<div id="cardInventoryList" class="inventory-list profile-card-grid"></div>
-</section>
-
-<section class="open-stage-panel">
-<h2>Letzte Oeffnungen</h2>
-<div id="openHistoryList" class="history-list"></div>
+<section class="mail-panel">
+<h2>Mail Status</h2>
+<div id="tradeFeedback" class="inventory-item trade-feedback-box">Trade-Aktionen erscheinen hier mit Feedback.</div>
 </section>
 </main>
 
 <script src="../webapp.js"></script>
 <script>
-initTelegramApp("openbooster");
+initTelegramApp("mail");
 </script>
 </body>
 </html>

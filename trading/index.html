@@ -20,6 +20,7 @@
 <a href="../inventory/" data-page="inventory">Inventory</a>
 <a href="../openbooster/" data-page="openbooster">Open</a>
 <a href="../trading/" data-page="trading">Trade</a>
+<a href="../mail/" data-page="mail">Mail</a>
 <a href="../account/" data-page="account">Account</a>
 </nav>
 </header>
@@ -38,11 +39,12 @@
 </section>
 
 <section class="trade-panel">
-<h2>Trade erstellen</h2>
-<p class="hint">Waehle einen Trader, dann deine Karte und die Wunschkarte. Unten siehst du beide Karten direkt als Vorschau.</p>
+<h2>Trade bauen</h2>
+<p class="hint">Waehle einen Trader. Danach tippst du Karten an: erster Klick waehlt sie, jeder weitere Klick erhoeht die Menge.</p>
 <form id="tradeForm" class="stack">
 <div class="trade-form-grid">
 <select id="targetTraderId" class="app-select"></select>
+<div class="trade-hidden-controls">
 <select id="myTradeCardId" class="app-select"></select>
 <select id="myTradeQuantity" class="app-select">
 <option value="1">Deine Menge: 1</option>
@@ -51,6 +53,7 @@
 <select id="wantedTradeQuantity" class="app-select">
 <option value="1">Wunsch-Menge: 1</option>
 </select>
+</div>
 </div>
 <div class="trade-tap-section">
 <div>
@@ -63,16 +66,17 @@
 </div>
 </div>
 <div class="trade-preview-grid">
-<div class="trade-preview-panel trade-drop-zone" data-drop-side="mine">
+<div class="trade-preview-panel">
 <span>Du gibst</span>
 <div id="myTradePreview" class="card-reveal-grid"></div>
 </div>
-<div class="trade-preview-panel trade-drop-zone" data-drop-side="wanted">
+<div class="trade-preview-panel">
 <span>Du willst</span>
 <div id="wantedTradePreview" class="card-reveal-grid"></div>
 </div>
 </div>
 <button id="createTradeButton" class="shop-btn trade-create-btn" type="submit">Trade anbieten<small>Erstes Angebot erstellen</small></button>
+<div id="tradeFeedback" class="inventory-item trade-feedback-box">Baue dein Angebot. Nach dem Senden findest du es in Mail.</div>
 </form>
 </section>
 
@@ -84,21 +88,6 @@
 <section class="trade-panel">
 <h2>Oeffentliches Profil</h2>
 <div id="publicProfileView" class="inventory-list"></div>
-</section>
-
-<section class="trade-panel">
-<h2>Trade Status</h2>
-<div id="tradeFeedback" class="inventory-item trade-feedback-box">Erstellte und bearbeitete Trades erscheinen hier mit Feedback.</div>
-</section>
-
-<section class="trade-panel">
-<h2>Eingehende Trades</h2>
-<div id="incomingTradeOffersList" class="history-list"></div>
-</section>
-
-<section class="trade-panel">
-<h2>Gesendete Trades</h2>
-<div id="outgoingTradeOffersList" class="history-list"></div>
 </section>
 </main>
 

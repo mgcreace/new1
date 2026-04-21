@@ -886,6 +886,10 @@ h2{
     max-width:760px;
 }
 
+.mail-screen{
+    max-width:760px;
+}
+
 .trade-hero{
     position:relative;
     overflow:hidden;
@@ -912,6 +916,37 @@ h2{
 }
 
 .trade-hero .hint{
+    max-width:520px;
+    margin:8px 0 12px;
+    font-size:14px;
+    line-height:1.35;
+}
+
+.mail-hero{
+    position:relative;
+    overflow:hidden;
+    padding:18px 14px 14px;
+    text-align:left;
+}
+
+.mail-hero::before{
+    content:"";
+    position:absolute;
+    right:-46px;
+    top:-44px;
+    width:132px;
+    height:132px;
+    border-radius:999px;
+    background:radial-gradient(circle, rgba(103,232,249,.22), transparent 64%);
+}
+
+.mail-hero h1{
+    margin:0;
+    font-size:34px;
+    line-height:1;
+}
+
+.mail-hero .hint{
     max-width:520px;
     margin:8px 0 12px;
     font-size:14px;
@@ -947,6 +982,22 @@ h2{
     box-shadow:0 18px 46px rgba(0,0,0,.24);
 }
 
+.mail-panel{
+    background:
+        radial-gradient(circle at 92% 0%, rgba(103,232,249,.10), transparent 30%),
+        linear-gradient(180deg, rgba(17,24,39,.88), rgba(3,7,18,.96));
+    border:1px solid rgba(148,163,184,.18);
+    border-radius:22px;
+    padding:16px;
+    margin:0 0 16px;
+    box-shadow:0 18px 46px rgba(0,0,0,.24);
+}
+
+.mail-panel h2{
+    margin:0 0 10px;
+    font-size:21px;
+}
+
 .trade-panel h2{
     margin:0 0 10px;
     font-size:21px;
@@ -955,6 +1006,10 @@ h2{
 .trade-form-grid{
     display:grid;
     gap:10px;
+}
+
+.trade-hidden-controls{
+    display:none;
 }
 
 .trade-preview-panel{
@@ -2716,16 +2771,6 @@ h2{
     background:linear-gradient(90deg, transparent, rgba(103,232,249,.55), transparent);
 }
 
-.trade-drop-zone{
-    transition:border-color .16s ease, box-shadow .16s ease, transform .16s ease;
-}
-
-.trade-drop-zone.is-drag-over{
-    border-color:rgba(103,232,249,.78);
-    box-shadow:0 0 0 1px rgba(103,232,249,.25), 0 18px 38px rgba(34,211,238,.18);
-    transform:translateY(-2px);
-}
-
 .trade-tap-section{
     display:grid;
     grid-template-columns:repeat(2, minmax(0, 1fr));
@@ -2774,11 +2819,7 @@ h2{
     color:#fff;
     text-align:left;
     touch-action:manipulation;
-    cursor:grab;
-}
-
-.trade-tap-card:active{
-    cursor:grabbing;
+    cursor:pointer;
 }
 
 .trade-tap-card.is-selected{
@@ -2950,7 +2991,7 @@ h2{
         z-index:1000;
         width:auto;
         display:grid;
-        grid-template-columns:repeat(6, minmax(0, 1fr));
+        grid-template-columns:repeat(7, minmax(0, 1fr));
         gap:0;
         padding:5px 4px 0;
         background:#02040b;
@@ -3070,6 +3111,22 @@ h2{
         transform:translateX(6px) rotate(45deg);
     }
 
+    .topnav a[data-page="mail"]::before{
+        width:27px;
+        height:20px;
+        top:7px;
+        border-radius:5px;
+    }
+
+    .topnav a[data-page="mail"]::after{
+        top:10px;
+        width:18px;
+        height:18px;
+        border-left:2.4px solid currentColor;
+        border-bottom:2.4px solid currentColor;
+        transform:translateX(-50%) rotate(-45deg);
+    }
+
     .topnav a[data-page="account"]::before{
         width:18px;
         height:18px;
@@ -3163,6 +3220,11 @@ h2{
     }
 
     .trade-screen{
+        padding-left:0;
+        padding-right:0;
+    }
+
+    .mail-screen{
         padding-left:0;
         padding-right:0;
     }
@@ -3262,6 +3324,21 @@ h2{
         margin-right:12px;
         padding:13px 12px;
         border-radius:18px;
+    }
+
+    .mail-screen .mail-panel{
+        margin-left:12px;
+        margin-right:12px;
+        padding:13px 12px;
+        border-radius:18px;
+    }
+
+    .mail-hero{
+        padding:12px 14px 10px;
+    }
+
+    .mail-hero h1{
+        font-size:30px;
     }
 
     .trade-preview-grid,
@@ -3729,7 +3806,7 @@ h2{
     }
 
     .topnav{
-        grid-template-columns:repeat(6, minmax(0, 1fr));
+        grid-template-columns:repeat(7, minmax(0, 1fr));
         gap:0;
     }
 

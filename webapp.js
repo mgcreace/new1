@@ -637,7 +637,7 @@ function setupGlobalCardModal() {
 }
 
 function updateTradeBadge(summary = {}) {
-    const tradeLink = document.querySelector('.topnav a[data-page="trading"]');
+    const tradeLink = document.querySelector('.topnav a[data-page="mail"]');
     if (!tradeLink) {
         return;
     }
@@ -663,6 +663,14 @@ function updateTradeBadge(summary = {}) {
             tradeNotice.innerHTML = "Keine offenen eingehenden Trade-Anfragen.";
             tradeNotice.style.display = "block";
         }
+    }
+
+    const mailNotice = document.getElementById("mailNotice");
+    if (mailNotice) {
+        mailNotice.innerHTML = incoming > 0
+            ? `<strong>${incoming}</strong> offene Trade-Anfrage${incoming === 1 ? "" : "n"} in deiner Inbox.`
+            : "Keine offenen Trade-Anfragen.";
+        mailNotice.style.display = "block";
     }
 }
 
@@ -1252,6 +1260,10 @@ async function initTelegramApp(pageName) {
     if (pageName === "trading") {
         await loadTradingPage(tg, user);
     }
+
+    if (pageName === "mail") {
+        await loadMailPage(tg, user);
+    }
 }
 
 function setupStarShop(tg, user) {
@@ -1712,8 +1724,6 @@ async function loadTradingPage(tg, user) {
         }
 
         const traderList = document.getElementById("traderList");
-        const incomingTradeOffersList = document.getElementById("incomingTradeOffersList");
-        const outgoingTradeOffersList = document.getElementById("outgoingTradeOffersList");
         const targetTraderSelect = document.getElementById("targetTraderId");
         const myTradeCardSelect = document.getElementById("myTradeCardId");
         const myTradeQuantity = document.getElementById("myTradeQuantity");
@@ -1774,12 +1784,22 @@ async function loadTradingPage(tg, user) {
             }
 
             targetElement.innerHTML = cards.map(card => `
-                <button type="button" draggable="true" class="trade-tap-card ${String(selectedCardId || "") === String(card.card_id) ? "is-selected" : ""}" data-side="${side}" data-card-id="${card.card_id}">
+                <button type="button" class="trade-tap-card ${String(selectedCardId || "") === String(card.card_id) ? "is-selected" : ""}" data-side="${side}" data-card-id="${card.card_id}">
                     ${getCardArtMarkup(card)}
                     <strong>${card.card_name}</strong>
-                    <span>${card.rarity} | x${card.quantity}</span>
+                    <span>${card.rarity} | x${card.quantity}${String(selectedCardId || "") === String(card.card_id) ? ` | Auswahl x${side === "mine" ? myTradeQuantity.value : wantedTradeQuantity.value}` : ""}</span>
                 </button>
             `).join("");
+        }
+
+        function incrementQuantitySelect(selectElement, maxAmount) {
+            if (!selectElement) {
+                return;
+            }
+
+            const currentValue = Number(selectElement.value || 1);
+            const safeMax = Math.max(1, Number(maxAmount || 1));
+            selectElement.value = String(Math.min(safeMax, currentValue + 1));
         }
 
         function refreshTradeTapSelection() {
@@ -1792,9 +1812,14 @@ async function loadTradingPage(tg, user) {
                 return;
             }
 
+            const wasSelected = String(myTradeCardSelect.value || "") === String(cardId || "");
             myTradeCardSelect.value = cardId || "";
             const selectedCard = findCardById(myCardInventory, myTradeCardSelect.value);
-            fillQuantitySelect(myTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Deine Menge");
+            if (!wasSelected) {
+                fillQuantitySelect(myTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Deine Menge");
+            } else {
+                incrementQuantitySelect(myTradeQuantity, selectedCard ? selectedCard.quantity : 1);
+            }
             updateTradePreview(myTradePreview, selectedCard, "Deine ausgewaehlte Karte erscheint hier.", "DEIN", myTradeQuantity ? myTradeQuantity.value : 1, "Du gibst");
             refreshTradeTapSelection();
         }
@@ -1804,22 +1829,16 @@ async function loadTradingPage(tg, user) {
                 return;
             }
 
+            const wasSelected = String(wantedTradeCardSelect.value || "") === String(cardId || "");
             wantedTradeCardSelect.value = cardId || "";
             const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect.value);
-            fillQuantitySelect(wantedTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Wunsch-Menge");
+            if (!wasSelected) {
+                fillQuantitySelect(wantedTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Wunsch-Menge");
+            } else {
+                incrementQuantitySelect(wantedTradeQuantity, selectedCard ? selectedCard.quantity : 1);
+            }
             updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity ? wantedTradeQuantity.value : 1, "Du willst");
             refreshTradeTapSelection();
-        }
-
-        function handleTradeDrop(side, cardId) {
-            if (side === "mine") {
-                selectMyTradeCard(cardId);
-                return;
-            }
-
-            if (side === "wanted") {
-                selectWantedTradeCard(cardId);
-            }
         }
 
         function resetTradeForm() {
@@ -1857,13 +1876,6 @@ async function loadTradingPage(tg, user) {
                 `).join("");
             }
         }
-
-        const allTradeOffers = traderData.trade_offers || [];
-        const incomingOffers = allTradeOffers.filter(offer => Number(offer.to_user_id) === Number(user.id));
-        const outgoingOffers = allTradeOffers.filter(offer => Number(offer.from_user_id) === Number(user.id));
-
-        renderTradeOfferCards(incomingTradeOffersList, incomingOffers, user.id);
-        renderTradeOfferCards(outgoingTradeOffersList, outgoingOffers, user.id);
 
         if (document.getElementById("tradeFeedback") && !document.getElementById("tradeFeedback").dataset.initialized) {
             document.getElementById("tradeFeedback").dataset.initialized = "1";
@@ -1923,16 +1935,6 @@ async function loadTradingPage(tg, user) {
                     return;
                 }
                 selectMyTradeCard(cardButton.dataset.cardId);
-            });
-            myTradeTapCards.addEventListener("dragstart", event => {
-                const cardButton = event.target.closest(".trade-tap-card");
-                if (!cardButton) {
-                    return;
-                }
-                event.dataTransfer.setData("text/plain", JSON.stringify({
-                    side: cardButton.dataset.side,
-                    cardId: cardButton.dataset.cardId
-                }));
             });
         }
 
@@ -2011,47 +2013,7 @@ async function loadTradingPage(tg, user) {
                 }
                 selectWantedTradeCard(cardButton.dataset.cardId);
             });
-            wantedTradeTapCards.addEventListener("dragstart", event => {
-                const cardButton = event.target.closest(".trade-tap-card");
-                if (!cardButton) {
-                    return;
-                }
-                event.dataTransfer.setData("text/plain", JSON.stringify({
-                    side: cardButton.dataset.side,
-                    cardId: cardButton.dataset.cardId
-                }));
-            });
         }
-
-        document.querySelectorAll(".trade-drop-zone").forEach(zone => {
-            if (zone.dataset.bound) {
-                return;
-            }
-
-            zone.dataset.bound = "1";
-            zone.addEventListener("dragover", event => {
-                event.preventDefault();
-                zone.classList.add("is-drag-over");
-            });
-            zone.addEventListener("dragleave", () => {
-                zone.classList.remove("is-drag-over");
-            });
-            zone.addEventListener("drop", event => {
-                event.preventDefault();
-                zone.classList.remove("is-drag-over");
-
-                try {
-                    const payload = JSON.parse(event.dataTransfer.getData("text/plain") || "{}");
-                    if (payload.side !== zone.dataset.dropSide) {
-                        showToast("Diese Karte gehoert in den anderen Trade-Slot.", "error");
-                        return;
-                    }
-                    handleTradeDrop(payload.side, payload.cardId);
-                } catch (error) {
-                    showToast("Drag & Drop konnte nicht gelesen werden.", "error");
-                }
-            });
-        });
 
         if (preselectTargetUserId && targetTraderSelect && targetTraderSelect.value !== preselectTargetUserId) {
             targetTraderSelect.value = preselectTargetUserId;
@@ -2111,8 +2073,9 @@ async function loadTradingPage(tg, user) {
                         return;
                     }
 
-                    renderTradeFeedback("Trade-Angebot erfolgreich erstellt. Es ist jetzt im Bereich <strong>Gesendete Trades</strong> sichtbar.", "success");
+                    renderTradeFeedback("Trade-Angebot erstellt. Du findest es jetzt in <strong>Mail</strong> bei gesendeten Angeboten.", "success");
                     resetTradeForm();
+                    await loadTradeSummary(tg, user);
                     await loadTradingPage(tg, user);
                 } catch (error) {
                     console.log(error);
@@ -2275,6 +2238,105 @@ async function loadTradingPage(tg, user) {
                     renderCardInventory(result.card_inventory || []);
                     await loadTradeSummary(tg, user);
                     await loadTradingPage(tg, user);
+                } catch (error) {
+                    console.log(error);
+                    showToast("Fehler bei Debug Accept.", "error");
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        });
+    } catch (error) {
+        console.log(error);
+    }
+}
+
+async function loadMailPage(tg, user) {
+    try {
+        const traderData = await postJson("/traders", {
+            initData: tg.initData,
+            user_id: user.id
+        });
+
+        if (!traderData.ok) {
+            return;
+        }
+
+        const allTradeOffers = traderData.trade_offers || [];
+        const incomingOffers = allTradeOffers.filter(offer => Number(offer.to_user_id) === Number(user.id));
+        const outgoingOffers = allTradeOffers.filter(offer => Number(offer.from_user_id) === Number(user.id));
+
+        renderTradeOfferCards(document.getElementById("incomingTradeOffersList"), incomingOffers, user.id);
+        renderTradeOfferCards(document.getElementById("outgoingTradeOffersList"), outgoingOffers, user.id);
+
+        if (document.getElementById("tradeFeedback") && !document.getElementById("tradeFeedback").dataset.initialized) {
+            document.getElementById("tradeFeedback").dataset.initialized = "1";
+            renderTradeFeedback("Hier kannst du Trade-Angebote annehmen, ablehnen oder Test-Trades simulieren.", "info");
+        }
+
+        document.querySelectorAll(".trade-response-btn").forEach(button => {
+            if (button.dataset.bound) {
+                return;
+            }
+
+            button.dataset.bound = "1";
+            button.addEventListener("click", async () => {
+                button.disabled = true;
+
+                try {
+                    const result = await postJson("/trade-offer/respond", {
+                        initData: tg.initData,
+                        user_id: user.id,
+                        trade_id: button.dataset.tradeId,
+                        action: button.dataset.action
+                    });
+
+                    if (!result.ok) {
+                        showToast("Trade konnte nicht verarbeitet werden.", "error");
+                        return;
+                    }
+
+                    renderTradeFeedback(
+                        button.dataset.action === "accept"
+                            ? "Trade erfolgreich angenommen. Die Karten wurden getauscht."
+                            : "Trade wurde abgelehnt und geschlossen.",
+                        "success"
+                    );
+                    await loadTradeSummary(tg, user);
+                    await loadMailPage(tg, user);
+                } catch (error) {
+                    console.log(error);
+                    showToast("Fehler beim Bearbeiten des Trades.", "error");
+                } finally {
+                    button.disabled = false;
+                }
+            });
+        });
+
+        document.querySelectorAll(".trade-debug-accept-btn").forEach(button => {
+            if (button.dataset.bound) {
+                return;
+            }
+
+            button.dataset.bound = "1";
+            button.addEventListener("click", async () => {
+                button.disabled = true;
+
+                try {
+                    const result = await postJson("/trade-offer/debug-accept", {
+                        initData: tg.initData,
+                        user_id: user.id,
+                        trade_id: button.dataset.tradeId
+                    });
+
+                    if (!result.ok) {
+                        showToast(result.error || "Debug Accept fehlgeschlagen.", "error");
+                        return;
+                    }
+
+                    renderTradeFeedback("Debug Accept erfolgreich. Der Test-Trade wurde simuliert und die Karten wurden getauscht.", "success");
+                    await loadTradeSummary(tg, user);
+                    await loadMailPage(tg, user);
                 } catch (error) {
                     console.log(error);
                     showToast("Fehler bei Debug Accept.", "error");
