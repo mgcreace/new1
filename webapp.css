@@ -246,7 +246,7 @@ h2{
 
 .hero-card-preview{
     position:absolute;
-    inset:120px 74px 118px 22px;
+    inset:120px 22px 118px 22px;
     z-index:1;
     border-radius:34px;
     padding:28px;
@@ -306,38 +306,10 @@ h2{
     line-height:1.45;
 }
 
-.hero-side-actions{
-    position:absolute;
-    right:18px;
-    bottom:132px;
-    z-index:2;
-    display:grid;
-    gap:18px;
-}
-
-.side-action{
-    width:54px;
-    height:54px;
-    border-radius:999px;
-    display:grid;
-    place-items:center;
-    background:rgba(255,255,255,.95);
-    color:#050713;
-    text-decoration:none;
-    font-size:23px;
-    font-weight:900;
-    box-shadow:0 12px 28px rgba(0,0,0,.32);
-}
-
-.side-action-plus{
-    background:linear-gradient(135deg, #22d3ee, #fff 42%, #f43f5e);
-    font-size:32px;
-}
-
 .hero-caption{
     position:absolute;
     left:22px;
-    right:94px;
+    right:22px;
     bottom:24px;
     z-index:2;
     display:grid;
@@ -823,7 +795,7 @@ h2{
         display:grid;
         grid-template-columns:repeat(6, minmax(0, 1fr));
         gap:0;
-        padding:8px 6px calc(8px + env(safe-area-inset-bottom));
+        padding:9px 4px calc(9px + env(safe-area-inset-bottom));
         background:#02040b;
         border-top:1px solid rgba(255,255,255,.10);
         pointer-events:auto;
@@ -832,8 +804,8 @@ h2{
     .topnav a{
         position:relative;
         text-align:center;
-        padding:4px 2px 2px;
-        font-size:11px;
+        padding:3px 1px 1px;
+        font-size:10px;
         border-radius:12px;
         background:transparent;
         border:none;
@@ -843,17 +815,43 @@ h2{
     .topnav a::before{
         content:"";
         display:block;
-        width:24px;
-        height:24px;
+        width:27px;
+        height:27px;
         margin:0 auto 4px;
-        border-radius:8px;
-        border:2px solid currentColor;
+        border-radius:9px;
+        border:2.4px solid currentColor;
         box-sizing:border-box;
+        transition:transform .18s ease, border-color .18s ease, background .18s ease;
+    }
+
+    .topnav a[data-page="home"]::before{
+        border-radius:9px 9px 7px 7px;
+        border-top-width:7px;
+        transform:rotate(45deg) scale(.82);
+    }
+
+    .topnav a[data-page="shop"]::before{
+        border-radius:8px;
+        border-top-width:8px;
+    }
+
+    .topnav a[data-page="inventory"]::before{
+        border-radius:9px 9px 12px 12px;
+        border-top-width:7px;
+    }
+
+    .topnav a[data-page="trading"]::before{
+        border-radius:999px;
+    }
+
+    .topnav a[data-page="account"]::before{
+        border-radius:999px 999px 10px 10px;
     }
 
     .topnav a[data-page="openbooster"]::before{
-        width:48px;
-        border-radius:16px;
+        width:52px;
+        height:30px;
+        border-radius:18px;
         background:linear-gradient(135deg, #22d3ee, #fff 42%, #f43f5e);
         border:none;
         box-shadow:0 0 18px rgba(34,211,238,.26);
@@ -868,12 +866,20 @@ h2{
         content:"+";
         position:absolute;
         left:50%;
-        top:4px;
+        top:3px;
         transform:translateX(-50%);
         color:#050713;
-        font-size:30px;
-        line-height:24px;
+        font-size:31px;
+        line-height:27px;
         font-weight:900;
+    }
+
+    .topnav a.active::before{
+        transform:translateY(-2px) scale(1.05);
+    }
+
+    .topnav a[data-page="home"].active::before{
+        transform:translateY(-2px) rotate(45deg) scale(.88);
     }
 
     .topnav a.active{
@@ -990,8 +996,8 @@ h2{
     }
 
     .topnav{
-        grid-template-columns:1fr 1fr;
-        gap:8px;
+        grid-template-columns:repeat(6, minmax(0, 1fr));
+        gap:0;
     }
 
     .topnav a{
