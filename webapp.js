@@ -1348,11 +1348,21 @@ async function loadBoosterShop(tg, user) {
 
         const boosterShop = document.getElementById("boosterShop");
         if (boosterShop) {
+            const ownedPackCounts = {};
+            (data.inventory || []).forEach(item => {
+                ownedPackCounts[item.pack_key] = Number(item.amount || 0);
+            });
+
             boosterShop.innerHTML = data.packs.map(pack => `
-                <button class="shop-btn booster-buy-btn booster-product-card" data-pack-key="${pack.pack_key}">
+                <button class="shop-btn booster-buy-btn booster-product-card booster-product-${pack.pack_key}" data-pack-key="${pack.pack_key}">
+                    <span class="shop-pack-owned">Besitz: ${ownedPackCounts[pack.pack_key] || 0}</span>
                     ${renderPackArt(pack.name, pack.image_url, "shop-pack-art")}
                     <span class="shop-product-name">${pack.name}</span>
-                    <small>${pack.price} Coins | 12 Karten</small>
+                    <span class="shop-pack-meta-row">
+                        <small>12 Karten</small>
+                        <small>1 Rare+</small>
+                    </span>
+                    <span class="shop-price-chip">${pack.price} Coins</span>
                 </button>
             `).join("");
 

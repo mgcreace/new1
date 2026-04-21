@@ -1186,7 +1186,8 @@ h2{
 }
 
 .booster-product-card{
-    min-height:168px;
+    min-height:198px;
+    padding-top:30px;
     background:
         radial-gradient(circle at 78% 0%, rgba(34,211,238,.22), transparent 34%),
         radial-gradient(circle at 0% 100%, rgba(244,63,94,.16), transparent 32%),
@@ -1199,6 +1200,69 @@ h2{
     inset:0;
     background:linear-gradient(120deg, transparent 0 38%, rgba(255,255,255,.08) 39% 45%, transparent 46% 100%);
     pointer-events:none;
+}
+
+.booster-product-starter_pack{
+    border-color:rgba(103,232,249,.26);
+}
+
+.booster-product-speed_pack{
+    border-color:rgba(250,204,21,.32);
+    background:
+        radial-gradient(circle at 76% 0%, rgba(250,204,21,.28), transparent 34%),
+        radial-gradient(circle at 0% 100%, rgba(34,211,238,.20), transparent 34%),
+        linear-gradient(180deg, rgba(41,37,36,.98), rgba(2,6,23,.96));
+}
+
+.booster-product-legend_pack{
+    border-color:rgba(167,139,250,.36);
+    background:
+        radial-gradient(circle at 76% 0%, rgba(250,204,21,.24), transparent 32%),
+        radial-gradient(circle at 0% 100%, rgba(167,139,250,.26), transparent 34%),
+        linear-gradient(180deg, rgba(30,27,75,.98), rgba(2,6,23,.96));
+}
+
+.shop-pack-owned{
+    position:absolute;
+    top:9px;
+    right:9px;
+    z-index:2;
+    padding:5px 8px;
+    border-radius:999px;
+    background:rgba(2,6,23,.58);
+    border:1px solid rgba(255,255,255,.12);
+    color:#e2e8f0;
+    font-size:10px;
+    font-weight:900;
+}
+
+.shop-pack-meta-row{
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    margin:8px 0 10px;
+}
+
+.shop-pack-meta-row small{
+    padding:5px 7px;
+    border-radius:999px;
+    background:rgba(255,255,255,.08);
+    color:#cbd5e1;
+    font-size:10px;
+}
+
+.shop-price-chip{
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    min-height:34px;
+    padding:0 12px;
+    border-radius:999px;
+    background:linear-gradient(135deg, #fef08a, #f59e0b);
+    color:#231307;
+    font-size:13px;
+    font-weight:950;
+    box-shadow:0 10px 24px rgba(245,158,11,.18);
 }
 
 .booster-buy-feedback{
