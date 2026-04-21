@@ -24,58 +24,88 @@
 </nav>
 </header>
 
-<main>
-<h1>Account</h1>
-<div class="card">
-<p id="telegramID"></p>
-<p id="status">Loading...</p>
-<p id="coins">Coins: 0</p>
+<main class="account-screen">
+<section class="profile-hero">
+<div class="profile-actions">
+<span class="profile-action-icon profile-add-icon" aria-hidden="true"></span>
+<span class="profile-action-icon profile-menu-icon" aria-hidden="true"></span>
 </div>
 
-<div class="card">
-<h2>Profil</h2>
-<p class="stat">Name: <span id="accountName">-</span></p>
-<p class="stat">Telegram ID: <span id="accountId">-</span></p>
+<div class="profile-avatar-wrap">
+<img id="accountAvatar" class="profile-avatar" alt="avatar">
+<span class="profile-avatar-plus">+</span>
 </div>
 
-<div class="card">
+<h1 id="accountProfileName">Account</h1>
+<p id="accountHandle" class="profile-handle">@user</p>
+<p id="telegramID" class="profile-id"></p>
+
+<div class="profile-stats">
+<div>
+<strong id="accountCoins">0</strong>
+<span>Coins</span>
+</div>
+<div>
+<strong id="accountCards">0</strong>
+<span>Karten</span>
+</div>
+<div>
+<strong id="accountBoosters">0</strong>
+<span>Booster</span>
+</div>
+</div>
+
+<p id="accountBioText" class="profile-bio">Baue dein Deck, oeffne Booster und trade mit anderen Spielern.</p>
+
+<div class="profile-pill-row">
+<span id="status" class="profile-pill">Loading...</span>
+<span id="accountTradingStatus" class="profile-pill">Trading laden</span>
+<span id="accountVisibilityStatus" class="profile-pill">Inventar laden</span>
+</div>
+</section>
+
+<section class="profile-tabs">
+<a href="#profileForm" class="profile-tab active">Bearbeiten</a>
+<a href="#profileSummary" class="profile-tab">Status</a>
+<a href="#cardInventoryList" class="profile-tab">Karten</a>
+</section>
+
+<section class="profile-edit-panel">
 <h2>Profil bearbeiten</h2>
 <form id="profileForm">
-<p class="stat">Display Name</p>
-<input id="displayName" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:white;">
+<label class="form-label" for="displayName">Display Name</label>
+<input id="displayName" class="form-control">
 
-<p class="stat">Bio</p>
-<textarea id="bio" rows="4" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:white;"></textarea>
+<label class="form-label" for="bio">Bio</label>
+<textarea id="bio" class="form-control" rows="4"></textarea>
 
-<p class="stat">Inventar Sichtbarkeit</p>
-<select id="inventoryVisibility" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:white;">
+<label class="form-label" for="inventoryVisibility">Inventar Sichtbarkeit</label>
+<select id="inventoryVisibility" class="form-control">
 <option value="public">public</option>
 <option value="private">private</option>
 </select>
 
-<p class="stat">Lieblingskarte</p>
-<select id="favoriteCardId" style="width:100%;padding:12px;border-radius:12px;border:1px solid #334155;background:#0b1220;color:white;"></select>
+<label class="form-label" for="favoriteCardId">Lieblingskarte</label>
+<select id="favoriteCardId" class="form-control"></select>
 
-<p class="stat">
-<label>
+<label class="toggle-row">
 <input type="checkbox" id="tradingEnabled">
- Trading aktivieren
+<span>Trading aktivieren</span>
 </label>
-</p>
 
 <button id="saveProfileButton" class="shop-btn" type="submit">Profil speichern<small>Privacy und Profil aktualisieren</small></button>
 </form>
-</div>
+</section>
 
-<div class="card">
+<section class="profile-panel">
 <h2>Profil Status</h2>
 <div id="profileSummary" class="inventory-list"></div>
-</div>
+</section>
 
-<div class="card">
+<section class="profile-panel">
 <h2>Deine Karten</h2>
 <div id="cardInventoryList" class="inventory-list"></div>
-</div>
+</section>
 </main>
 
 <script src="../webapp.js"></script>

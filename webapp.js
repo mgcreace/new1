@@ -48,6 +48,37 @@ function formatDate(value) {
     return date.toLocaleString();
 }
 
+function updateAccountHero(user, secureData = {}, profile = {}) {
+    const displayName = profile.display_name || user.first_name || "User";
+    const username = user.username ? `@${user.username}` : `@user_${user.id}`;
+    const avatarUrl = user.photo_url || "https://via.placeholder.com/120";
+    const cardCount = (secureData.card_inventory || []).reduce((sum, item) => sum + Number(item.quantity || 0), 0);
+    const boosterCount = (secureData.inventory || []).reduce((sum, item) => sum + Number(item.amount || 0), 0);
+
+    const fields = {
+        accountProfileName: displayName,
+        accountHandle: username,
+        accountCoins: Number(secureData.coins || 0),
+        accountCards: cardCount,
+        accountBoosters: boosterCount,
+        accountBioText: profile.bio || "Baue dein Deck, oeffne Booster und trade mit anderen Spielern.",
+        accountTradingStatus: profile.trading_enabled ? "Trading aktiv" : "Trading aus",
+        accountVisibilityStatus: `Inventar ${profile.inventory_visibility || "public"}`
+    };
+
+    Object.entries(fields).forEach(([id, value]) => {
+        const element = document.getElementById(id);
+        if (element) {
+            element.innerText = value;
+        }
+    });
+
+    const accountAvatar = document.getElementById("accountAvatar");
+    if (accountAvatar) {
+        accountAvatar.src = avatarUrl;
+    }
+}
+
 function renderInventory(items) {
     const inventoryList = document.getElementById("inventoryList");
 
@@ -693,6 +724,8 @@ async function initTelegramApp(pageName) {
         avatar.src = user.photo_url || "https://via.placeholder.com/45";
     }
 
+    updateAccountHero(user);
+
     if (telegramID) {
         telegramID.innerText = "ID: " + user.id;
     }
@@ -749,6 +782,7 @@ async function initTelegramApp(pageName) {
     renderInventory(data.inventory || []);
     renderCardInventory(data.card_inventory || []);
     renderDashboardStats(data.inventory || [], data.card_inventory || [], data.coins || 0);
+    updateAccountHero(user, data);
 
     if (pageName === "shop") {
         setupStarShop(tg, user);
@@ -1006,6 +1040,10 @@ async function loadProfilePage(tg, user, secureData) {
 
         const profile = profileData.profile || {};
         const cardInventory = profileData.card_inventory || [];
+        updateAccountHero(user, {
+            ...secureData,
+            card_inventory: cardInventory
+        }, profile);
 
         const accountName = document.getElementById("accountName");
         const accountId = document.getElementById("accountId");
