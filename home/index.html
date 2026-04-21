@@ -25,11 +25,40 @@
 </header>
 
 <main>
-<h1>Dashboard</h1>
-<div class="card">
-<p id="telegramID"></p>
-<p id="status">Loading...</p>
-<p id="coins">Coins: 0</p>
+<section class="feed-hero">
+<div class="feed-tabs">
+<span>Decks</span>
+<span>Booster</span>
+<span class="active">For You</span>
+</div>
+<div class="feed-search">Search</div>
+<div class="hero-card-preview">
+<div class="hero-glow"></div>
+<div class="hero-pack">CARD PACK</div>
+<div class="hero-title">Open. Collect. Trade.</div>
+<div class="hero-subtitle">Baue dein Deck, oeffne Booster und trade Karten mit anderen Spielern.</div>
+</div>
+<div class="hero-side-actions">
+<a href="../openbooster/" class="side-action side-action-plus">+</a>
+<a href="../inventory/" class="side-action">C</a>
+<a href="../trading/" class="side-action">T</a>
+</div>
+<div class="hero-caption">
+<strong id="heroUsername">Dashboard</strong>
+<span id="telegramID"></span>
+<span id="status">Loading...</span>
+<span id="coins">Coins: 0</span>
+</div>
+</section>
+
+<div class="card app-card-over-hero">
+<h2>Heute bereit</h2>
+<p class="hint">Starte direkt mit Booster oeffnen, Shop oder deiner Sammlung.</p>
+<div class="grid">
+<a class="shop-btn quick-link-btn" href="../shop/">Shop<small>Coins ausgeben</small></a>
+<a class="shop-btn quick-link-btn" href="../openbooster/">Open<small>Booster revealen</small></a>
+<a class="shop-btn quick-link-btn" href="../inventory/">Cards<small>Sammlung ansehen</small></a>
+</div>
 </div>
 
 <div class="card">
@@ -40,16 +69,6 @@
 <div class="card">
 <h2>Rarity Uebersicht</h2>
 <div id="rarityStats" class="stats-grid"></div>
-</div>
-
-<div class="card">
-<h2>Schnellzugriff</h2>
-<div class="grid">
-<a class="shop-btn quick-link-btn" href="../shop/">Booster kaufen<small>Direkt in den Shop</small></a>
-<a class="shop-btn quick-link-btn" href="../openbooster/">Booster oeffnen<small>Letzten Pull starten</small></a>
-<a class="shop-btn quick-link-btn" href="../inventory/">Inventar<small>Sammlung ansehen</small></a>
-<a class="shop-btn quick-link-btn" href="../trading/">Trading<small>Trades erstellen</small></a>
-</div>
 </div>
 
 <div class="card">

@@ -677,11 +677,16 @@ async function initTelegramApp(pageName) {
     window.__tgApp = { tg, user };
 
     const username = document.getElementById("username");
+    const heroUsername = document.getElementById("heroUsername");
     const avatar = document.getElementById("avatar");
     const telegramID = document.getElementById("telegramID");
 
     if (username) {
         username.innerText = user.first_name || "User";
+    }
+
+    if (heroUsername) {
+        heroUsername.innerText = user.first_name || "Dashboard";
     }
 
     if (avatar) {
