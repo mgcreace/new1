@@ -1226,6 +1226,20 @@ function setupStarShop(tg, user) {
     });
 }
 
+function renderPackArt(name, imageUrl, className) {
+    const label = String(name || "PK").slice(0, 2).toUpperCase();
+
+    if (imageUrl) {
+        return `
+            <span class="${className} has-image">
+                <img src="${imageUrl}" alt="${name || "Booster Pack"}">
+            </span>
+        `;
+    }
+
+    return `<span class="${className}">${label}</span>`;
+}
+
 async function loadBoosterShop(tg, user) {
     try {
         const data = await postJson("/booster-shop", {
@@ -1246,7 +1260,7 @@ async function loadBoosterShop(tg, user) {
         if (boosterShop) {
             boosterShop.innerHTML = data.packs.map(pack => `
                 <button class="shop-btn booster-buy-btn booster-product-card" data-pack-key="${pack.pack_key}">
-                    <span class="shop-pack-art">${String(pack.name || "PK").slice(0, 2).toUpperCase()}</span>
+                    ${renderPackArt(pack.name, pack.image_url, "shop-pack-art")}
                     <span class="shop-product-name">${pack.name}</span>
                     <small>${pack.price} Coins | 12 Karten</small>
                 </button>
@@ -1349,9 +1363,7 @@ async function loadOpenBoosterPage(tg, user) {
 
         openBoosterList.innerHTML = ownedBoosters.map(item => `
             <div class="booster-pack-card">
-                <div class="booster-pack-art" aria-hidden="true">
-                    <span>${String(item.pack_name || "PACK").slice(0, 2).toUpperCase()}</span>
-                </div>
+                ${renderPackArt(item.pack_name, item.image_url, "booster-pack-art")}
                 <div class="booster-pack-header">
                     <div class="booster-pack-title">${item.pack_name}</div>
                     <div class="booster-pack-count">${item.amount}x</div>
