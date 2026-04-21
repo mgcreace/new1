@@ -1721,6 +1721,8 @@ async function loadTradingPage(tg, user) {
         const wantedTradeQuantity = document.getElementById("wantedTradeQuantity");
         const myTradePreview = document.getElementById("myTradePreview");
         const wantedTradePreview = document.getElementById("wantedTradePreview");
+        const myTradeTapCards = document.getElementById("myTradeTapCards");
+        const wantedTradeTapCards = document.getElementById("wantedTradeTapCards");
         const tradeParams = new URLSearchParams(window.location.search);
         const preselectTargetUserId = tradeParams.get("target_user_id");
         const preselectWantedCardId = tradeParams.get("wanted_card_id");
@@ -1761,6 +1763,54 @@ async function loadTradingPage(tg, user) {
             showToast(message, "error");
         }
 
+        function renderTradeTapCards(targetElement, cards, selectedCardId, emptyMessage, side) {
+            if (!targetElement) {
+                return;
+            }
+
+            if (!cards || !cards.length) {
+                targetElement.innerHTML = `<div class="inventory-item">${emptyMessage}</div>`;
+                return;
+            }
+
+            targetElement.innerHTML = cards.map(card => `
+                <button type="button" class="trade-tap-card ${String(selectedCardId || "") === String(card.card_id) ? "is-selected" : ""}" data-side="${side}" data-card-id="${card.card_id}">
+                    ${getCardArtMarkup(card)}
+                    <strong>${card.card_name}</strong>
+                    <span>${card.rarity} | x${card.quantity}</span>
+                </button>
+            `).join("");
+        }
+
+        function refreshTradeTapSelection() {
+            renderTradeTapCards(myTradeTapCards, myCardInventory, myTradeCardSelect ? myTradeCardSelect.value : "", "Du hast noch keine Karten zum Traden.", "mine");
+            renderTradeTapCards(wantedTradeTapCards, selectedTargetCards, wantedTradeCardSelect ? wantedTradeCardSelect.value : "", "Waehle zuerst einen Trader.", "wanted");
+        }
+
+        function selectMyTradeCard(cardId) {
+            if (!myTradeCardSelect) {
+                return;
+            }
+
+            myTradeCardSelect.value = cardId || "";
+            const selectedCard = findCardById(myCardInventory, myTradeCardSelect.value);
+            fillQuantitySelect(myTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Deine Menge");
+            updateTradePreview(myTradePreview, selectedCard, "Deine ausgewaehlte Karte erscheint hier.", "DEIN", myTradeQuantity ? myTradeQuantity.value : 1, "Du gibst");
+            refreshTradeTapSelection();
+        }
+
+        function selectWantedTradeCard(cardId) {
+            if (!wantedTradeCardSelect) {
+                return;
+            }
+
+            wantedTradeCardSelect.value = cardId || "";
+            const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect.value);
+            fillQuantitySelect(wantedTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Wunsch-Menge");
+            updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity ? wantedTradeQuantity.value : 1, "Du willst");
+            refreshTradeTapSelection();
+        }
+
         function resetTradeForm() {
             if (targetTraderSelect) {
                 targetTraderSelect.value = "";
@@ -1776,6 +1826,7 @@ async function loadTradingPage(tg, user) {
             selectedTargetCards = [];
             renderCardCollection([], myTradePreview, "Deine ausgewaehlte Karte erscheint hier.", { slotLabel: "DEIN" });
             renderCardCollection([], wantedTradePreview, "Die Wunschkarte des Traders erscheint hier.", { slotLabel: "WUNSCH" });
+            refreshTradeTapSelection();
         }
 
         if (traderList) {
@@ -1819,6 +1870,7 @@ async function loadTradingPage(tg, user) {
             user_id: user.id
         });
         const myCardInventory = myCards.card_inventory || [];
+        refreshTradeTapSelection();
 
         if (myTradeCardSelect) {
             myTradeCardSelect.innerHTML = "<option value=''>Deine Karte waehlen</option>" + myCardInventory.map(card => (
@@ -1840,9 +1892,7 @@ async function loadTradingPage(tg, user) {
         if (myTradeCardSelect && !myTradeCardSelect.dataset.bound) {
             myTradeCardSelect.dataset.bound = "1";
             myTradeCardSelect.addEventListener("change", () => {
-                const selectedCard = findCardById(myCardInventory, myTradeCardSelect.value);
-                fillQuantitySelect(myTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Deine Menge");
-                updateTradePreview(myTradePreview, selectedCard, "Deine ausgewaehlte Karte erscheint hier.", "DEIN", myTradeQuantity ? myTradeQuantity.value : 1, "Du gibst");
+                selectMyTradeCard(myTradeCardSelect.value);
             });
         }
 
@@ -1851,6 +1901,17 @@ async function loadTradingPage(tg, user) {
             myTradeQuantity.addEventListener("change", () => {
                 const selectedCard = findCardById(myCardInventory, myTradeCardSelect ? myTradeCardSelect.value : "");
                 updateTradePreview(myTradePreview, selectedCard, "Deine ausgewaehlte Karte erscheint hier.", "DEIN", myTradeQuantity.value, "Du gibst");
+            });
+        }
+
+        if (myTradeTapCards && !myTradeTapCards.dataset.bound) {
+            myTradeTapCards.dataset.bound = "1";
+            myTradeTapCards.addEventListener("click", event => {
+                const cardButton = event.target.closest(".trade-tap-card");
+                if (!cardButton) {
+                    return;
+                }
+                selectMyTradeCard(cardButton.dataset.cardId);
             });
         }
 
@@ -1863,6 +1924,7 @@ async function loadTradingPage(tg, user) {
             fillQuantitySelect(wantedTradeQuantity, 1, "Wunsch-Menge");
             selectedTargetCards = [];
             renderCardCollection([], wantedTradePreview, "Die Wunschkarte des Traders erscheint hier.", { slotLabel: "WUNSCH" });
+            refreshTradeTapSelection();
 
             if (!targetTraderSelect.value) {
                 return;
@@ -1893,6 +1955,8 @@ async function loadTradingPage(tg, user) {
                 wantedTradeCardSelect.classList.add("field-needs-attention");
                 window.setTimeout(() => wantedTradeCardSelect.classList.remove("field-needs-attention"), 1400);
             }
+
+            refreshTradeTapSelection();
         }
 
         if (targetTraderSelect && !targetTraderSelect.dataset.bound) {
@@ -1905,9 +1969,7 @@ async function loadTradingPage(tg, user) {
         if (wantedTradeCardSelect && !wantedTradeCardSelect.dataset.bound) {
             wantedTradeCardSelect.dataset.bound = "1";
             wantedTradeCardSelect.addEventListener("change", () => {
-                const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect.value);
-                fillQuantitySelect(wantedTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Wunsch-Menge");
-                updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity ? wantedTradeQuantity.value : 1, "Du willst");
+                selectWantedTradeCard(wantedTradeCardSelect.value);
             });
         }
 
@@ -1916,6 +1978,17 @@ async function loadTradingPage(tg, user) {
             wantedTradeQuantity.addEventListener("change", () => {
                 const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect ? wantedTradeCardSelect.value : "");
                 updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity.value, "Du willst");
+            });
+        }
+
+        if (wantedTradeTapCards && !wantedTradeTapCards.dataset.bound) {
+            wantedTradeTapCards.dataset.bound = "1";
+            wantedTradeTapCards.addEventListener("click", event => {
+                const cardButton = event.target.closest(".trade-tap-card");
+                if (!cardButton) {
+                    return;
+                }
+                selectWantedTradeCard(cardButton.dataset.cardId);
             });
         }
 
