@@ -1052,15 +1052,19 @@ async function loadOpenBoosterPage(tg, user) {
 
         openBoosterList.innerHTML = ownedBoosters.map(item => `
             <div class="booster-pack-card">
+                <div class="booster-pack-art" aria-hidden="true">
+                    <span>${String(item.pack_name || "PACK").slice(0, 2).toUpperCase()}</span>
+                </div>
                 <div class="booster-pack-header">
                     <div class="booster-pack-title">${item.pack_name}</div>
                     <div class="booster-pack-count">${item.amount}x</div>
                 </div>
                 <div class="booster-pack-meta">
-                    <span>Pack Key: ${item.pack_key}</span>
-                    <span>Bereit fuer 12 Karten</span>
+                    <span>${item.pack_key}</span>
+                    <span>12 Karten</span>
+                    <span>1 Rare garantiert</span>
                 </div>
-                <button class="shop-btn open-booster-btn" data-pack-key="${item.pack_key}">
+                <button class="shop-btn open-booster-btn open-pack-cta" data-pack-key="${item.pack_key}">
                     Booster oeffnen
                     <small>12 Karten Reveal starten</small>
                 </button>

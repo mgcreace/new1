@@ -24,40 +24,43 @@
 </nav>
 </header>
 
-<main>
+<main class="open-screen">
+<section class="open-hero">
+<p class="eyebrow">Booster Lab</p>
 <h1>Booster oeffnen</h1>
-<div class="card">
-<p id="telegramID"></p>
-<p id="status">Loading...</p>
-<p id="coins">Coins: 0</p>
+<p class="hint">12 Karten pro Pack: 9 Normal, 1 garantierte Rare und 2 Bonus-Slots.</p>
+<div class="inventory-summary-row">
+<span id="telegramID"></span>
+<span id="status">Loading...</span>
+<span id="coins">Coins: 0</span>
 </div>
+</section>
 
-<div class="card">
+<section class="open-stage-panel">
 <h2>Bereit zum Oeffnen</h2>
-<p class="hint">Jeder Booster enthaelt 12 Karten: 9 normale, 1 garantierte Rare und 2 Bonus-Slots mit Chance auf starke Karten.</p>
 <div id="openReward"></div>
 <div id="openBoosterList" class="inventory-list"></div>
-</div>
+</section>
 
-<div class="card">
+<section class="open-stage-panel">
 <h2>Letzter Reveal</h2>
-<div id="openedCardsList" class="card-reveal-grid"></div>
-</div>
+<div id="openedCardsList" class="card-reveal-grid open-reveal-grid"></div>
+</section>
 
-<div class="card">
+<section class="open-stage-panel">
 <h2>Dein Inventar</h2>
 <div id="inventoryList" class="inventory-list"></div>
-</div>
+</section>
 
-<div class="card">
+<section class="open-stage-panel">
 <h2>Deine Karten</h2>
-<div id="cardInventoryList" class="inventory-list"></div>
-</div>
+<div id="cardInventoryList" class="inventory-list profile-card-grid"></div>
+</section>
 
-<div class="card">
+<section class="open-stage-panel">
 <h2>Letzte Oeffnungen</h2>
 <div id="openHistoryList" class="history-list"></div>
-</div>
+</section>
 </main>
 
 <script src="../webapp.js"></script>
