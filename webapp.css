@@ -2016,6 +2016,98 @@ h2{
     margin-top:2px;
 }
 
+.card-modal{
+    position:fixed;
+    inset:0;
+    z-index:3000;
+    display:none;
+}
+
+.card-modal.active{
+    display:block;
+}
+
+.card-modal-backdrop{
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.72);
+    backdrop-filter:blur(10px);
+}
+
+.card-modal-sheet{
+    position:absolute;
+    left:12px;
+    right:12px;
+    bottom:calc(10px + env(safe-area-inset-bottom));
+    max-width:520px;
+    margin:0 auto;
+    padding:16px;
+    border-radius:26px;
+    background:
+        radial-gradient(circle at 88% 8%, rgba(34,211,238,.16), transparent 32%),
+        linear-gradient(180deg, rgba(17,24,39,.98), rgba(2,6,23,.98));
+    border:1px solid rgba(148,163,184,.22);
+    box-shadow:0 24px 70px rgba(0,0,0,.48);
+    animation:modalSheetIn .18s ease both;
+}
+
+.card-modal-close{
+    position:absolute;
+    right:14px;
+    top:12px;
+    z-index:2;
+    border:0;
+    border-radius:999px;
+    padding:7px 10px;
+    background:rgba(255,255,255,.10);
+    color:white;
+    font-weight:850;
+}
+
+.card-modal-art{
+    overflow:hidden;
+    min-height:250px;
+    padding:12px;
+    border-radius:22px;
+    margin-bottom:14px;
+    transform:perspective(180px) rotateY(-4deg);
+    box-shadow:12px 14px 0 rgba(15,23,42,.72), 0 22px 44px rgba(34,211,238,.12);
+}
+
+.card-modal-art .card-art,
+.card-modal-art .card-art-fallback{
+    height:190px;
+    border-radius:16px;
+    margin-bottom:12px;
+}
+
+.card-modal-copy span{
+    color:#67e8f9;
+    font-size:12px;
+    font-weight:950;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+}
+
+.card-modal-copy strong{
+    display:block;
+    margin:5px 0 10px;
+    color:white;
+    font-size:28px;
+    line-height:1.05;
+}
+
+@keyframes modalSheetIn{
+    from{
+        opacity:0;
+        transform:translateY(18px) scale(.98);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0) scale(1);
+    }
+}
+
 .detail-title{
     font-size:24px;
     font-weight:800;
@@ -2785,6 +2877,24 @@ h2{
     .favorite-card-btn{
         min-height:48px;
         font-size:13px;
+    }
+
+    .card-modal-sheet{
+        padding:14px;
+        border-radius:24px;
+    }
+
+    .card-modal-art{
+        min-height:220px;
+    }
+
+    .card-modal-art .card-art,
+    .card-modal-art .card-art-fallback{
+        height:166px;
+    }
+
+    .card-modal-copy strong{
+        font-size:24px;
     }
 
     .detail-card-art .card-art,

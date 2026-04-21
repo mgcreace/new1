@@ -479,6 +479,124 @@ function getCardArtMarkup(card) {
     return `<div class="card-art-fallback">${rarity}</div>`;
 }
 
+function getCardDetailData(card, options = {}) {
+    return {
+        card_id: card.card_id || card.id || "",
+        card_name: card.card_name || "Card",
+        rarity: card.rarity || "N",
+        pack_key: card.pack_key || options.packLabel || "",
+        quantity: options.displayQuantity || card.quantity || "",
+        image_url: card.image_url || "",
+        canFavorite: Boolean(options.canFavorite)
+    };
+}
+
+function getCardDetailAttributes(card, options = {}) {
+    const detail = getCardDetailData(card, options);
+    return `
+        data-card-detail="1"
+        data-card-id="${detail.card_id}"
+        data-card-name="${String(detail.card_name).replace(/"/g, "&quot;")}"
+        data-card-rarity="${detail.rarity}"
+        data-card-pack="${detail.pack_key}"
+        data-card-quantity="${detail.quantity}"
+        data-card-image="${detail.image_url}"
+        data-can-favorite="${detail.canFavorite ? "1" : "0"}"
+    `;
+}
+
+function ensureCardModal() {
+    let modal = document.getElementById("cardDetailModal");
+    if (modal) {
+        return modal;
+    }
+
+    modal = document.createElement("div");
+    modal.id = "cardDetailModal";
+    modal.className = "card-modal";
+    modal.innerHTML = `
+        <div class="card-modal-backdrop" data-close-card-modal="1"></div>
+        <div class="card-modal-sheet">
+            <button class="card-modal-close" type="button" data-close-card-modal="1">Close</button>
+            <div id="cardModalContent"></div>
+        </div>
+    `;
+    document.body.appendChild(modal);
+
+    modal.addEventListener("click", event => {
+        if (event.target.dataset.closeCardModal) {
+            closeCardModal();
+        }
+    });
+
+    return modal;
+}
+
+function closeCardModal() {
+    const modal = document.getElementById("cardDetailModal");
+    if (modal) {
+        modal.classList.remove("active");
+    }
+}
+
+function openCardModalFromElement(element) {
+    const modal = ensureCardModal();
+    const content = document.getElementById("cardModalContent");
+    const card = {
+        card_id: element.dataset.cardId,
+        card_name: element.dataset.cardName,
+        rarity: element.dataset.cardRarity,
+        pack_key: element.dataset.cardPack,
+        quantity: element.dataset.cardQuantity,
+        image_url: element.dataset.cardImage
+    };
+
+    content.innerHTML = `
+        <div class="card-modal-art ${getRarityClass(card.rarity)}">
+            ${getCardArtMarkup(card)}
+        </div>
+        <div class="card-modal-copy">
+            <span>${card.rarity || "CARD"}</span>
+            <strong>${card.card_name}</strong>
+            <div class="detail-meta-grid">
+                <span><strong>${card.pack_key || "-"}</strong><small>Pack</small></span>
+                <span><strong>${card.quantity || "-"}</strong><small>Menge</small></span>
+            </div>
+            ${
+                element.dataset.canFavorite === "1" && card.card_id
+                    ? `<button class="shop-btn favorite-card-btn" type="button" data-modal-favorite-card="${card.card_id}">Als Lieblingskarte setzen<small>Im Profil anzeigen</small></button>`
+                    : ""
+            }
+        </div>
+    `;
+
+    const favoriteButton = content.querySelector("[data-modal-favorite-card]");
+    if (favoriteButton) {
+        favoriteButton.addEventListener("click", async () => {
+            await setFavoriteCardFromInventory(favoriteButton.dataset.modalFavoriteCard);
+            closeCardModal();
+        });
+    }
+
+    modal.classList.add("active");
+}
+
+function setupGlobalCardModal() {
+    if (document.body.dataset.cardModalBound) {
+        return;
+    }
+
+    document.body.dataset.cardModalBound = "1";
+    document.addEventListener("click", event => {
+        const cardElement = event.target.closest("[data-card-detail]");
+        if (!cardElement) {
+            return;
+        }
+
+        openCardModalFromElement(cardElement);
+    });
+}
+
 function renderOpenedCards(items, packName) {
     const openedCardsList = document.getElementById("openedCardsList");
 
@@ -492,7 +610,7 @@ function renderOpenedCards(items, packName) {
     }
 
     openedCardsList.innerHTML = items.map(card => `
-        <div class="card-face ${getRarityClass(card.rarity)}">
+        <div class="card-face ${getRarityClass(card.rarity)}" ${getCardDetailAttributes(card, { packLabel: packName })}>
             ${getCardArtMarkup(card)}
             <div class="card-slot">Slot ${card.slot_number}</div>
             <div class="card-name">${card.card_name}</div>
@@ -552,7 +670,7 @@ async function animateOpenedCards(items, packName) {
 
     for (const card of items || []) {
         const cardHtml = `
-            <div class="card-face ${getRarityClass(card.rarity)} reveal-enter ${["SR", "SEC"].includes(String(card.rarity || "").toUpperCase()) ? "reveal-hit" : ""}">
+            <div class="card-face ${getRarityClass(card.rarity)} reveal-enter ${["SR", "SEC"].includes(String(card.rarity || "").toUpperCase()) ? "reveal-hit" : ""}" ${getCardDetailAttributes(card, { packLabel: packName })}>
                 ${getCardArtMarkup(card)}
                 <div class="card-slot">Slot ${card.slot_number}</div>
                 <div class="card-name">${card.card_name}</div>
@@ -578,7 +696,7 @@ function renderCardCollection(items, targetElement, emptyMessage, options = {}) 
     }
 
     targetElement.innerHTML = items.map(item => `
-        <div class="card-face ${getRarityClass(item.rarity)} ${options.clickable ? "clickable" : ""} ${String(options.selectedCardId || "") === String(item.card_id || "") ? "is-selected" : ""}" ${options.clickable ? `data-card-id="${item.card_id}"` : ""}>
+        <div class="card-face ${getRarityClass(item.rarity)} ${options.clickable ? "clickable" : ""} ${String(options.selectedCardId || "") === String(item.card_id || "") ? "is-selected" : ""}" ${options.clickable ? `data-card-id="${item.card_id}"` : ""} ${getCardDetailAttributes(item, options)}>
             ${getCardArtMarkup(item)}
             <div class="card-slot">${options.slotLabel || item.rarity || "CARD"}</div>
             <div class="card-name">${item.card_name}</div>
@@ -633,14 +751,14 @@ function renderTradeOfferCards(targetElement, offers, userId) {
             <span class="muted">Erstellt: ${formatDate(offer.created_at)}</span>
             ${offer.responded_at ? `<br><span class="muted">Bearbeitet: ${formatDate(offer.responded_at)}</span>` : ""}
             <div class="trade-offer-row">
-                <div class="card-face ${getRarityClass(offer.offered_card_rarity)}">
+                <div class="card-face ${getRarityClass(offer.offered_card_rarity)}" ${getCardDetailAttributes({ image_url: offer.offered_card_image_url, card_name: offer.offered_card_name, rarity: offer.offered_card_rarity }, { displayQuantity: offer.offered_quantity || 1 })}>
                     ${getCardArtMarkup({ image_url: offer.offered_card_image_url, card_name: offer.offered_card_name, rarity: offer.offered_card_rarity })}
                     <div class="trade-side-label">${offer.from_user_id === userId ? "Dein Angebot" : "Angeboten an dich"}</div>
                     <div class="card-name">${offer.offered_card_name}</div>
                     <div class="card-rarity">${offer.offered_card_rarity}</div>
                     <div class="card-qty">Menge: ${offer.offered_quantity || 1}</div>
                 </div>
-                <div class="card-face ${getRarityClass(offer.requested_card_rarity)}">
+                <div class="card-face ${getRarityClass(offer.requested_card_rarity)}" ${getCardDetailAttributes({ image_url: offer.requested_card_image_url, card_name: offer.requested_card_name, rarity: offer.requested_card_rarity }, { displayQuantity: offer.requested_quantity || 1 })}>
                     ${getCardArtMarkup({ image_url: offer.requested_card_image_url, card_name: offer.requested_card_name, rarity: offer.requested_card_rarity })}
                     <div class="trade-side-label">${offer.to_user_id === userId ? "Dein Erhalt" : "Dein Wunsch"}</div>
                     <div class="card-name">${offer.requested_card_name}</div>
@@ -790,7 +908,8 @@ function renderInventoryCollectionView() {
 
     renderCardCollection(items, cardInventoryList, "Keine Karten fuer diesen Filter gefunden.", {
         clickable: true,
-        selectedCardId: INVENTORY_STATE.selectedCardId
+        selectedCardId: INVENTORY_STATE.selectedCardId,
+        canFavorite: true
     });
 
     renderInventoryCardDetail(findCardById(items, INVENTORY_STATE.selectedCardId));
@@ -907,6 +1026,7 @@ async function initTelegramApp(pageName) {
     window.__tgApp = { tg, user };
     setupProfileTabs();
     setupKeyboardFriendlyForms();
+    setupGlobalCardModal();
 
     const username = document.getElementById("username");
     const heroUsername = document.getElementById("heroUsername");
@@ -1680,7 +1800,7 @@ async function loadTradingPage(tg, user) {
                                     ? (
                                         profile.visible_cards.length
                                             ? profile.visible_cards.map(card => `
-                                                <div class="card-face ${getRarityClass(card.rarity)}">
+                                                <div class="card-face ${getRarityClass(card.rarity)}" ${getCardDetailAttributes(card)}>
                                                     <div class="card-slot">${card.rarity}</div>
                                                     <div class="card-name">${card.card_name}</div>
                                                     <div class="card-rarity">${card.rarity}</div>
