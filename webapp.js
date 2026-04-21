@@ -1111,11 +1111,17 @@ async function loadProfilePage(tg, user, secureData) {
 
         if (profileSummary) {
             profileSummary.innerHTML = `
-                <div class="inventory-item">
-                    <strong>Aktuelle Einstellungen</strong><br>
-                    Inventar: ${profile.inventory_visibility || "public"}<br>
-                    Trading: ${profile.trading_enabled ? "aktiv" : "aus"}<br>
-                    Lieblingskarte: ${profile.favorite_card_name || "Keine"}
+                <div class="profile-status-card">
+                    <span>Inventar</span>
+                    <strong>${profile.inventory_visibility || "public"}</strong>
+                </div>
+                <div class="profile-status-card">
+                    <span>Trading</span>
+                    <strong>${profile.trading_enabled ? "aktiv" : "aus"}</strong>
+                </div>
+                <div class="profile-status-card wide">
+                    <span>Lieblingskarte</span>
+                    <strong>${profile.favorite_card_name || "Keine"}</strong>
                 </div>
             `;
         }

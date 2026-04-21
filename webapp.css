@@ -564,22 +564,23 @@ h2{
 
 .profile-edit-panel h2,
 .profile-panel h2{
-    margin:0 0 16px;
-    font-size:25px;
+    margin:0 0 12px;
+    font-size:21px;
 }
 
 .form-label{
     display:block;
-    margin:14px 0 7px;
+    margin:11px 0 6px;
     color:rgba(255,255,255,.78);
     font-weight:800;
+    font-size:13px;
     text-align:left;
 }
 
 .form-control{
     width:100%;
-    padding:13px 14px;
-    border-radius:14px;
+    padding:11px 12px;
+    border-radius:12px;
     border:1px solid rgba(148,163,184,.28);
     background:rgba(2,6,23,.86);
     color:white;
@@ -597,13 +598,92 @@ h2{
     display:flex;
     align-items:center;
     gap:10px;
-    margin:16px 0;
-    padding:12px 14px;
-    border-radius:14px;
+    margin:12px 0;
+    padding:11px 12px;
+    border-radius:12px;
     background:rgba(255,255,255,.07);
     color:rgba(255,255,255,.88);
     font-weight:800;
     text-align:left;
+}
+
+.profile-status-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:10px;
+}
+
+.profile-status-card{
+    min-height:72px;
+    padding:13px;
+    border-radius:16px;
+    background:linear-gradient(160deg, rgba(15,23,42,.96), rgba(2,6,23,.94));
+    border:1px solid rgba(148,163,184,.18);
+    text-align:left;
+}
+
+.profile-status-card.wide{
+    grid-column:1 / -1;
+}
+
+.profile-status-card span{
+    display:block;
+    color:rgba(255,255,255,.55);
+    font-size:12px;
+    font-weight:800;
+    text-transform:uppercase;
+    letter-spacing:.06em;
+}
+
+.profile-status-card strong{
+    display:block;
+    margin-top:9px;
+    color:#fff;
+    font-size:18px;
+    line-height:1.15;
+}
+
+.profile-card-grid{
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:8px;
+}
+
+.profile-card-grid .card-face{
+    min-height:132px;
+    padding:7px;
+    border-radius:14px;
+    aspect-ratio:3 / 4;
+}
+
+.profile-card-grid .card-art,
+.profile-card-grid .card-art-fallback{
+    height:58px;
+    margin-bottom:7px;
+    border-radius:10px;
+    font-size:18px;
+}
+
+.profile-card-grid .card-slot{
+    min-width:0;
+    height:22px;
+    padding:0 8px;
+    font-size:10px;
+}
+
+.profile-card-grid .card-name{
+    margin:7px 0 4px;
+    font-size:12px;
+    line-height:1.12;
+}
+
+.profile-card-grid .card-rarity,
+.profile-card-grid .card-pack-label{
+    display:none;
+}
+
+.profile-card-grid .card-qty{
+    margin-top:4px;
+    font-size:11px;
 }
 
 .booster-pack-card{
@@ -1201,7 +1281,7 @@ h2{
     .account-screen .profile-panel{
         margin-left:12px;
         margin-right:12px;
-        padding:14px 13px;
+        padding:13px 12px;
         border-radius:18px;
     }
 
@@ -1245,6 +1325,49 @@ h2{
     .profile-tab{
         padding:10px 4px 9px;
         font-size:13px;
+    }
+
+    .account-screen .shop-btn{
+        min-height:48px;
+        padding:11px 12px;
+        border-radius:13px;
+        font-size:14px;
+    }
+
+    .account-screen .shop-btn small{
+        font-size:11px;
+        margin-top:2px;
+    }
+
+    .profile-card-grid{
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+        gap:7px;
+    }
+
+    .profile-card-grid .card-face{
+        min-height:118px;
+        padding:6px;
+        border-radius:12px;
+    }
+
+    .profile-card-grid .card-art,
+    .profile-card-grid .card-art-fallback{
+        height:48px;
+        margin-bottom:6px;
+    }
+
+    .profile-card-grid .card-name{
+        font-size:11px;
+    }
+
+    .profile-status-card{
+        min-height:64px;
+        padding:11px;
+        border-radius:14px;
+    }
+
+    .profile-status-card strong{
+        font-size:16px;
     }
 
     .toast-stack{
