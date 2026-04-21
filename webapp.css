@@ -1058,6 +1058,23 @@ h2{
     border-color:transparent;
 }
 
+.mail-filter span{
+    display:inline-grid;
+    place-items:center;
+    min-width:20px;
+    height:20px;
+    margin-left:6px;
+    padding:0 6px;
+    border-radius:999px;
+    background:rgba(255,255,255,.12);
+    color:inherit;
+    font-size:11px;
+}
+
+.mail-filter.active span{
+    background:rgba(2,6,23,.16);
+}
+
 .trade-panel h2{
     margin:0 0 10px;
     font-size:21px;

@@ -2366,7 +2366,23 @@ async function loadMailPage(tg, user) {
             bindMailTradeActions();
         }
 
+        function updateMailFilterCounts() {
+            const counts = {
+                incoming: pendingIncomingOffers.length,
+                outgoing: pendingOutgoingOffers.length,
+                done: doneOffers.length
+            };
+
+            document.querySelectorAll(".mail-filter").forEach(button => {
+                const filter = button.dataset.mailFilter || "incoming";
+                button.innerHTML = `${button.dataset.label || button.textContent.split(" ")[0]} <span>${counts[filter] || 0}</span>`;
+            });
+        }
+
         document.querySelectorAll(".mail-filter").forEach(button => {
+            if (!button.dataset.label) {
+                button.dataset.label = button.textContent.trim();
+            }
             if (!button.dataset.bound) {
                 button.dataset.bound = "1";
                 button.addEventListener("click", () => {
@@ -2380,6 +2396,7 @@ async function loadMailPage(tg, user) {
             button.classList.toggle("active", button.dataset.mailFilter === currentMailFilter);
         });
 
+        updateMailFilterCounts();
         renderMailFilter();
 
         if (document.getElementById("tradeFeedback") && !document.getElementById("tradeFeedback").dataset.initialized) {
