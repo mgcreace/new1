@@ -2337,28 +2337,46 @@ async function loadMailPage(tg, user) {
         let currentMailFilter = document.querySelector(".mail-filter.active")?.dataset.mailFilter || "incoming";
 
         function bindMailTradeActions() {
-            document.querySelectorAll(".trade-response-btn").forEach(button => {
-                if (button.dataset.bound) {
+            const mailTradeOffersList = document.getElementById("mailTradeOffersList");
+            if (!mailTradeOffersList || mailTradeOffersList.dataset.bound) {
+                return;
+            }
+
+            mailTradeOffersList.dataset.bound = "1";
+            mailTradeOffersList.addEventListener("click", async event => {
+                const responseButton = event.target.closest(".trade-response-btn");
+                const debugButton = event.target.closest(".trade-debug-accept-btn");
+                const button = responseButton || debugButton;
+
+                if (!button) {
                     return;
                 }
 
-                button.dataset.bound = "1";
-                button.addEventListener("click", async () => {
-                    button.disabled = true;
+                button.disabled = true;
 
-                    try {
-                        const result = await postJson("/trade-offer/respond", {
-                            initData: tg.initData,
-                            user_id: user.id,
-                            trade_id: button.dataset.tradeId,
-                            action: button.dataset.action
-                        });
+                try {
+                    const path = debugButton ? "/trade-offer/debug-accept" : "/trade-offer/respond";
+                    const payload = {
+                        initData: tg.initData,
+                        user_id: user.id,
+                        trade_id: button.dataset.tradeId
+                    };
 
-                        if (!result.ok) {
-                            showToast("Trade konnte nicht verarbeitet werden.", "error");
-                            return;
-                        }
+                    if (responseButton) {
+                        payload.action = button.dataset.action;
+                    }
 
+                    const result = await postJson(path, payload);
+
+                    if (!result.ok) {
+                        showToast(result.error || "Trade konnte nicht verarbeitet werden.", "error");
+                        return;
+                    }
+
+                    if (debugButton) {
+                        renderTradeFeedback("Debug Accept erfolgreich. Der Test-Trade wurde simuliert und die Karten wurden getauscht.", "success");
+                        markInventoryHasNewCards();
+                    } else {
                         renderTradeFeedback(
                             button.dataset.action === "accept"
                                 ? "Trade erfolgreich angenommen. Die Karten wurden getauscht."
@@ -2368,49 +2386,16 @@ async function loadMailPage(tg, user) {
                         if (button.dataset.action === "accept") {
                             markInventoryHasNewCards();
                         }
-                        await loadTradeSummary(tg, user);
-                        await loadMailPage(tg, user);
-                    } catch (error) {
-                        console.log(error);
-                        showToast("Fehler beim Bearbeiten des Trades.", "error");
-                    } finally {
-                        button.disabled = false;
                     }
-                });
-            });
 
-            document.querySelectorAll(".trade-debug-accept-btn").forEach(button => {
-                if (button.dataset.bound) {
-                    return;
+                    await loadTradeSummary(tg, user);
+                    await loadMailPage(tg, user);
+                } catch (error) {
+                    console.log(error);
+                    showToast(debugButton ? "Fehler bei Debug Accept." : "Fehler beim Bearbeiten des Trades.", "error");
+                } finally {
+                    button.disabled = false;
                 }
-
-                button.dataset.bound = "1";
-                button.addEventListener("click", async () => {
-                    button.disabled = true;
-
-                    try {
-                        const result = await postJson("/trade-offer/debug-accept", {
-                            initData: tg.initData,
-                            user_id: user.id,
-                            trade_id: button.dataset.tradeId
-                        });
-
-                        if (!result.ok) {
-                            showToast(result.error || "Debug Accept fehlgeschlagen.", "error");
-                            return;
-                        }
-
-                        renderTradeFeedback("Debug Accept erfolgreich. Der Test-Trade wurde simuliert und die Karten wurden getauscht.", "success");
-                        markInventoryHasNewCards();
-                        await loadTradeSummary(tg, user);
-                        await loadMailPage(tg, user);
-                    } catch (error) {
-                        console.log(error);
-                        showToast("Fehler bei Debug Accept.", "error");
-                    } finally {
-                        button.disabled = false;
-                    }
-                });
             });
         }
 
