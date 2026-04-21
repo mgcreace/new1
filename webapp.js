@@ -1315,6 +1315,8 @@ async function loadBoosterShop(tg, user) {
                             coinsLabel.innerText = "Coins: " + (buyData.coins || 0);
                         }
 
+                        const boughtPack = (data.packs || []).find(pack => pack.pack_key === button.dataset.packKey);
+                        showToast(`${boughtPack ? boughtPack.name : "Booster"} gekauft!`, "success");
                         renderInventory(buyData.inventory || []);
                         renderHistory(buyData.history || []);
                     } catch (error) {
