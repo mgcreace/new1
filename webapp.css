@@ -1008,7 +1008,25 @@ h2{
     background:#090d18;
 }
 
-.shop-pack-art.has-image::before,
+.shop-pack-art.has-image{
+    isolation:isolate;
+}
+
+.shop-pack-art.has-image::before{
+    content:"";
+    display:block;
+    position:absolute;
+    inset:0;
+    z-index:2;
+    border-radius:inherit;
+    background:linear-gradient(115deg, transparent 0 38%, rgba(255,255,255,.32) 44%, transparent 52% 100%);
+    pointer-events:none;
+}
+
+.shop-pack-art.has-image::before{
+    border:0;
+}
+
 .shop-pack-art.has-image::after{
     display:none;
 }
@@ -1020,6 +1038,28 @@ h2{
     display:block;
     object-fit:cover;
     border-radius:inherit;
+}
+
+.pack-art-fallback{
+    display:none;
+}
+
+.shop-pack-art.image-error,
+.booster-pack-art.image-error{
+    display:grid;
+    place-items:center;
+    background:
+        linear-gradient(110deg, transparent 0 42%, rgba(255,255,255,.38) 43% 48%, transparent 49%),
+        linear-gradient(155deg, #67e8f9 0 18%, #eef2ff 42%, #fb7185 100%);
+    color:#02040b;
+}
+
+.shop-pack-art.image-error .pack-art-fallback,
+.booster-pack-art.image-error .pack-art-fallback{
+    display:block;
+    font-size:18px;
+    font-weight:950;
+    letter-spacing:.08em;
 }
 
 .booster-product-card{

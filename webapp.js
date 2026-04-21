@@ -1232,7 +1232,8 @@ function renderPackArt(name, imageUrl, className) {
     if (imageUrl) {
         return `
             <span class="${className} has-image">
-                <img src="${imageUrl}" alt="${name || "Booster Pack"}">
+                <img src="${imageUrl}" alt="${name || "Booster Pack"}" onerror="this.parentElement.classList.add('image-error'); this.remove();">
+                <span class="pack-art-fallback">${label}</span>
             </span>
         `;
     }
