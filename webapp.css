@@ -1840,6 +1840,11 @@ h2{
     border-radius:14px;
 }
 
+.showcase-card-art{
+    transform:perspective(160px) rotateY(-5deg);
+    box-shadow:10px 12px 0 rgba(15,23,42,.72), 0 18px 34px rgba(34,211,238,.12);
+}
+
 .detail-card-art .card-art,
 .detail-card-art .card-art-fallback{
     height:100%;
@@ -1883,6 +1888,24 @@ h2{
     display:block;
     color:white;
     font-size:16px;
+}
+
+.favorite-card-btn{
+    width:100%;
+    min-height:50px;
+    margin-top:11px;
+    padding:11px 12px;
+    border-radius:15px;
+    background:linear-gradient(135deg, #67e8f9, #fff 46%, #fb7185);
+    color:#02040b;
+    font-size:14px;
+    box-shadow:0 14px 28px rgba(34,211,238,.12);
+}
+
+.favorite-card-btn small{
+    color:rgba(2,4,11,.62);
+    font-weight:800;
+    margin-top:2px;
 }
 
 .detail-title{
@@ -2626,6 +2649,11 @@ h2{
 
     .detail-card-art{
         min-height:104px;
+    }
+
+    .favorite-card-btn{
+        min-height:48px;
+        font-size:13px;
     }
 
     .detail-card-art .card-art,

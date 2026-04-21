@@ -679,7 +679,7 @@ function renderInventoryCardDetail(card) {
 
     detailElement.innerHTML = `
         <div class="detail-panel inventory-detail-panel">
-            <div class="detail-card-art ${getRarityClass(card.rarity)}">
+            <div class="detail-card-art showcase-card-art ${getRarityClass(card.rarity)}">
                 ${getCardArtMarkup(card)}
             </div>
             <div>
@@ -690,9 +690,43 @@ function renderInventoryCardDetail(card) {
                     <span><strong>${card.pack_key || "-"}</strong><small>Pack</small></span>
                     <span><strong>${formatDate(card.last_acquired_at)}</strong><small>Erhalten</small></span>
                 </div>
+                <button class="shop-btn favorite-card-btn" type="button" data-card-id="${card.card_id}">
+                    Als Lieblingskarte setzen
+                    <small>Im Profil anzeigen</small>
+                </button>
             </div>
         </div>
     `;
+
+    const favoriteButton = detailElement.querySelector(".favorite-card-btn");
+    if (favoriteButton) {
+        favoriteButton.addEventListener("click", () => setFavoriteCardFromInventory(favoriteButton.dataset.cardId));
+    }
+}
+
+async function setFavoriteCardFromInventory(cardId) {
+    if (!window.__tgApp || !cardId) {
+        return;
+    }
+
+    const { tg, user } = window.__tgApp;
+    try {
+        const result = await postJson("/profile/favorite-card", {
+            initData: tg.initData,
+            user_id: user.id,
+            favorite_card_id: cardId
+        });
+
+        if (!result.ok) {
+            showToast("Lieblingskarte konnte nicht gesetzt werden.", "error");
+            return;
+        }
+
+        showToast("Lieblingskarte gespeichert.", "success");
+    } catch (error) {
+        console.log(error);
+        showToast("Fehler beim Speichern der Lieblingskarte.", "error");
+    }
 }
 
 function renderInventoryCollectionView() {
