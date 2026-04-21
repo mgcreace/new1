@@ -470,9 +470,31 @@ function getRarityClass(rarity) {
     return "card-face-n";
 }
 
+function getAssetUrl(url) {
+    if (!url) {
+        return "";
+    }
+
+    const value = String(url).trim();
+    if (!value) {
+        return "";
+    }
+
+    if (value.startsWith("http://") || value.startsWith("https://") || value.startsWith("data:")) {
+        return value;
+    }
+
+    if (value.startsWith("/")) {
+        return `${API_BASE}${value}`;
+    }
+
+    return value;
+}
+
 function getCardArtMarkup(card) {
-    if (card && card.image_url) {
-        return `<img class="card-art" src="${card.image_url}" alt="${card.card_name || "Card"}">`;
+    const imageUrl = getAssetUrl(card && card.image_url);
+    if (imageUrl) {
+        return `<img class="card-art" src="${imageUrl}" alt="${card.card_name || "Card"}">`;
     }
 
     const rarity = String((card && card.rarity) || "N").toUpperCase();
@@ -1228,11 +1250,12 @@ function setupStarShop(tg, user) {
 
 function renderPackArt(name, imageUrl, className) {
     const label = String(name || "PK").slice(0, 2).toUpperCase();
+    const src = getAssetUrl(imageUrl);
 
-    if (imageUrl) {
+    if (src) {
         return `
             <span class="${className} has-image">
-                <img src="${imageUrl}" alt="${name || "Booster Pack"}" onerror="this.parentElement.classList.add('image-error'); this.remove();">
+                <img src="${src}" alt="${name || "Booster Pack"}" onerror="this.parentElement.classList.add('image-error'); this.remove();">
                 <span class="pack-art-fallback">${label}</span>
             </span>
         `;
