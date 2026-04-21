@@ -881,6 +881,17 @@ function getTradeStatusClass(status) {
     return "trade-status trade-status-pending";
 }
 
+function getTradeStatusLabel(status) {
+    const normalized = String(status || "pending").toLowerCase();
+    if (normalized === "accepted") {
+        return "angenommen";
+    }
+    if (normalized === "rejected") {
+        return "abgelehnt";
+    }
+    return "offen";
+}
+
 function renderTradeFeedback(message, mode = "info") {
     const feedbackBox = document.getElementById("tradeFeedback");
     if (!feedbackBox) {
@@ -893,20 +904,20 @@ function renderTradeFeedback(message, mode = "info") {
     feedbackBox.innerHTML = message;
 }
 
-function renderTradeOfferCards(targetElement, offers, userId) {
+function renderTradeOfferCards(targetElement, offers, userId, emptyMessage = "Noch keine Trades in diesem Bereich.") {
     if (!targetElement) {
         return;
     }
 
     if (!offers.length) {
-        targetElement.innerHTML = "<div class='history-item'>Noch keine Trades in diesem Bereich.</div>";
+        targetElement.innerHTML = `<div class='history-item'>${emptyMessage}</div>`;
         return;
     }
 
     targetElement.innerHTML = offers.map(offer => `
         <div class="trade-offer-card">
             <strong>Trade #${offer.id}</strong><br>
-            <div class="${getTradeStatusClass(offer.status)}">${offer.status}</div><br>
+            <div class="${getTradeStatusClass(offer.status)}">${getTradeStatusLabel(offer.status)}</div><br>
             <span class="muted">Erstellt: ${formatDate(offer.created_at)}</span>
             ${offer.responded_at ? `<br><span class="muted">Bearbeitet: ${formatDate(offer.responded_at)}</span>` : ""}
             <div class="trade-offer-row">
@@ -2259,6 +2270,16 @@ async function loadMailPage(tg, user) {
         const doneOffers = allTradeOffers.filter(offer => offer.status !== "pending");
         let currentMailFilter = document.querySelector(".mail-filter.active")?.dataset.mailFilter || "incoming";
 
+        function getMailEmptyMessage() {
+            if (currentMailFilter === "outgoing") {
+                return "Keine gesendeten offenen Trade-Angebote.";
+            }
+            if (currentMailFilter === "done") {
+                return "Noch keine erledigten Trades.";
+            }
+            return "Keine offenen eingehenden Trade-Angebote.";
+        }
+
         function bindMailTradeActions() {
             const mailTradeOffersList = document.getElementById("mailTradeOffersList");
             if (!mailTradeOffersList || mailTradeOffersList.dataset.bound) {
@@ -2311,6 +2332,10 @@ async function loadMailPage(tg, user) {
                         }
                     }
 
+                    currentMailFilter = "done";
+                    document.querySelectorAll(".mail-filter").forEach(item => {
+                        item.classList.toggle("active", item.dataset.mailFilter === currentMailFilter);
+                    });
                     await loadTradeSummary(tg, user);
                     await loadMailPage(tg, user);
                 } catch (error) {
@@ -2337,7 +2362,7 @@ async function loadMailPage(tg, user) {
                 mailTradeCount.innerText = String(offers.length);
             }
 
-            renderTradeOfferCards(mailTradeOffersList, offers, user.id);
+            renderTradeOfferCards(mailTradeOffersList, offers, user.id, getMailEmptyMessage());
             bindMailTradeActions();
         }
 
