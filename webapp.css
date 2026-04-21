@@ -803,10 +803,12 @@ h2{
 
     .topnav a{
         position:relative;
-        min-height:48px;
+        display:block;
+        min-height:58px;
         text-align:center;
-        padding:34px 1px 1px;
+        padding:42px 1px 1px;
         font-size:10px;
+        line-height:1.1;
         border-radius:12px;
         background:transparent;
         border:none;
@@ -940,7 +942,7 @@ h2{
     .topnav a[data-page="openbooster"]{
         color:#fff;
         font-size:0;
-        padding-top:34px;
+        padding-top:42px;
     }
 
     .topnav a[data-page="openbooster"]::after{
@@ -1084,8 +1086,10 @@ h2{
     }
 
     .topnav a{
+        min-height:58px;
         font-size:10px;
-        padding:4px 1px 2px;
+        padding:42px 1px 1px;
+        line-height:1.1;
     }
 
     main{
