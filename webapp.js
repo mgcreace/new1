@@ -109,6 +109,12 @@ function setupProfileTabs() {
 
 function setupKeyboardFriendlyForms() {
     const focusableSelector = "input, textarea, select";
+    const closeFormFocus = () => {
+        if (document.activeElement && document.activeElement.matches(focusableSelector)) {
+            document.activeElement.blur();
+        }
+        document.body.classList.remove("form-focus-mode");
+    };
 
     document.addEventListener("focusin", event => {
         if (!event.target.matches(focusableSelector)) {
@@ -134,6 +140,18 @@ function setupKeyboardFriendlyForms() {
                 document.body.classList.remove("form-focus-mode");
             }
         }, 120);
+    });
+
+    document.addEventListener("pointerdown", event => {
+        if (!document.body.classList.contains("form-focus-mode")) {
+            return;
+        }
+
+        if (event.target.closest(focusableSelector)) {
+            return;
+        }
+
+        closeFormFocus();
     });
 }
 
