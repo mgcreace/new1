@@ -2150,49 +2150,6 @@ async function loadTradingPage(tg, user) {
             });
         }
 
-        document.querySelectorAll(".trade-response-btn").forEach(button => {
-            if (button.dataset.bound) {
-                return;
-            }
-
-            button.dataset.bound = "1";
-            button.addEventListener("click", async () => {
-                button.disabled = true;
-
-                try {
-                    const result = await postJson("/trade-offer/respond", {
-                        initData: tg.initData,
-                        user_id: user.id,
-                        trade_id: button.dataset.tradeId,
-                        action: button.dataset.action
-                    });
-
-                    if (!result.ok) {
-                        showToast("Trade konnte nicht verarbeitet werden.", "error");
-                        return;
-                    }
-
-                    renderTradeFeedback(
-                        button.dataset.action === "accept"
-                            ? "Trade erfolgreich angenommen. Die Karten wurden getauscht."
-                            : "Trade wurde abgelehnt und geschlossen.",
-                        "success"
-                    );
-                    if (button.dataset.action === "accept") {
-                        markInventoryHasNewCards();
-                    }
-                    renderCardInventory(result.card_inventory || []);
-                    await loadTradeSummary(tg, user);
-                    await loadTradingPage(tg, user);
-                } catch (error) {
-                    console.log(error);
-                    showToast("Fehler beim Bearbeiten des Trades.", "error");
-                } finally {
-                    button.disabled = false;
-                }
-            });
-        });
-
         document.querySelectorAll(".trader-profile-btn").forEach(button => {
             if (button.dataset.bound) {
                 return;
@@ -2278,40 +2235,6 @@ async function loadTradingPage(tg, user) {
             });
         });
 
-        document.querySelectorAll(".trade-debug-accept-btn").forEach(button => {
-            if (button.dataset.bound) {
-                return;
-            }
-
-            button.dataset.bound = "1";
-            button.addEventListener("click", async () => {
-                button.disabled = true;
-
-                try {
-                    const result = await postJson("/trade-offer/debug-accept", {
-                        initData: tg.initData,
-                        user_id: user.id,
-                        trade_id: button.dataset.tradeId
-                    });
-
-                    if (!result.ok) {
-                        showToast(result.error || "Debug Accept fehlgeschlagen.", "error");
-                        return;
-                    }
-
-                    renderTradeFeedback("Debug Accept erfolgreich. Der Test-Trade wurde simuliert und die Karten wurden getauscht.", "success");
-                    markInventoryHasNewCards();
-                    renderCardInventory(result.card_inventory || []);
-                    await loadTradeSummary(tg, user);
-                    await loadTradingPage(tg, user);
-                } catch (error) {
-                    console.log(error);
-                    showToast("Fehler bei Debug Accept.", "error");
-                } finally {
-                    button.disabled = false;
-                }
-            });
-        });
     } catch (error) {
         console.log(error);
     }
