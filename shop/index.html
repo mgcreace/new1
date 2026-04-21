@@ -24,38 +24,42 @@
 </nav>
 </header>
 
-<main>
+<main class="shop-screen">
+<section class="shop-hero">
+<p class="eyebrow">Market</p>
 <h1>Shop</h1>
-<div class="card">
-<p id="telegramID"></p>
-<p id="status">Loading...</p>
-<p id="coins">Coins: 0</p>
+<p class="hint">Kaufe Coins, hol dir Booster und starte danach direkt den Reveal.</p>
+<div class="inventory-summary-row">
+<span id="telegramID"></span>
+<span id="status">Loading...</span>
+<span id="coins">Coins: 0</span>
 </div>
+</section>
 
-<div class="card">
+<section class="shop-panel">
 <h2>Coins kaufen</h2>
 <p class="hint">Falls Telegram Desktop beim Checkout Probleme macht, versuche den Kauf bitte in der mobilen Telegram-App.</p>
-<div class="grid">
-<button class="shop-btn" data-item="coins_100">100 Coins<small>50 Stars</small></button>
-<button class="shop-btn" data-item="coins_500">500 Coins<small>200 Stars</small></button>
-<button class="shop-btn" data-item="coins_1000">1000 Coins<small>350 Stars</small></button>
+<div class="shop-product-grid">
+<button class="shop-btn coin-product-card" data-item="coins_100"><span>100 Coins</span><small>50 Stars</small></button>
+<button class="shop-btn coin-product-card" data-item="coins_500"><span>500 Coins</span><small>200 Stars</small></button>
+<button class="shop-btn coin-product-card" data-item="coins_1000"><span>1000 Coins</span><small>350 Stars</small></button>
 </div>
-</div>
+</section>
 
-<div class="card" id="premiumShopCard">
+<section class="shop-panel" id="premiumShopCard">
 <h2>Premium kaufen</h2>
-<div class="grid">
-<button class="shop-btn" data-item="premium_week">7 Tage<small>100 Stars</small></button>
-<button class="shop-btn" data-item="premium_month">30 Tage<small>300 Stars</small></button>
-<button class="shop-btn" data-item="premium_lifetime">Lifetime<small>1000 Stars</small></button>
+<div class="shop-product-grid">
+<button class="shop-btn premium-product-card" data-item="premium_week"><span>7 Tage</span><small>100 Stars</small></button>
+<button class="shop-btn premium-product-card" data-item="premium_month"><span>30 Tage</span><small>300 Stars</small></button>
+<button class="shop-btn premium-product-card" data-item="premium_lifetime"><span>Lifetime</span><small>1000 Stars</small></button>
 </div>
-</div>
+</section>
 
-<div class="card">
+<section class="shop-panel">
 <h2>Booster Shop</h2>
 <p class="hint">Diese Packs kaufst du mit deinen Coins. Jeder Kauf wird gespeichert und landet direkt in deinem Inventar.</p>
-<div class="grid" id="boosterShop"></div>
-</div>
+<div class="shop-product-grid" id="boosterShop"></div>
+</section>
 </main>
 
 <script src="../webapp.js"></script>
