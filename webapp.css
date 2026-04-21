@@ -2716,6 +2716,16 @@ h2{
     background:linear-gradient(90deg, transparent, rgba(103,232,249,.55), transparent);
 }
 
+.trade-drop-zone{
+    transition:border-color .16s ease, box-shadow .16s ease, transform .16s ease;
+}
+
+.trade-drop-zone.is-drag-over{
+    border-color:rgba(103,232,249,.78);
+    box-shadow:0 0 0 1px rgba(103,232,249,.25), 0 18px 38px rgba(34,211,238,.18);
+    transform:translateY(-2px);
+}
+
 .trade-tap-section{
     display:grid;
     grid-template-columns:repeat(2, minmax(0, 1fr));
@@ -2763,6 +2773,12 @@ h2{
         linear-gradient(180deg, rgba(15,23,42,.96), rgba(2,6,23,.94));
     color:#fff;
     text-align:left;
+    touch-action:manipulation;
+    cursor:grab;
+}
+
+.trade-tap-card:active{
+    cursor:grabbing;
 }
 
 .trade-tap-card.is-selected{

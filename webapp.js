@@ -1774,7 +1774,7 @@ async function loadTradingPage(tg, user) {
             }
 
             targetElement.innerHTML = cards.map(card => `
-                <button type="button" class="trade-tap-card ${String(selectedCardId || "") === String(card.card_id) ? "is-selected" : ""}" data-side="${side}" data-card-id="${card.card_id}">
+                <button type="button" draggable="true" class="trade-tap-card ${String(selectedCardId || "") === String(card.card_id) ? "is-selected" : ""}" data-side="${side}" data-card-id="${card.card_id}">
                     ${getCardArtMarkup(card)}
                     <strong>${card.card_name}</strong>
                     <span>${card.rarity} | x${card.quantity}</span>
@@ -1809,6 +1809,17 @@ async function loadTradingPage(tg, user) {
             fillQuantitySelect(wantedTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Wunsch-Menge");
             updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity ? wantedTradeQuantity.value : 1, "Du willst");
             refreshTradeTapSelection();
+        }
+
+        function handleTradeDrop(side, cardId) {
+            if (side === "mine") {
+                selectMyTradeCard(cardId);
+                return;
+            }
+
+            if (side === "wanted") {
+                selectWantedTradeCard(cardId);
+            }
         }
 
         function resetTradeForm() {
@@ -1913,6 +1924,16 @@ async function loadTradingPage(tg, user) {
                 }
                 selectMyTradeCard(cardButton.dataset.cardId);
             });
+            myTradeTapCards.addEventListener("dragstart", event => {
+                const cardButton = event.target.closest(".trade-tap-card");
+                if (!cardButton) {
+                    return;
+                }
+                event.dataTransfer.setData("text/plain", JSON.stringify({
+                    side: cardButton.dataset.side,
+                    cardId: cardButton.dataset.cardId
+                }));
+            });
         }
 
         async function loadSelectedTargetCards(options = {}) {
@@ -1990,7 +2011,47 @@ async function loadTradingPage(tg, user) {
                 }
                 selectWantedTradeCard(cardButton.dataset.cardId);
             });
+            wantedTradeTapCards.addEventListener("dragstart", event => {
+                const cardButton = event.target.closest(".trade-tap-card");
+                if (!cardButton) {
+                    return;
+                }
+                event.dataTransfer.setData("text/plain", JSON.stringify({
+                    side: cardButton.dataset.side,
+                    cardId: cardButton.dataset.cardId
+                }));
+            });
         }
+
+        document.querySelectorAll(".trade-drop-zone").forEach(zone => {
+            if (zone.dataset.bound) {
+                return;
+            }
+
+            zone.dataset.bound = "1";
+            zone.addEventListener("dragover", event => {
+                event.preventDefault();
+                zone.classList.add("is-drag-over");
+            });
+            zone.addEventListener("dragleave", () => {
+                zone.classList.remove("is-drag-over");
+            });
+            zone.addEventListener("drop", event => {
+                event.preventDefault();
+                zone.classList.remove("is-drag-over");
+
+                try {
+                    const payload = JSON.parse(event.dataTransfer.getData("text/plain") || "{}");
+                    if (payload.side !== zone.dataset.dropSide) {
+                        showToast("Diese Karte gehoert in den anderen Trade-Slot.", "error");
+                        return;
+                    }
+                    handleTradeDrop(payload.side, payload.cardId);
+                } catch (error) {
+                    showToast("Drag & Drop konnte nicht gelesen werden.", "error");
+                }
+            });
+        });
 
         if (preselectTargetUserId && targetTraderSelect && targetTraderSelect.value !== preselectTargetUserId) {
             targetTraderSelect.value = preselectTargetUserId;
