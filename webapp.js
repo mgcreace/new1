@@ -753,8 +753,11 @@ async function animateOpenedCards(items, packName) {
     openedCardsList.innerHTML = "";
 
     for (const card of items || []) {
+        const rarity = String(card.rarity || "N").toUpperCase();
+        const isBigHit = ["SR", "SEC"].includes(rarity);
+        const isRare = rarity === "R";
         const cardHtml = `
-            <div class="card-face ${getRarityClass(card.rarity)} reveal-enter ${["SR", "SEC"].includes(String(card.rarity || "").toUpperCase()) ? "reveal-hit" : ""}" ${getCardDetailAttributes(card, { packLabel: packName })}>
+            <div class="card-face ${getRarityClass(card.rarity)} reveal-enter ${isRare ? "reveal-rare" : ""} ${isBigHit ? "reveal-hit" : ""}" ${getCardDetailAttributes(card, { packLabel: packName })}>
                 ${getCardArtMarkup(card)}
                 <div class="card-slot">Slot ${card.slot_number}</div>
                 <div class="card-name">${card.card_name}</div>
@@ -763,7 +766,7 @@ async function animateOpenedCards(items, packName) {
             </div>
         `;
         openedCardsList.insertAdjacentHTML("beforeend", cardHtml);
-        await new Promise(resolve => setTimeout(resolve, 180));
+        await new Promise(resolve => setTimeout(resolve, isBigHit ? 520 : isRare ? 320 : 135));
     }
 
     BOOSTER_REVEAL_STATE.isAnimating = false;
