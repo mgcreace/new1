@@ -243,15 +243,43 @@ function renderDashboardStats(inventoryItems, cardItems, coinAmount) {
 
 async function loadHomeDashboard(tg, user) {
     try {
-        const data = await postJson("/news", {
-            initData: tg.initData,
-            user_id: user.id
-        });
+        const [data, pullData] = await Promise.all([
+            postJson("/news", {
+                initData: tg.initData,
+                user_id: user.id
+            }),
+            postJson("/top-pulls", {
+                initData: tg.initData,
+                user_id: user.id
+            })
+        ]);
 
         renderHomeNews(data.news || []);
+        renderTopPulls(pullData.pulls || []);
     } catch (error) {
         console.log(error);
     }
+}
+
+function renderTopPulls(pulls) {
+    const topPullNewsList = document.getElementById("topPullNewsList");
+    if (!topPullNewsList || !pulls.length) {
+        return;
+    }
+
+    topPullNewsList.innerHTML = pulls.map(pull => {
+        const username = pull.username || pull.first_name || "Spieler";
+        return `
+            <article class="news-card top-pull-card ${String(pull.rarity).toLowerCase()}">
+                ${pull.image_url ? `<img src="${pull.image_url}" alt="${pull.card_name}">` : `<div class="top-pull-fallback">${pull.rarity}</div>`}
+                <div>
+                    <strong>${pull.card_name}</strong>
+                    <p>${username} hat ${pull.rarity} aus ${pull.pack_name || "Booster"} gezogen.</p>
+                    <small>${formatDate(pull.opened_at)}</small>
+                </div>
+            </article>
+        `;
+    }).join("");
 }
 
 function renderNewsCards(items, targetElement, fallbackHtml) {
