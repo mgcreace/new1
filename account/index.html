@@ -26,14 +26,8 @@
 
 <main class="account-screen">
 <section class="profile-hero">
-<div class="profile-actions">
-<span class="profile-action-icon profile-add-icon" aria-hidden="true"></span>
-<span class="profile-action-icon profile-menu-icon" aria-hidden="true"></span>
-</div>
-
 <div class="profile-avatar-wrap">
 <img id="accountAvatar" class="profile-avatar" alt="avatar">
-<span class="profile-avatar-plus">+</span>
 </div>
 
 <h1 id="accountProfileName">Account</h1>
@@ -65,12 +59,12 @@
 </section>
 
 <section class="profile-tabs">
-<a href="#profileForm" class="profile-tab active">Bearbeiten</a>
-<a href="#profileSummary" class="profile-tab">Status</a>
-<a href="#cardInventoryList" class="profile-tab">Karten</a>
+<button class="profile-tab active" type="button" data-profile-tab="edit">Bearbeiten</button>
+<button class="profile-tab" type="button" data-profile-tab="status">Status</button>
+<button class="profile-tab" type="button" data-profile-tab="cards">Karten</button>
 </section>
 
-<section class="profile-edit-panel">
+<section class="profile-edit-panel profile-tab-panel active" data-profile-panel="edit">
 <h2>Profil bearbeiten</h2>
 <form id="profileForm">
 <label class="form-label" for="displayName">Display Name</label>
@@ -97,12 +91,12 @@
 </form>
 </section>
 
-<section class="profile-panel">
+<section class="profile-panel profile-tab-panel" data-profile-panel="status">
 <h2>Profil Status</h2>
 <div id="profileSummary" class="inventory-list"></div>
 </section>
 
-<section class="profile-panel">
+<section class="profile-panel profile-tab-panel" data-profile-panel="cards">
 <h2>Deine Karten</h2>
 <div id="cardInventoryList" class="inventory-list"></div>
 </section>

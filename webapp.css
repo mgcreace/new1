@@ -404,66 +404,6 @@ h2{
     color:white;
 }
 
-.profile-actions{
-    position:absolute;
-    top:12px;
-    left:10px;
-    right:10px;
-    display:flex;
-    justify-content:space-between;
-    pointer-events:none;
-}
-
-.profile-action-icon{
-    position:relative;
-    width:34px;
-    height:34px;
-    color:#f8fafc;
-    opacity:.95;
-}
-
-.profile-add-icon::before{
-    content:"";
-    position:absolute;
-    left:4px;
-    top:2px;
-    width:15px;
-    height:15px;
-    border:3px solid currentColor;
-    border-radius:50%;
-}
-
-.profile-add-icon::after{
-    content:"+";
-    position:absolute;
-    left:18px;
-    top:12px;
-    font-size:27px;
-    line-height:1;
-    font-weight:300;
-}
-
-.profile-menu-icon::before{
-    content:"";
-    position:absolute;
-    right:1px;
-    top:7px;
-    width:28px;
-    height:20px;
-    border-top:3px solid currentColor;
-    border-bottom:3px solid currentColor;
-}
-
-.profile-menu-icon::after{
-    content:"";
-    position:absolute;
-    right:1px;
-    top:16px;
-    width:28px;
-    height:3px;
-    background:currentColor;
-}
-
 .profile-avatar-wrap{
     position:relative;
     width:116px;
@@ -479,23 +419,6 @@ h2{
     border:2px solid rgba(255,255,255,.14);
     background:#111827;
     box-shadow:0 18px 40px rgba(0,0,0,.35);
-}
-
-.profile-avatar-plus{
-    position:absolute;
-    right:2px;
-    bottom:2px;
-    width:34px;
-    height:34px;
-    border-radius:50%;
-    display:grid;
-    place-items:center;
-    background:#38bdf8;
-    color:white;
-    border:4px solid #02040b;
-    font-size:28px;
-    font-weight:700;
-    line-height:1;
 }
 
 .profile-hero h1{
@@ -583,10 +506,13 @@ h2{
 .profile-tab{
     position:relative;
     padding:14px 4px 13px;
+    border:0;
+    background:transparent;
     color:rgba(255,255,255,.60);
-    text-decoration:none;
+    font:inherit;
     font-weight:800;
     text-align:center;
+    cursor:pointer;
 }
 
 .profile-tab.active{
@@ -612,6 +538,26 @@ h2{
     padding:18px 16px;
     margin:0 0 16px;
     box-shadow:0 18px 46px rgba(0,0,0,.24);
+}
+
+.profile-tab-panel{
+    display:none;
+}
+
+.profile-tab-panel.active{
+    display:block;
+    animation:profilePanelIn .18s ease both;
+}
+
+@keyframes profilePanelIn{
+    from{
+        opacity:0;
+        transform:translateY(8px);
+    }
+    to{
+        opacity:1;
+        transform:translateY(0);
+    }
 }
 
 .profile-edit-panel h2,

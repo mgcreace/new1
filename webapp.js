@@ -79,6 +79,34 @@ function updateAccountHero(user, secureData = {}, profile = {}) {
     }
 }
 
+function setupProfileTabs() {
+    const tabs = document.querySelectorAll("[data-profile-tab]");
+    const panels = document.querySelectorAll("[data-profile-panel]");
+
+    if (!tabs.length || !panels.length) {
+        return;
+    }
+
+    tabs.forEach(tab => {
+        if (tab.dataset.bound) {
+            return;
+        }
+
+        tab.dataset.bound = "1";
+        tab.addEventListener("click", () => {
+            const target = tab.dataset.profileTab;
+
+            tabs.forEach(item => {
+                item.classList.toggle("active", item === tab);
+            });
+
+            panels.forEach(panel => {
+                panel.classList.toggle("active", panel.dataset.profilePanel === target);
+            });
+        });
+    });
+}
+
 function renderInventory(items) {
     const inventoryList = document.getElementById("inventoryList");
 
@@ -706,6 +734,7 @@ async function initTelegramApp(pageName) {
 
     const user = tg.initDataUnsafe.user;
     window.__tgApp = { tg, user };
+    setupProfileTabs();
 
     const username = document.getElementById("username");
     const heroUsername = document.getElementById("heroUsername");
