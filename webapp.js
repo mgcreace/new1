@@ -1733,6 +1733,8 @@ async function loadTradingPage(tg, user) {
         const wantedTradePreview = document.getElementById("wantedTradePreview");
         const myTradeTapCards = document.getElementById("myTradeTapCards");
         const wantedTradeTapCards = document.getElementById("wantedTradeTapCards");
+        const resetMyTradePick = document.getElementById("resetMyTradePick");
+        const resetWantedTradePick = document.getElementById("resetWantedTradePick");
         const tradeParams = new URLSearchParams(window.location.search);
         const preselectTargetUserId = tradeParams.get("target_user_id");
         const preselectWantedCardId = tradeParams.get("wanted_card_id");
@@ -1788,6 +1790,7 @@ async function loadTradingPage(tg, user) {
                     ${getCardArtMarkup(card)}
                     <strong>${card.card_name}</strong>
                     <span>${card.rarity} | x${card.quantity}${String(selectedCardId || "") === String(card.card_id) ? ` | Auswahl x${side === "mine" ? myTradeQuantity.value : wantedTradeQuantity.value}` : ""}</span>
+                    ${String(selectedCardId || "") === String(card.card_id) ? "<small>Nochmal tippen = +1</small>" : ""}
                 </button>
             `).join("");
         }
@@ -1838,6 +1841,24 @@ async function loadTradingPage(tg, user) {
                 incrementQuantitySelect(wantedTradeQuantity, selectedCard ? selectedCard.quantity : 1);
             }
             updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity ? wantedTradeQuantity.value : 1, "Du willst");
+            refreshTradeTapSelection();
+        }
+
+        function clearMyTradeCard() {
+            if (myTradeCardSelect) {
+                myTradeCardSelect.value = "";
+            }
+            fillQuantitySelect(myTradeQuantity, 1, "Deine Menge");
+            renderCardCollection([], myTradePreview, "Deine ausgewaehlte Karte erscheint hier.", { slotLabel: "DEIN" });
+            refreshTradeTapSelection();
+        }
+
+        function clearWantedTradeCard() {
+            if (wantedTradeCardSelect) {
+                wantedTradeCardSelect.value = "";
+            }
+            fillQuantitySelect(wantedTradeQuantity, 1, "Wunsch-Menge");
+            renderCardCollection([], wantedTradePreview, "Die Wunschkarte des Traders erscheint hier.", { slotLabel: "WUNSCH" });
             refreshTradeTapSelection();
         }
 
@@ -1938,6 +1959,11 @@ async function loadTradingPage(tg, user) {
             });
         }
 
+        if (resetMyTradePick && !resetMyTradePick.dataset.bound) {
+            resetMyTradePick.dataset.bound = "1";
+            resetMyTradePick.addEventListener("click", clearMyTradeCard);
+        }
+
         async function loadSelectedTargetCards(options = {}) {
             if (!targetTraderSelect || !wantedTradeCardSelect) {
                 return;
@@ -2013,6 +2039,11 @@ async function loadTradingPage(tg, user) {
                 }
                 selectWantedTradeCard(cardButton.dataset.cardId);
             });
+        }
+
+        if (resetWantedTradePick && !resetWantedTradePick.dataset.bound) {
+            resetWantedTradePick.dataset.bound = "1";
+            resetWantedTradePick.addEventListener("click", clearWantedTradeCard);
         }
 
         if (preselectTargetUserId && targetTraderSelect && targetTraderSelect.value !== preselectTargetUserId) {
