@@ -487,6 +487,7 @@ function getCardDetailData(card, options = {}) {
         pack_key: card.pack_key || options.packLabel || "",
         quantity: options.displayQuantity || card.quantity || "",
         image_url: card.image_url || "",
+        tradeTargetUserId: options.tradeTargetUserId || "",
         canFavorite: Boolean(options.canFavorite)
     };
 }
@@ -501,6 +502,7 @@ function getCardDetailAttributes(card, options = {}) {
         data-card-pack="${detail.pack_key}"
         data-card-quantity="${detail.quantity}"
         data-card-image="${detail.image_url}"
+        data-trade-target-user-id="${detail.tradeTargetUserId}"
         data-can-favorite="${detail.canFavorite ? "1" : "0"}"
     `;
 }
@@ -548,7 +550,8 @@ function openCardModalFromElement(element) {
         rarity: element.dataset.cardRarity,
         pack_key: element.dataset.cardPack,
         quantity: element.dataset.cardQuantity,
-        image_url: element.dataset.cardImage
+        image_url: element.dataset.cardImage,
+        tradeTargetUserId: element.dataset.tradeTargetUserId
     };
 
     content.innerHTML = `
@@ -567,6 +570,11 @@ function openCardModalFromElement(element) {
                     ? `<button class="shop-btn favorite-card-btn" type="button" data-modal-favorite-card="${card.card_id}">Als Lieblingskarte setzen<small>Im Profil anzeigen</small></button>`
                     : ""
             }
+            ${
+                card.tradeTargetUserId && card.card_id
+                    ? `<button class="shop-btn trade-from-card-btn" type="button" data-trade-target-user-id="${card.tradeTargetUserId}" data-wanted-card-id="${card.card_id}">Trade anfragen<small>Trading mit dieser Wunschkarte oeffnen</small></button>`
+                    : ""
+            }
         </div>
     `;
 
@@ -575,6 +583,15 @@ function openCardModalFromElement(element) {
         favoriteButton.addEventListener("click", async () => {
             await setFavoriteCardFromInventory(favoriteButton.dataset.modalFavoriteCard);
             closeCardModal();
+        });
+    }
+
+    const tradeButton = content.querySelector("[data-trade-target-user-id][data-wanted-card-id]");
+    if (tradeButton) {
+        tradeButton.addEventListener("click", () => {
+            const targetUserId = tradeButton.dataset.tradeTargetUserId;
+            const wantedCardId = tradeButton.dataset.wantedCardId;
+            window.location.href = `../trading/?target_user_id=${encodeURIComponent(targetUserId)}&wanted_card_id=${encodeURIComponent(wantedCardId)}`;
         });
     }
 
@@ -1497,6 +1514,9 @@ async function loadTradingPage(tg, user) {
         const wantedTradeQuantity = document.getElementById("wantedTradeQuantity");
         const myTradePreview = document.getElementById("myTradePreview");
         const wantedTradePreview = document.getElementById("wantedTradePreview");
+        const tradeParams = new URLSearchParams(window.location.search);
+        const preselectTargetUserId = tradeParams.get("target_user_id");
+        const preselectWantedCardId = tradeParams.get("wanted_card_id");
         let selectedTargetCards = [];
 
         function fillQuantitySelect(selectElement, maxAmount, labelPrefix) {
@@ -1601,9 +1621,11 @@ async function loadTradingPage(tg, user) {
             });
         }
 
-        if (targetTraderSelect && !targetTraderSelect.dataset.bound) {
-            targetTraderSelect.dataset.bound = "1";
-            targetTraderSelect.addEventListener("change", async () => {
+        async function loadSelectedTargetCards(options = {}) {
+            if (!targetTraderSelect || !wantedTradeCardSelect) {
+                return;
+            }
+
                 wantedTradeCardSelect.innerHTML = "<option value=''>Karte waehlen</option>";
                 fillQuantitySelect(wantedTradeQuantity, 1, "Wunsch-Menge");
                 selectedTargetCards = [];
@@ -1628,6 +1650,20 @@ async function loadTradingPage(tg, user) {
                 wantedTradeCardSelect.innerHTML = "<option value=''>Karte waehlen</option>" + selectedTargetCards.map(card => (
                     `<option value="${card.card_id}">${card.card_name} (${card.rarity}) x${card.quantity}</option>`
                 )).join("");
+
+                if (options.wantedCardId && selectedTargetCards.some(card => String(card.card_id) === String(options.wantedCardId))) {
+                    wantedTradeCardSelect.value = options.wantedCardId;
+                    const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect.value);
+                    fillQuantitySelect(wantedTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Wunsch-Menge");
+                    updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity ? wantedTradeQuantity.value : 1, "Du willst");
+                    renderTradeFeedback("Wunschkarte wurde aus dem Karten-Modal vorausgewaehlt. Waehle jetzt deine Karte fuer das Angebot.", "info");
+                }
+        }
+
+        if (targetTraderSelect && !targetTraderSelect.dataset.bound) {
+            targetTraderSelect.dataset.bound = "1";
+            targetTraderSelect.addEventListener("change", async () => {
+                await loadSelectedTargetCards();
             });
         }
 
@@ -1646,6 +1682,11 @@ async function loadTradingPage(tg, user) {
                 const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect ? wantedTradeCardSelect.value : "");
                 updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity.value, "Du willst");
             });
+        }
+
+        if (preselectTargetUserId && targetTraderSelect && targetTraderSelect.value !== preselectTargetUserId) {
+            targetTraderSelect.value = preselectTargetUserId;
+            await loadSelectedTargetCards({ wantedCardId: preselectWantedCardId });
         }
 
         const tradeForm = document.getElementById("tradeForm");
@@ -1800,7 +1841,7 @@ async function loadTradingPage(tg, user) {
                                     ? (
                                         profile.visible_cards.length
                                             ? profile.visible_cards.map(card => `
-                                                <div class="card-face ${getRarityClass(card.rarity)}" ${getCardDetailAttributes(card)}>
+                                                <div class="card-face ${getRarityClass(card.rarity)}" ${getCardDetailAttributes(card, { tradeTargetUserId: profile.user_id })}>
                                                     <div class="card-slot">${card.rarity}</div>
                                                     <div class="card-name">${card.card_name}</div>
                                                     <div class="card-rarity">${card.rarity}</div>
