@@ -1264,11 +1264,15 @@ function renderPackArt(name, imageUrl, className) {
     return `<span class="${className}">${label}</span>`;
 }
 
-function renderBoosterBuyFeedback(packName, coins) {
+function renderBoosterBuyFeedback(packName, coins, packKey) {
     const feedback = document.getElementById("boosterBuyFeedback");
     if (!feedback) {
         return;
     }
+
+    const openUrl = packKey
+        ? `../openbooster/?pack_key=${encodeURIComponent(packKey)}`
+        : "../openbooster/";
 
     feedback.innerHTML = `
         <div class="booster-buy-feedback">
@@ -1276,7 +1280,7 @@ function renderBoosterBuyFeedback(packName, coins) {
                 <strong>${packName} gekauft</strong>
                 <span>Noch ${coins || 0} Coins. Dein Pack wartet im Inventar.</span>
             </div>
-            <a href="../openbooster/">Jetzt oeffnen</a>
+            <a href="${openUrl}">Jetzt oeffnen</a>
         </div>
     `;
 }
@@ -1335,7 +1339,7 @@ async function loadBoosterShop(tg, user) {
                         const boughtPack = (data.packs || []).find(pack => pack.pack_key === button.dataset.packKey);
                         const boughtPackName = boughtPack ? boughtPack.name : "Booster";
                         showToast(`${boughtPackName} gekauft!`, "success");
-                        renderBoosterBuyFeedback(boughtPackName, buyData.coins);
+                        renderBoosterBuyFeedback(boughtPackName, buyData.coins, button.dataset.packKey);
                         renderInventory(buyData.inventory || []);
                         renderHistory(buyData.history || []);
                     } catch (error) {
@@ -1380,6 +1384,7 @@ async function loadOpenBoosterPage(tg, user) {
         const rewardBox = document.getElementById("openReward");
         const openedCardsList = document.getElementById("openedCardsList");
         const openBoosterList = document.getElementById("openBoosterList");
+        const selectedPackKey = new URLSearchParams(window.location.search).get("pack_key");
         if (!openBoosterList) {
             return;
         }
@@ -1407,7 +1412,7 @@ async function loadOpenBoosterPage(tg, user) {
         }
 
         openBoosterList.innerHTML = ownedBoosters.map(item => `
-            <div class="booster-pack-card">
+            <div class="booster-pack-card ${selectedPackKey === item.pack_key ? "is-selected" : ""}">
                 ${renderPackArt(item.pack_name, item.image_url, "booster-pack-art")}
                 <div class="booster-pack-header">
                     <div class="booster-pack-title">${item.pack_name}</div>

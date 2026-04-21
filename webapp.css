@@ -1694,6 +1694,23 @@ h2{
     text-align:left;
 }
 
+.booster-pack-card.is-selected{
+    border-color:rgba(103,232,249,.75);
+    box-shadow:
+        0 0 0 1px rgba(103,232,249,.35),
+        0 20px 46px rgba(34,211,238,.18);
+    animation:selectedPackPulse 1.35s ease-in-out 2;
+}
+
+@keyframes selectedPackPulse{
+    0%, 100%{
+        transform:translateY(0) scale(1);
+    }
+    50%{
+        transform:translateY(-3px) scale(1.015);
+    }
+}
+
 .booster-pack-art{
     height:92px;
     margin-bottom:12px;
