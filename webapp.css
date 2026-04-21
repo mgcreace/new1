@@ -1078,6 +1078,48 @@ h2{
     pointer-events:none;
 }
 
+.booster-buy-feedback{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin-top:14px;
+    padding:13px;
+    border:1px solid rgba(52,211,153,.32);
+    border-radius:18px;
+    background:
+        radial-gradient(circle at 100% 0%, rgba(52,211,153,.22), transparent 34%),
+        linear-gradient(180deg, rgba(20,83,45,.30), rgba(2,6,23,.90));
+    box-shadow:0 18px 36px rgba(16,185,129,.10);
+}
+
+.booster-buy-feedback strong,
+.booster-buy-feedback span{
+    display:block;
+}
+
+.booster-buy-feedback strong{
+    color:#ecfdf5;
+    font-size:15px;
+}
+
+.booster-buy-feedback span{
+    margin-top:3px;
+    color:#a7f3d0;
+    font-size:12px;
+}
+
+.booster-buy-feedback a{
+    flex:0 0 auto;
+    padding:10px 12px;
+    border-radius:999px;
+    background:linear-gradient(135deg, #67e8f9, #fff 46%, #fb7185);
+    color:#02040b;
+    font-size:12px;
+    font-weight:900;
+    text-decoration:none;
+}
+
 .inventory-list,
 .history-list{
     text-align:left;

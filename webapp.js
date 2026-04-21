@@ -1264,6 +1264,23 @@ function renderPackArt(name, imageUrl, className) {
     return `<span class="${className}">${label}</span>`;
 }
 
+function renderBoosterBuyFeedback(packName, coins) {
+    const feedback = document.getElementById("boosterBuyFeedback");
+    if (!feedback) {
+        return;
+    }
+
+    feedback.innerHTML = `
+        <div class="booster-buy-feedback">
+            <div>
+                <strong>${packName} gekauft</strong>
+                <span>Noch ${coins || 0} Coins. Dein Pack wartet im Inventar.</span>
+            </div>
+            <a href="../openbooster/">Jetzt oeffnen</a>
+        </div>
+    `;
+}
+
 async function loadBoosterShop(tg, user) {
     try {
         const data = await postJson("/booster-shop", {
@@ -1316,7 +1333,9 @@ async function loadBoosterShop(tg, user) {
                         }
 
                         const boughtPack = (data.packs || []).find(pack => pack.pack_key === button.dataset.packKey);
-                        showToast(`${boughtPack ? boughtPack.name : "Booster"} gekauft!`, "success");
+                        const boughtPackName = boughtPack ? boughtPack.name : "Booster";
+                        showToast(`${boughtPackName} gekauft!`, "success");
+                        renderBoosterBuyFeedback(boughtPackName, buyData.coins);
                         renderInventory(buyData.inventory || []);
                         renderHistory(buyData.history || []);
                     } catch (error) {
