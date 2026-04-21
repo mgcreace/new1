@@ -243,76 +243,89 @@ function renderDashboardStats(inventoryItems, cardItems, coinAmount) {
 
 async function loadHomeDashboard(tg, user) {
     try {
-        const [shopData, traderData] = await Promise.all([
-            postJson("/booster-shop", {
-                initData: tg.initData,
-                user_id: user.id
-            }),
-            postJson("/traders", {
-                initData: tg.initData,
-                user_id: user.id
-            })
-        ]);
+        const data = await postJson("/news", {
+            initData: tg.initData,
+            user_id: user.id
+        });
 
-        const recentActivity = document.getElementById("recentActivity");
-        const tradeSummary = document.getElementById("tradeSummary");
-
-        const purchases = (shopData.history || []).slice(0, 2);
-        const openings = (shopData.open_history || []).slice(0, 2);
-        const allTrades = traderData.trade_offers || [];
-        const pendingIncoming = allTrades.filter(offer => Number(offer.to_user_id) === Number(user.id) && offer.status === "pending").length;
-        const pendingOutgoing = allTrades.filter(offer => Number(offer.from_user_id) === Number(user.id) && offer.status === "pending").length;
-
-        if (recentActivity) {
-            const activityItems = [];
-
-            purchases.forEach(item => {
-                activityItems.push(`
-                    <div class="activity-card">
-                        <strong>Booster gekauft</strong><br>
-                        ${item.pack_name}<br>
-                        <span class="muted">${item.coins_spent} Coins | ${formatDate(item.purchased_at)}</span>
-                    </div>
-                `);
-            });
-
-            openings.forEach(item => {
-                activityItems.push(`
-                    <div class="activity-card">
-                        <strong>Booster geoeffnet</strong><br>
-                        ${item.pack_name}<br>
-                        <span class="muted">${item.reward_value} ${item.reward_type} | ${formatDate(item.opened_at)}</span>
-                    </div>
-                `);
-            });
-
-            recentActivity.innerHTML = activityItems.length
-                ? activityItems.join("")
-                : "<div class='inventory-item'>Noch keine Aktivitaet vorhanden.</div>";
-        }
-
-        if (tradeSummary) {
-            tradeSummary.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-label">Offen eingehend</div>
-                    <div class="stat-value">${pendingIncoming}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Offen gesendet</div>
-                    <div class="stat-value">${pendingOutgoing}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Alle Trades</div>
-                    <div class="stat-value">${allTrades.length}</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-label">Trader sichtbar</div>
-                    <div class="stat-value">${(traderData.traders || []).length}</div>
-                </div>
-            `;
-        }
+        renderHomeNews(data.news || []);
     } catch (error) {
         console.log(error);
+    }
+}
+
+function renderNewsCards(items, targetElement, fallbackHtml) {
+    if (!targetElement) {
+        return;
+    }
+
+    if (!items.length) {
+        targetElement.innerHTML = fallbackHtml;
+        return;
+    }
+
+    targetElement.innerHTML = items.map(item => `
+        <article class="news-card">
+            <strong>${item.title}</strong>
+            <p>${item.body}</p>
+        </article>
+    `).join("");
+}
+
+function renderHomeNews(newsItems) {
+    const items = newsItems || [];
+    const featuredNews = document.getElementById("featuredNews");
+    const topPullNewsList = document.getElementById("topPullNewsList");
+    const shopNewsList = document.getElementById("shopNewsList");
+    const roadmapNewsList = document.getElementById("roadmapNewsList");
+
+    const featured = items.find(item => item.news_type === "featured");
+    if (featuredNews && featured) {
+        featuredNews.innerHTML = `
+            <span class="news-tag">${featured.badge || "News"}</span>
+            <h2>${featured.title}</h2>
+            <p>${featured.body}</p>
+            <div class="news-pack-preview">
+                <span>${String(featured.pack_key || "PK").slice(0, 2).toUpperCase()}</span>
+            </div>
+        `;
+    }
+
+    renderNewsCards(
+        items.filter(item => item.news_type === "pull"),
+        topPullNewsList,
+        `
+            <article class="news-card">
+                <strong>Top Pull der Woche</strong>
+                <p>Hier spaeter: User zieht SEC Karte aus einem Booster.</p>
+            </article>
+            <article class="news-card">
+                <strong>Rare Streak</strong>
+                <p>Hier spaeter: beste Serie oder besondere Pull-Statistik.</p>
+            </article>
+        `
+    );
+
+    renderNewsCards(
+        items.filter(item => item.news_type === "shop"),
+        shopNewsList,
+        `
+            <article class="news-card">
+                <strong>Coin Bonus Event</strong>
+                <p>Platzhalter fuer spaetere Angebote, Bonus-Coins oder Rabattaktionen.</p>
+            </article>
+            <article class="news-card">
+                <strong>Premium Update</strong>
+                <p>Platzhalter fuer Premium-Funktionen, falls Premium wieder aktiv genutzt wird.</p>
+            </article>
+        `
+    );
+
+    if (roadmapNewsList) {
+        const roadmapItems = items.filter(item => item.news_type === "roadmap");
+        if (roadmapItems.length) {
+            roadmapNewsList.innerHTML = roadmapItems.map(item => `<span>${item.title}</span>`).join("");
+        }
     }
 }
 
