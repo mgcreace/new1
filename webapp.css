@@ -367,6 +367,70 @@ h2{
     line-height:1.6;
 }
 
+.inventory-screen{
+    max-width:760px;
+}
+
+.inventory-hero{
+    padding:18px 14px 12px;
+    text-align:left;
+}
+
+.eyebrow{
+    margin:0 0 4px;
+    color:#67e8f9;
+    font-size:12px;
+    font-weight:900;
+    letter-spacing:.12em;
+    text-transform:uppercase;
+}
+
+.inventory-hero h1{
+    margin:0;
+    font-size:34px;
+    line-height:1;
+}
+
+.inventory-hero .hint{
+    margin:8px 0 12px;
+    font-size:14px;
+    line-height:1.35;
+}
+
+.inventory-summary-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+}
+
+.inventory-summary-row span{
+    display:inline-flex;
+    align-items:center;
+    min-height:28px;
+    padding:5px 10px;
+    border-radius:999px;
+    background:rgba(255,255,255,.09);
+    color:rgba(255,255,255,.82);
+    font-size:12px;
+    font-weight:800;
+}
+
+.inventory-panel{
+    background:
+        radial-gradient(circle at 92% 0%, rgba(34,211,238,.10), transparent 30%),
+        linear-gradient(180deg, rgba(17,24,39,.88), rgba(3,7,18,.96));
+    border:1px solid rgba(148,163,184,.18);
+    border-radius:22px;
+    padding:16px;
+    margin:0 0 16px;
+    box-shadow:0 18px 46px rgba(0,0,0,.24);
+}
+
+.inventory-panel h2{
+    margin:0 0 10px;
+    font-size:21px;
+}
+
 .inventory-list,
 .history-list{
     text-align:left;
@@ -377,11 +441,13 @@ h2{
 
 .inventory-item,
 .history-item{
-    background:#0b1220;
-    border:1px solid #1e293b;
-    border-radius:14px;
-    padding:16px;
-    font-size:17px;
+    background:
+        radial-gradient(circle at 88% 8%, rgba(34,211,238,.12), transparent 32%),
+        linear-gradient(180deg, rgba(15,23,42,.96), rgba(2,6,23,.92));
+    border:1px solid rgba(148,163,184,.18);
+    border-radius:16px;
+    padding:13px;
+    font-size:15px;
 }
 
 .muted{
@@ -1012,18 +1078,19 @@ h2{
 
 .app-select{
     width:100%;
-    padding:14px 16px;
+    padding:12px 13px;
     border-radius:14px;
-    border:1px solid #334155;
-    background:#0b1220;
+    border:1px solid rgba(148,163,184,.24);
+    background:rgba(2,6,23,.86);
     color:white;
-    font-size:16px;
+    font-size:14px;
+    font-weight:800;
 }
 
 .inventory-toolbar{
     display:grid;
-    gap:14px;
-    margin-top:18px;
+    gap:10px;
+    margin-top:12px;
 }
 
 .filter-row{
@@ -1033,20 +1100,66 @@ h2{
 }
 
 .filter-chip{
-    border:1px solid #334155;
-    background:#0b1220;
+    border:1px solid rgba(148,163,184,.22);
+    background:rgba(2,6,23,.74);
     color:#e2e8f0;
     border-radius:999px;
-    padding:10px 14px;
-    font-size:14px;
+    padding:9px 12px;
+    font-size:13px;
     font-weight:700;
     cursor:pointer;
 }
 
 .filter-chip.active{
-    background:#1d4ed8;
-    border-color:#1d4ed8;
-    color:#eff6ff;
+    background:linear-gradient(135deg, #67e8f9, #fda4af);
+    border-color:transparent;
+    color:#02040b;
+    box-shadow:0 10px 24px rgba(34,211,238,.14);
+}
+
+.inventory-collection-grid{
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:8px;
+}
+
+.inventory-collection-grid .card-face{
+    min-height:132px;
+    padding:7px;
+    border-radius:14px;
+    aspect-ratio:3 / 4;
+    border:1px solid rgba(148,163,184,.18);
+    box-shadow:0 10px 24px rgba(0,0,0,.24);
+}
+
+.inventory-collection-grid .card-art,
+.inventory-collection-grid .card-art-fallback{
+    height:58px;
+    margin-bottom:7px;
+    border-radius:10px;
+    font-size:18px;
+}
+
+.inventory-collection-grid .card-slot{
+    min-width:0;
+    height:22px;
+    padding:0 8px;
+    font-size:10px;
+}
+
+.inventory-collection-grid .card-name{
+    margin:7px 0 4px;
+    font-size:12px;
+    line-height:1.12;
+}
+
+.inventory-collection-grid .card-rarity,
+.inventory-collection-grid .card-pack-label{
+    display:none;
+}
+
+.inventory-collection-grid .card-qty{
+    margin-top:4px;
+    font-size:11px;
 }
 
 .card-face.clickable{
@@ -1065,6 +1178,73 @@ h2{
     text-align:left;
     display:grid;
     gap:10px;
+}
+
+.inventory-detail-card{
+    background:
+        radial-gradient(circle at 88% 8%, rgba(34,211,238,.13), transparent 32%),
+        linear-gradient(180deg, rgba(15,23,42,.96), rgba(2,6,23,.92));
+    border:1px solid rgba(148,163,184,.18);
+    border-radius:18px;
+    padding:13px;
+    text-align:left;
+}
+
+.inventory-detail-panel{
+    grid-template-columns:94px 1fr;
+    align-items:center;
+}
+
+.detail-card-art{
+    overflow:hidden;
+    min-height:118px;
+    padding:6px;
+    border-radius:14px;
+}
+
+.detail-card-art .card-art,
+.detail-card-art .card-art-fallback{
+    height:100%;
+    min-height:106px;
+    margin:0;
+    border-radius:10px;
+}
+
+.detail-meta-grid{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:8px;
+    margin-top:10px;
+}
+
+.detail-meta-grid span{
+    display:block;
+    padding:9px;
+    border-radius:12px;
+    background:rgba(255,255,255,.07);
+}
+
+.detail-meta-grid strong{
+    display:block;
+    color:white;
+    font-size:13px;
+    line-height:1.2;
+    word-break:break-word;
+}
+
+.detail-meta-grid small,
+.detail-empty span{
+    display:block;
+    margin-top:3px;
+    color:rgba(255,255,255,.55);
+    font-size:11px;
+    font-weight:700;
+}
+
+.detail-empty strong{
+    display:block;
+    color:white;
+    font-size:16px;
 }
 
 .detail-title{
@@ -1393,6 +1573,26 @@ h2{
         padding-right:0;
     }
 
+    .inventory-screen{
+        padding-left:0;
+        padding-right:0;
+    }
+
+    .inventory-hero{
+        padding:12px 14px 10px;
+    }
+
+    .inventory-hero h1{
+        font-size:30px;
+    }
+
+    .inventory-screen .inventory-panel{
+        margin-left:12px;
+        margin-right:12px;
+        padding:13px 12px;
+        border-radius:18px;
+    }
+
     .account-screen .profile-edit-panel,
     .account-screen .profile-panel{
         margin-left:12px;
@@ -1516,6 +1716,41 @@ h2{
         font-size:16px;
     }
 
+    .inventory-collection-grid{
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+        gap:7px;
+    }
+
+    .inventory-collection-grid .card-face{
+        min-height:118px;
+        padding:6px;
+        border-radius:12px;
+    }
+
+    .inventory-collection-grid .card-art,
+    .inventory-collection-grid .card-art-fallback{
+        height:48px;
+        margin-bottom:6px;
+    }
+
+    .inventory-collection-grid .card-name{
+        font-size:11px;
+    }
+
+    .inventory-detail-panel{
+        grid-template-columns:82px 1fr;
+        gap:10px;
+    }
+
+    .detail-card-art{
+        min-height:104px;
+    }
+
+    .detail-card-art .card-art,
+    .detail-card-art .card-art-fallback{
+        min-height:92px;
+    }
+
     .toast-stack{
         right:12px;
         left:12px;
@@ -1589,6 +1824,11 @@ h2{
     .card-reveal-grid{
         grid-template-columns:1fr;
         gap:12px;
+    }
+
+    .inventory-collection-grid{
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+        gap:7px;
     }
 
     .card-face{

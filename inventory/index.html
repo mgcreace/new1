@@ -24,22 +24,26 @@
 </nav>
 </header>
 
-<main>
+<main class="inventory-screen">
+<section class="inventory-hero">
+<p class="eyebrow">Collection</p>
 <h1>Inventory</h1>
-<div class="card">
-<p id="telegramID"></p>
-<p id="status">Loading...</p>
-<p id="coins">Coins: 0</p>
+<p class="hint">Deine Booster, Karten und seltenen Pulls an einem Ort.</p>
+<div class="inventory-summary-row">
+<span id="telegramID"></span>
+<span id="status">Loading...</span>
+<span id="coins">Coins: 0</span>
 </div>
+</section>
 
-<div class="card">
+<section class="inventory-panel">
 <h2>Dein Inventar</h2>
 <div id="inventoryList" class="inventory-list"></div>
-</div>
+</section>
 
-<div class="card">
+<section class="inventory-panel">
 <h2>Deine Karten</h2>
-<p class="hint">Deine Sammlung wird hier als Kartenansicht angezeigt. Seltene Karten stechen farblich direkt heraus.</p>
+<p class="hint">Tippe eine Karte an, um Details zu sehen.</p>
 <div class="inventory-toolbar">
 <div class="filter-row">
 <button class="filter-chip active" type="button" data-rarity-filter="ALL">Alle</button>
@@ -55,18 +59,18 @@
 <option value="quantity_desc">Sortierung: Hoechste Menge</option>
 </select>
 </div>
-<div id="cardInventoryList" class="card-reveal-grid"></div>
-</div>
+<div id="cardInventoryList" class="card-reveal-grid inventory-collection-grid"></div>
+</section>
 
-<div class="card">
+<section class="inventory-panel">
 <h2>Karten-Details</h2>
-<div id="inventoryCardDetail" class="inventory-item">Tippe auf eine Karte, um Details zu sehen.</div>
-</div>
+<div id="inventoryCardDetail" class="inventory-detail-card">Tippe auf eine Karte, um Details zu sehen.</div>
+</section>
 
-<div class="card">
+<section class="inventory-panel">
 <h2>Letzte Booster-Kaeufe</h2>
 <div id="historyList" class="history-list"></div>
-</div>
+</section>
 </main>
 
 <script src="../webapp.js"></script>

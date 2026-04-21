@@ -626,18 +626,28 @@ function renderInventoryCardDetail(card) {
     }
 
     if (!card) {
-        detailElement.innerHTML = "Tippe auf eine Karte, um Details zu sehen.";
+        detailElement.innerHTML = `
+            <div class="detail-empty">
+                <strong>Keine Karte ausgewaehlt</strong>
+                <span>Tippe auf eine Karte aus deiner Collection.</span>
+            </div>
+        `;
         return;
     }
 
     detailElement.innerHTML = `
-        <div class="detail-panel">
-            <div class="detail-title">${card.card_name}</div>
-            <div class="detail-meta">
-                Seltenheit: ${card.rarity}<br>
-                Pack: ${card.pack_key || "-"}<br>
-                Menge: ${card.quantity || 1}<br>
-                Zuletzt erhalten: ${formatDate(card.last_acquired_at)}
+        <div class="detail-panel inventory-detail-panel">
+            <div class="detail-card-art ${getRarityClass(card.rarity)}">
+                ${getCardArtMarkup(card)}
+            </div>
+            <div>
+                <div class="detail-title">${card.card_name}</div>
+                <div class="detail-meta-grid">
+                    <span><strong>${card.rarity}</strong><small>Seltenheit</small></span>
+                    <span><strong>${card.quantity || 1}</strong><small>Menge</small></span>
+                    <span><strong>${card.pack_key || "-"}</strong><small>Pack</small></span>
+                    <span><strong>${formatDate(card.last_acquired_at)}</strong><small>Erhalten</small></span>
+                </div>
             </div>
         </div>
     `;
