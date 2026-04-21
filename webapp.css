@@ -503,6 +503,129 @@ h2{
     font-size:21px;
 }
 
+.open-v3-stage{
+    position:relative;
+    overflow:hidden;
+    min-height:238px;
+    border-radius:24px;
+    display:grid;
+    place-items:center;
+    padding:22px 16px 18px;
+    background:
+        radial-gradient(circle at 50% 35%, rgba(103,232,249,.26), transparent 31%),
+        radial-gradient(circle at 80% 15%, rgba(251,191,36,.18), transparent 28%),
+        radial-gradient(circle at 16% 90%, rgba(251,113,133,.18), transparent 28%),
+        linear-gradient(180deg, rgba(2,6,23,.64), rgba(2,6,23,.96));
+    border:1px solid rgba(148,163,184,.18);
+    box-shadow:inset 0 0 44px rgba(103,232,249,.08);
+}
+
+.open-v3-stage::before{
+    content:"";
+    position:absolute;
+    width:210px;
+    height:210px;
+    border-radius:999px;
+    background:conic-gradient(from 80deg, rgba(103,232,249,0), rgba(103,232,249,.36), rgba(251,113,133,.28), rgba(103,232,249,0));
+    filter:blur(.2px);
+    animation:openStageSpin 7s linear infinite;
+}
+
+.open-v3-stage::after{
+    content:"";
+    position:absolute;
+    inset:auto 22px 20px;
+    height:34px;
+    border-radius:999px;
+    background:radial-gradient(ellipse at center, rgba(103,232,249,.28), transparent 66%);
+}
+
+.open-v3-stage.is-empty{
+    min-height:150px;
+    text-align:center;
+    color:#cbd5e1;
+}
+
+.open-v3-stage.is-empty strong{
+    display:block;
+    color:#fff;
+    font-size:22px;
+    margin-bottom:6px;
+}
+
+.open-v3-pack-art{
+    position:relative;
+    z-index:2;
+    display:grid;
+    place-items:center;
+    width:132px;
+    height:176px;
+    border-radius:20px;
+    background:
+        linear-gradient(110deg, transparent 0 42%, rgba(255,255,255,.38) 43% 48%, transparent 49%),
+        linear-gradient(155deg, #67e8f9 0 18%, #eef2ff 42%, #fb7185 100%);
+    color:#02040b;
+    font-size:28px;
+    font-weight:950;
+    letter-spacing:.12em;
+    transform:perspective(240px) rotateY(-10deg) rotate(-3deg);
+    box-shadow:
+        15px 16px 0 rgba(2,6,23,.72),
+        0 24px 70px rgba(103,232,249,.24);
+    animation:openPackFloat 2.5s ease-in-out infinite;
+}
+
+.open-v3-pack-art.has-image{
+    overflow:hidden;
+    padding:0;
+    background:#090d18;
+}
+
+.open-v3-pack-art img{
+    width:100%;
+    height:100%;
+    display:block;
+    object-fit:cover;
+    border-radius:inherit;
+}
+
+.open-v3-copy{
+    position:relative;
+    z-index:3;
+    text-align:center;
+    margin-top:14px;
+}
+
+.open-v3-copy span,
+.open-v3-copy small{
+    display:block;
+    color:#94a3b8;
+    font-size:12px;
+    font-weight:800;
+}
+
+.open-v3-copy strong{
+    display:block;
+    color:#fff;
+    font-size:23px;
+    margin:4px 0;
+}
+
+@keyframes openStageSpin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+@keyframes openPackFloat{
+    0%, 100%{
+        transform:perspective(240px) rotateY(-10deg) rotate(-3deg) translateY(0);
+    }
+    50%{
+        transform:perspective(240px) rotateY(7deg) rotate(2deg) translateY(-7px);
+    }
+}
+
 .shop-screen{
     max-width:760px;
 }
@@ -1702,12 +1825,50 @@ h2{
     animation:selectedPackPulse 1.35s ease-in-out 2;
 }
 
+.booster-pack-card.is-opening{
+    border-color:rgba(250,204,21,.85);
+    box-shadow:
+        0 0 0 1px rgba(250,204,21,.35),
+        0 24px 58px rgba(250,204,21,.18);
+    animation:boosterOpeningCharge .65s ease-in-out both;
+}
+
+.booster-pack-card.is-opening::after{
+    content:"";
+    position:absolute;
+    inset:-40%;
+    background:conic-gradient(from 0deg, transparent, rgba(255,255,255,.30), transparent, rgba(103,232,249,.28), transparent);
+    animation:openStageSpin .65s linear infinite;
+    pointer-events:none;
+}
+
 @keyframes selectedPackPulse{
     0%, 100%{
         transform:translateY(0) scale(1);
     }
     50%{
         transform:translateY(-3px) scale(1.015);
+    }
+}
+
+@keyframes boosterOpeningCharge{
+    0%{
+        transform:translateY(0) rotate(0deg) scale(1);
+        filter:saturate(1);
+    }
+    20%{
+        transform:translateY(-2px) rotate(-1deg) scale(1.01);
+    }
+    40%{
+        transform:translateY(1px) rotate(1deg) scale(1.015);
+    }
+    65%{
+        transform:translateY(-3px) rotate(-1deg) scale(1.025);
+        filter:saturate(1.35) brightness(1.08);
+    }
+    100%{
+        transform:translateY(-1px) rotate(0deg) scale(1.01);
+        filter:saturate(1.2);
     }
 }
 

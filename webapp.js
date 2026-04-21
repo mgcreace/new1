@@ -1285,6 +1285,29 @@ function renderBoosterBuyFeedback(packName, coins, packKey) {
     `;
 }
 
+function renderOpenV3Stage(pack) {
+    if (!pack) {
+        return `
+            <div class="open-v3-stage is-empty">
+                <strong>Kein Booster bereit</strong>
+                <span>Kaufe zuerst ein Pack im Shop, dann startet hier dein Reveal.</span>
+            </div>
+        `;
+    }
+
+    return `
+        <div class="open-v3-stage">
+            <div class="open-v3-orbit" aria-hidden="true"></div>
+            ${renderPackArt(pack.pack_name, pack.image_url, "open-v3-pack-art")}
+            <div class="open-v3-copy">
+                <span>Pack geladen</span>
+                <strong>${pack.pack_name}</strong>
+                <small>${pack.amount}x im Inventar | Tippe unten auf Booster oeffnen</small>
+            </div>
+        </div>
+    `;
+}
+
 async function loadBoosterShop(tg, user) {
     try {
         const data = await postJson("/booster-shop", {
@@ -1389,14 +1412,6 @@ async function loadOpenBoosterPage(tg, user) {
             return;
         }
 
-        if (rewardBox && !rewardBox.innerHTML.trim() && !BOOSTER_REVEAL_STATE.lastCards.length) {
-            rewardBox.innerHTML = `
-                <div class="history-item">
-                    Waehle einen Booster aus deinem Inventar und starte den Reveal hier.
-                </div>
-            `;
-        }
-
         if (BOOSTER_REVEAL_STATE.lastCards.length && !BOOSTER_REVEAL_STATE.isAnimating) {
             renderRevealBanner(BOOSTER_REVEAL_STATE.lastPackName, BOOSTER_REVEAL_STATE.lastCards);
             renderOpenedCards(BOOSTER_REVEAL_STATE.lastCards, BOOSTER_REVEAL_STATE.lastPackName);
@@ -1407,8 +1422,16 @@ async function loadOpenBoosterPage(tg, user) {
         const ownedBoosters = (data.inventory || []).filter(item => Number(item.amount) > 0);
 
         if (!ownedBoosters.length) {
+            if (rewardBox && !BOOSTER_REVEAL_STATE.lastCards.length) {
+                rewardBox.innerHTML = renderOpenV3Stage(null);
+            }
             openBoosterList.innerHTML = "<div class='inventory-item'>Du hast keine Booster zum Oeffnen.</div>";
             return;
+        }
+
+        const stagedPack = ownedBoosters.find(item => selectedPackKey === item.pack_key) || ownedBoosters[0];
+        if (rewardBox && !BOOSTER_REVEAL_STATE.lastCards.length) {
+            rewardBox.innerHTML = renderOpenV3Stage(stagedPack);
         }
 
         openBoosterList.innerHTML = ownedBoosters.map(item => `
@@ -1433,8 +1456,15 @@ async function loadOpenBoosterPage(tg, user) {
         document.querySelectorAll(".open-booster-btn").forEach(button => {
             button.addEventListener("click", async () => {
                 button.disabled = true;
+                const packCard = button.closest(".booster-pack-card");
+                if (packCard) {
+                    packCard.classList.add("is-opening");
+                    packCard.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
 
                 try {
+                    await new Promise(resolve => setTimeout(resolve, 650));
+
                     const result = await postJson("/open-booster", {
                         initData: tg.initData,
                         user_id: user.id,
@@ -1470,6 +1500,9 @@ async function loadOpenBoosterPage(tg, user) {
                     showToast("Fehler beim Oeffnen.", "error");
                 } finally {
                     button.disabled = false;
+                    if (packCard) {
+                        packCard.classList.remove("is-opening");
+                    }
                 }
             });
         });
