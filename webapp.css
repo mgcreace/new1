@@ -1391,6 +1391,24 @@ h2{
     box-shadow:0 0 0 3px rgba(34,211,238,.14);
 }
 
+.field-needs-attention{
+    border-color:#fb7185 !important;
+    box-shadow:0 0 0 3px rgba(251,113,133,.22), 0 0 24px rgba(251,113,133,.18) !important;
+    animation:fieldPulse .45s ease 2;
+}
+
+@keyframes fieldPulse{
+    0%, 100%{
+        transform:translateX(0);
+    }
+    35%{
+        transform:translateX(-3px);
+    }
+    70%{
+        transform:translateX(3px);
+    }
+}
+
 .toggle-row{
     display:flex;
     align-items:center;

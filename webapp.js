@@ -1545,6 +1545,32 @@ async function loadTradingPage(tg, user) {
             );
         }
 
+        function focusTradeField(element, message) {
+            if (element) {
+                element.classList.add("field-needs-attention");
+                element.scrollIntoView({ behavior: "smooth", block: "center" });
+                window.setTimeout(() => element.classList.remove("field-needs-attention"), 1400);
+            }
+            showToast(message, "error");
+        }
+
+        function resetTradeForm() {
+            if (targetTraderSelect) {
+                targetTraderSelect.value = "";
+            }
+            if (myTradeCardSelect) {
+                myTradeCardSelect.value = "";
+            }
+            if (wantedTradeCardSelect) {
+                wantedTradeCardSelect.innerHTML = "<option value=''>Karte waehlen</option>";
+            }
+            fillQuantitySelect(myTradeQuantity, 1, "Deine Menge");
+            fillQuantitySelect(wantedTradeQuantity, 1, "Wunsch-Menge");
+            selectedTargetCards = [];
+            renderCardCollection([], myTradePreview, "Deine ausgewaehlte Karte erscheint hier.", { slotLabel: "DEIN" });
+            renderCardCollection([], wantedTradePreview, "Die Wunschkarte des Traders erscheint hier.", { slotLabel: "WUNSCH" });
+        }
+
         if (traderList) {
             if (!traderData.traders.length) {
                 traderList.innerHTML = "<div class='inventory-item'>Noch keine oeffentlichen Trader gefunden.</div>";
@@ -1626,38 +1652,40 @@ async function loadTradingPage(tg, user) {
                 return;
             }
 
-                wantedTradeCardSelect.innerHTML = "<option value=''>Karte waehlen</option>";
-                fillQuantitySelect(wantedTradeQuantity, 1, "Wunsch-Menge");
-                selectedTargetCards = [];
-                renderCardCollection([], wantedTradePreview, "Die Wunschkarte des Traders erscheint hier.", { slotLabel: "WUNSCH" });
+            wantedTradeCardSelect.innerHTML = "<option value=''>Karte waehlen</option>";
+            fillQuantitySelect(wantedTradeQuantity, 1, "Wunsch-Menge");
+            selectedTargetCards = [];
+            renderCardCollection([], wantedTradePreview, "Die Wunschkarte des Traders erscheint hier.", { slotLabel: "WUNSCH" });
 
-                if (!targetTraderSelect.value) {
-                    return;
-                }
+            if (!targetTraderSelect.value) {
+                return;
+            }
 
-                const targetCards = await postJson("/trader-cards", {
-                    initData: tg.initData,
-                    user_id: user.id,
-                    target_user_id: targetTraderSelect.value
-                });
+            const targetCards = await postJson("/trader-cards", {
+                initData: tg.initData,
+                user_id: user.id,
+                target_user_id: targetTraderSelect.value
+            });
 
-                if (!targetCards.ok) {
-                    return;
-                }
+            if (!targetCards.ok) {
+                return;
+            }
 
-                selectedTargetCards = targetCards.cards || [];
+            selectedTargetCards = targetCards.cards || [];
 
-                wantedTradeCardSelect.innerHTML = "<option value=''>Karte waehlen</option>" + selectedTargetCards.map(card => (
-                    `<option value="${card.card_id}">${card.card_name} (${card.rarity}) x${card.quantity}</option>`
-                )).join("");
+            wantedTradeCardSelect.innerHTML = "<option value=''>Karte waehlen</option>" + selectedTargetCards.map(card => (
+                `<option value="${card.card_id}">${card.card_name} (${card.rarity}) x${card.quantity}</option>`
+            )).join("");
 
-                if (options.wantedCardId && selectedTargetCards.some(card => String(card.card_id) === String(options.wantedCardId))) {
-                    wantedTradeCardSelect.value = options.wantedCardId;
-                    const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect.value);
-                    fillQuantitySelect(wantedTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Wunsch-Menge");
-                    updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity ? wantedTradeQuantity.value : 1, "Du willst");
-                    renderTradeFeedback("Wunschkarte wurde aus dem Karten-Modal vorausgewaehlt. Waehle jetzt deine Karte fuer das Angebot.", "info");
-                }
+            if (options.wantedCardId && selectedTargetCards.some(card => String(card.card_id) === String(options.wantedCardId))) {
+                wantedTradeCardSelect.value = options.wantedCardId;
+                const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect.value);
+                fillQuantitySelect(wantedTradeQuantity, selectedCard ? selectedCard.quantity : 1, "Wunsch-Menge");
+                updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity ? wantedTradeQuantity.value : 1, "Du willst");
+                renderTradeFeedback("Wunschkarte wurde aus dem Karten-Modal vorausgewaehlt. Waehle jetzt deine Karte fuer das Angebot.", "info");
+                wantedTradeCardSelect.classList.add("field-needs-attention");
+                window.setTimeout(() => wantedTradeCardSelect.classList.remove("field-needs-attention"), 1400);
+            }
         }
 
         if (targetTraderSelect && !targetTraderSelect.dataset.bound) {
@@ -1701,8 +1729,23 @@ async function loadTradingPage(tg, user) {
                 const requestedCardId = document.getElementById("wantedTradeCardId").value;
                 const requestedQuantity = document.getElementById("wantedTradeQuantity").value;
 
-                if (!targetTraderId || !offeredCardId || !requestedCardId || !offeredQuantity || !requestedQuantity) {
-                    showToast("Bitte waehle Trader, Karten und Mengen aus.", "error");
+                if (!targetTraderId) {
+                    focusTradeField(document.getElementById("targetTraderId"), "Bitte zuerst einen Trader waehlen.");
+                    return;
+                }
+
+                if (!offeredCardId) {
+                    focusTradeField(document.getElementById("myTradeCardId"), "Bitte waehle deine Karte fuer das Angebot.");
+                    return;
+                }
+
+                if (!requestedCardId) {
+                    focusTradeField(document.getElementById("wantedTradeCardId"), "Bitte waehle die Wunschkarte.");
+                    return;
+                }
+
+                if (!offeredQuantity || !requestedQuantity) {
+                    showToast("Bitte waehle die Mengen aus.", "error");
                     return;
                 }
 
@@ -1728,6 +1771,7 @@ async function loadTradingPage(tg, user) {
                     }
 
                     renderTradeFeedback("Trade-Angebot erfolgreich erstellt. Es ist jetzt im Bereich <strong>Gesendete Trades</strong> sichtbar.", "success");
+                    resetTradeForm();
                     await loadTradingPage(tg, user);
                 } catch (error) {
                     console.log(error);
