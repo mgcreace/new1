@@ -2683,6 +2683,11 @@ h2{
         gap:12px;
     }
 
+    .open-reveal-grid{
+        grid-template-columns:repeat(3, minmax(0, 1fr));
+        gap:7px;
+    }
+
     .inventory-collection-grid{
         grid-template-columns:repeat(3, minmax(0, 1fr));
         gap:7px;
