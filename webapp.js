@@ -78,6 +78,43 @@ function updateAccountHero(user, secureData = {}, profile = {}) {
     if (accountAvatar) {
         accountAvatar.src = avatarUrl;
     }
+
+    renderProfileShowcase(profile);
+}
+
+function renderProfileShowcase(profile = {}) {
+    const showcase = document.getElementById("profileShowcase");
+    if (!showcase) {
+        return;
+    }
+
+    if (!profile.favorite_card_id) {
+        showcase.innerHTML = `
+            <div class="showcase-empty">
+                <strong>Keine Lieblingskarte gesetzt</strong>
+                <span>Waehle eine Karte im Inventory als Showcase.</span>
+            </div>
+        `;
+        return;
+    }
+
+    const card = {
+        card_name: profile.favorite_card_name,
+        rarity: profile.favorite_card_rarity,
+        image_url: profile.favorite_card_image_url
+    };
+
+    showcase.innerHTML = `
+        <div class="showcase-copy">
+            <span>Showcase</span>
+            <strong>${profile.favorite_card_name || "Lieblingskarte"}</strong>
+            <p>${profile.favorite_card_rarity || "CARD"} aus ${profile.favorite_card_pack_key || "Collection"}</p>
+        </div>
+        <div class="showcase-card ${getRarityClass(profile.favorite_card_rarity)}">
+            ${getCardArtMarkup(card)}
+            <div class="card-slot">${profile.favorite_card_rarity || "CARD"}</div>
+        </div>
+    `;
 }
 
 function setupProfileTabs() {
@@ -1616,6 +1653,26 @@ async function loadTradingPage(tg, user) {
                             Trading: ${profile.trading_enabled ? "aktiv" : "aus"}<br>
                             Inventar: ${profile.inventory_visibility}<br>
                             Lieblingskarte: ${profile.favorite_card_name || "Keine"}
+                        </div>
+                        <div class="public-showcase-card">
+                            ${
+                                profile.favorite_card_id
+                                    ? `
+                                        <div class="showcase-card ${getRarityClass(profile.favorite_card_rarity)}">
+                                            ${getCardArtMarkup({
+                                                card_name: profile.favorite_card_name,
+                                                rarity: profile.favorite_card_rarity,
+                                                image_url: profile.favorite_card_image_url
+                                            })}
+                                            <div class="card-slot">${profile.favorite_card_rarity || "CARD"}</div>
+                                        </div>
+                                        <div>
+                                            <strong>${profile.favorite_card_name}</strong>
+                                            <p>${profile.favorite_card_rarity || "CARD"} aus ${profile.favorite_card_pack_key || "Collection"}</p>
+                                        </div>
+                                    `
+                                    : "<div class='inventory-item'>Keine Lieblingskarte gesetzt.</div>"
+                            }
                         </div>
                         <div class="card-reveal-grid">
                             ${
