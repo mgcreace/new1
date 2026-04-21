@@ -824,37 +824,113 @@ h2{
         transition:transform .18s ease, border-color .18s ease, background .18s ease;
     }
 
+    .topnav a::after{
+        content:"";
+        position:absolute;
+        left:50%;
+        box-sizing:border-box;
+        pointer-events:none;
+    }
+
     .topnav a[data-page="home"]::before{
-        border-radius:9px 9px 7px 7px;
-        border-top-width:7px;
-        transform:rotate(45deg) scale(.82);
+        width:25px;
+        height:20px;
+        margin-top:7px;
+        border-radius:4px 4px 7px 7px;
+        border-top:none;
+        transform:none;
+    }
+
+    .topnav a[data-page="home"]::after{
+        top:1px;
+        width:19px;
+        height:19px;
+        border-left:2.4px solid currentColor;
+        border-top:2.4px solid currentColor;
+        border-radius:4px 0 0 0;
+        transform:translateX(-50%) rotate(45deg);
     }
 
     .topnav a[data-page="shop"]::before{
-        border-radius:8px;
-        border-top-width:8px;
+        width:25px;
+        height:25px;
+        margin-top:4px;
+        border-radius:7px;
+        background:linear-gradient(180deg, transparent 0 38%, rgba(255,255,255,.12) 38% 100%);
+    }
+
+    .topnav a[data-page="shop"]::after{
+        top:4px;
+        width:14px;
+        height:8px;
+        border:2.4px solid currentColor;
+        border-bottom:none;
+        border-radius:9px 9px 0 0;
+        transform:translateX(-50%);
     }
 
     .topnav a[data-page="inventory"]::before{
-        border-radius:9px 9px 12px 12px;
-        border-top-width:7px;
+        width:26px;
+        height:28px;
+        margin-top:2px;
+        border-radius:9px 9px 11px 11px;
+        background:linear-gradient(180deg, rgba(255,255,255,.14) 0 34%, transparent 34% 100%);
+    }
+
+    .topnav a[data-page="inventory"]::after{
+        top:7px;
+        width:14px;
+        height:7px;
+        border:2.2px solid currentColor;
+        border-bottom:none;
+        border-radius:7px 7px 0 0;
+        transform:translateX(-50%);
     }
 
     .topnav a[data-page="trading"]::before{
-        border-radius:999px;
+        width:28px;
+        height:20px;
+        margin-top:7px;
+        border:none;
+        border-top:3px solid currentColor;
+        border-bottom:3px solid currentColor;
+        border-radius:0;
+    }
+
+    .topnav a[data-page="trading"]::after{
+        top:8px;
+        width:8px;
+        height:8px;
+        border-top:3px solid currentColor;
+        border-right:3px solid currentColor;
+        transform:translateX(6px) rotate(45deg);
     }
 
     .topnav a[data-page="account"]::before{
-        border-radius:999px 999px 10px 10px;
+        width:18px;
+        height:18px;
+        margin-top:1px;
+        border-radius:999px;
+    }
+
+    .topnav a[data-page="account"]::after{
+        top:21px;
+        width:28px;
+        height:13px;
+        border:2.4px solid currentColor;
+        border-radius:14px 14px 8px 8px;
+        transform:translateX(-50%);
     }
 
     .topnav a[data-page="openbooster"]::before{
-        width:52px;
-        height:30px;
-        border-radius:18px;
-        background:linear-gradient(135deg, #22d3ee, #fff 42%, #f43f5e);
+        width:30px;
+        height:38px;
+        margin-top:-4px;
         border:none;
-        box-shadow:0 0 18px rgba(34,211,238,.26);
+        border-radius:7px;
+        background:linear-gradient(160deg, #22d3ee, #eef2ff 45%, #f43f5e);
+        box-shadow:0 0 20px rgba(34,211,238,.25);
+        transform:translateX(-5px) rotate(-8deg);
     }
 
     .topnav a[data-page="openbooster"]{
@@ -863,15 +939,13 @@ h2{
     }
 
     .topnav a[data-page="openbooster"]::after{
-        content:"+";
-        position:absolute;
-        left:50%;
-        top:3px;
-        transform:translateX(-50%);
-        color:#050713;
-        font-size:31px;
-        line-height:27px;
-        font-weight:900;
+        top:-1px;
+        width:30px;
+        height:38px;
+        border-radius:7px;
+        background:linear-gradient(160deg, #ffffff, #fde68a 45%, #fb7185);
+        transform:translateX(1px) rotate(8deg);
+        box-shadow:0 0 18px rgba(244,63,94,.22);
     }
 
     .topnav a.active::before{
@@ -879,7 +953,11 @@ h2{
     }
 
     .topnav a[data-page="home"].active::before{
-        transform:translateY(-2px) rotate(45deg) scale(.88);
+        transform:translateY(-2px) scale(1.05);
+    }
+
+    .topnav a[data-page="openbooster"].active::before{
+        transform:translate(-5px, -2px) rotate(-8deg) scale(1.05);
     }
 
     .topnav a.active{
