@@ -38,20 +38,46 @@ function renderTradeOfferCards(targetElement, offers, userId, emptyMessage = "No
     }
 
     if (!offers.length) {
-        targetElement.innerHTML = `<div class='history-item'>${emptyMessage}</div>`;
+        targetElement.innerHTML = `
+            <div class="history-item trade-mail-empty">
+                <strong>Keine Mail</strong>
+                <span>${emptyMessage}</span>
+            </div>
+        `;
         return;
     }
 
     targetElement.innerHTML = offers.map(offer => `
-        <div class="trade-offer-card">
-            <strong>Trade #${offer.id}</strong><br>
-            <div class="${getTradeStatusClass(offer.status)}">${getTradeStatusLabel(offer.status)}</div><br>
-            <span class="muted">Erstellt: ${formatDate(offer.created_at)}</span>
-            ${offer.responded_at ? `<br><span class="muted">Bearbeitet: ${formatDate(offer.responded_at)}</span>` : ""}
+        <div class="trade-offer-card trade-mail-card ${Number(offer.to_user_id) === Number(userId) ? "is-incoming" : "is-outgoing"}">
+            <div class="trade-mail-head">
+                <div class="trade-mail-headline">
+                    <span class="trade-mail-tag">${Number(offer.to_user_id) === Number(userId) ? "Eingehend" : "Gesendet"}</span>
+                    <strong>Trade #${offer.id}</strong>
+                </div>
+                <div class="${getTradeStatusClass(offer.status)}">${getTradeStatusLabel(offer.status)}</div>
+            </div>
+            <div class="trade-mail-meta">
+                <span>${Number(offer.to_user_id) === Number(userId) ? `Von User ${offer.from_user_id}` : `An User ${offer.to_user_id}`}</span>
+                <span>Erstellt: ${formatDate(offer.created_at)}</span>
+                ${offer.responded_at ? `<span>Bearbeitet: ${formatDate(offer.responded_at)}</span>` : ""}
+            </div>
+            <div class="trade-mail-summary">
+                <div class="trade-mail-side">
+                    <span class="trade-mail-side-title">${offer.from_user_id === userId ? "Du gibst" : "Du bekommst"}</span>
+                    <strong>${offer.offered_card_name}</strong>
+                    <small>${offer.offered_card_rarity} • x${offer.offered_quantity || 1}</small>
+                </div>
+                <div class="trade-mail-swap">⇄</div>
+                <div class="trade-mail-side">
+                    <span class="trade-mail-side-title">${offer.to_user_id === userId ? "Du gibst" : "Du willst"}</span>
+                    <strong>${offer.requested_card_name}</strong>
+                    <small>${offer.requested_card_rarity} • x${offer.requested_quantity || 1}</small>
+                </div>
+            </div>
             <div class="trade-offer-row">
                 <div class="card-face ${getRarityClass(offer.offered_card_rarity)}" ${getCardDetailAttributes({ image_url: offer.offered_card_image_url, card_name: offer.offered_card_name, rarity: offer.offered_card_rarity }, { displayQuantity: offer.offered_quantity || 1 })}>
                     ${getCardArtMarkup({ image_url: offer.offered_card_image_url, card_name: offer.offered_card_name, rarity: offer.offered_card_rarity })}
-                    <div class="trade-side-label">${offer.from_user_id === userId ? "Dein Angebot" : "Angeboten an dich"}</div>
+                    <div class="trade-side-label">${offer.from_user_id === userId ? "Dein Angebot" : "An dich"}</div>
                     <div class="card-name">${offer.offered_card_name}</div>
                     <div class="card-rarity">${offer.offered_card_rarity}</div>
                     <div class="card-qty">Menge: ${offer.offered_quantity || 1}</div>
