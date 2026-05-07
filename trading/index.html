@@ -70,13 +70,30 @@
 <span>Du gibst</span>
 <button type="button" id="resetMyTradePick" class="trade-slot-reset">Reset</button>
 <div id="myTradePreview" class="card-reveal-grid"></div>
+<div class="trade-qty-card">
+<span class="trade-qty-label">Deine Menge</span>
+<div class="trade-qty-controls">
+<button type="button" id="decreaseMyTradeQty" class="trade-qty-btn">-</button>
+<strong id="myTradeQtyDisplay">1</strong>
+<button type="button" id="increaseMyTradeQty" class="trade-qty-btn">+</button>
+</div>
+</div>
 </div>
 <div class="trade-preview-panel">
 <span>Du willst</span>
 <button type="button" id="resetWantedTradePick" class="trade-slot-reset">Reset</button>
 <div id="wantedTradePreview" class="card-reveal-grid"></div>
+<div class="trade-qty-card">
+<span class="trade-qty-label">Wunsch-Menge</span>
+<div class="trade-qty-controls">
+<button type="button" id="decreaseWantedTradeQty" class="trade-qty-btn">-</button>
+<strong id="wantedTradeQtyDisplay">1</strong>
+<button type="button" id="increaseWantedTradeQty" class="trade-qty-btn">+</button>
 </div>
 </div>
+</div>
+</div>
+<div id="tradeCompareBar" class="trade-compare-bar"></div>
 <div id="tradeBuilderSummary" class="trade-builder-summary"></div>
 <button id="createTradeButton" class="shop-btn trade-create-btn" type="submit">Trade anbieten<small>Erstes Angebot erstellen</small></button>
 <div id="tradeFeedback" class="inventory-item trade-feedback-box">Baue dein Angebot. Nach dem Senden findest du es in Mail.</div>

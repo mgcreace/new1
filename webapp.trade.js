@@ -128,6 +128,13 @@ async function loadTradingPage(tg, user) {
         const resetMyTradePick = document.getElementById("resetMyTradePick");
         const resetWantedTradePick = document.getElementById("resetWantedTradePick");
         const tradeBuilderSummary = document.getElementById("tradeBuilderSummary");
+        const tradeCompareBar = document.getElementById("tradeCompareBar");
+        const myTradeQtyDisplay = document.getElementById("myTradeQtyDisplay");
+        const wantedTradeQtyDisplay = document.getElementById("wantedTradeQtyDisplay");
+        const decreaseMyTradeQty = document.getElementById("decreaseMyTradeQty");
+        const increaseMyTradeQty = document.getElementById("increaseMyTradeQty");
+        const decreaseWantedTradeQty = document.getElementById("decreaseWantedTradeQty");
+        const increaseWantedTradeQty = document.getElementById("increaseWantedTradeQty");
         const tradeParams = new URLSearchParams(window.location.search);
         const preselectTargetUserId = tradeParams.get("target_user_id");
         const preselectWantedCardId = tradeParams.get("wanted_card_id");
@@ -194,6 +201,69 @@ async function loadTradingPage(tg, user) {
             }
         }
 
+        function updateQuantityDisplay() {
+            const mySelectedCard = findCardById(myCardInventory, myTradeCardSelect ? myTradeCardSelect.value : "");
+            const wantedSelectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect ? wantedTradeCardSelect.value : "");
+
+            if (myTradeQtyDisplay) {
+                myTradeQtyDisplay.textContent = String(myTradeQuantity ? myTradeQuantity.value : 1);
+            }
+            if (wantedTradeQtyDisplay) {
+                wantedTradeQtyDisplay.textContent = String(wantedTradeQuantity ? wantedTradeQuantity.value : 1);
+            }
+
+            if (decreaseMyTradeQty) {
+                decreaseMyTradeQty.disabled = !mySelectedCard || Number(myTradeQuantity?.value || 1) <= 1;
+            }
+            if (increaseMyTradeQty) {
+                increaseMyTradeQty.disabled = !mySelectedCard || Number(myTradeQuantity?.value || 1) >= Number(mySelectedCard.quantity || 1);
+            }
+            if (decreaseWantedTradeQty) {
+                decreaseWantedTradeQty.disabled = !wantedSelectedCard || Number(wantedTradeQuantity?.value || 1) <= 1;
+            }
+            if (increaseWantedTradeQty) {
+                increaseWantedTradeQty.disabled = !wantedSelectedCard || Number(wantedTradeQuantity?.value || 1) >= Number(wantedSelectedCard.quantity || 1);
+            }
+        }
+
+        function renderTradeCompareBar() {
+            if (!tradeCompareBar) {
+                return;
+            }
+
+            const mySelectedCard = findCardById(myCardInventory, myTradeCardSelect ? myTradeCardSelect.value : "");
+            const wantedSelectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect ? wantedTradeCardSelect.value : "");
+
+            if (!mySelectedCard && !wantedSelectedCard) {
+                tradeCompareBar.className = "trade-compare-bar is-empty";
+                tradeCompareBar.innerHTML = `
+                    <span>Vergleich</span>
+                    <strong>Waehle links und rechts je eine Karte.</strong>
+                `;
+                return;
+            }
+
+            tradeCompareBar.className = "trade-compare-bar";
+            tradeCompareBar.innerHTML = `
+                <div class="trade-compare-side">
+                    <span>Du gibst</span>
+                    <strong>${mySelectedCard ? mySelectedCard.card_name : "Noch offen"}</strong>
+                    <small>${mySelectedCard ? `${mySelectedCard.rarity} • x${myTradeQuantity ? myTradeQuantity.value : 1}` : "Karte fehlt"}</small>
+                </div>
+                <div class="trade-compare-arrow">⇄</div>
+                <div class="trade-compare-side">
+                    <span>Du willst</span>
+                    <strong>${wantedSelectedCard ? wantedSelectedCard.card_name : "Noch offen"}</strong>
+                    <small>${wantedSelectedCard ? `${wantedSelectedCard.rarity} • x${wantedTradeQuantity ? wantedTradeQuantity.value : 1}` : "Karte fehlt"}</small>
+                </div>
+            `;
+        }
+
+        function syncTradeVisualState() {
+            updateQuantityDisplay();
+            renderTradeCompareBar();
+        }
+
         function focusTradeField(element, message) {
             if (element) {
                 element.classList.add("field-needs-attention");
@@ -237,6 +307,7 @@ async function loadTradingPage(tg, user) {
             renderTradeTapCards(myTradeTapCards, myCardInventory, myTradeCardSelect ? myTradeCardSelect.value : "", "Du hast noch keine Karten zum Traden.", "mine");
             renderTradeTapCards(wantedTradeTapCards, selectedTargetCards, wantedTradeCardSelect ? wantedTradeCardSelect.value : "", "Waehle zuerst einen Trader.", "wanted");
             renderTradeBuilderSummary();
+            syncTradeVisualState();
         }
 
         function selectMyTradeCard(cardId) {
@@ -375,6 +446,7 @@ async function loadTradingPage(tg, user) {
                 const selectedCard = findCardById(myCardInventory, myTradeCardSelect ? myTradeCardSelect.value : "");
                 updateTradePreview(myTradePreview, selectedCard, "Deine ausgewaehlte Karte erscheint hier.", "DEIN", myTradeQuantity.value, "Du gibst");
                 renderTradeBuilderSummary();
+                syncTradeVisualState();
             });
         }
 
@@ -392,6 +464,29 @@ async function loadTradingPage(tg, user) {
         if (resetMyTradePick && !resetMyTradePick.dataset.bound) {
             resetMyTradePick.dataset.bound = "1";
             resetMyTradePick.addEventListener("click", clearMyTradeCard);
+        }
+
+        if (decreaseMyTradeQty && !decreaseMyTradeQty.dataset.bound) {
+            decreaseMyTradeQty.dataset.bound = "1";
+            decreaseMyTradeQty.addEventListener("click", () => {
+                if (!myTradeQuantity) {
+                    return;
+                }
+                myTradeQuantity.value = String(Math.max(1, Number(myTradeQuantity.value || 1) - 1));
+                myTradeQuantity.dispatchEvent(new Event("change"));
+            });
+        }
+
+        if (increaseMyTradeQty && !increaseMyTradeQty.dataset.bound) {
+            increaseMyTradeQty.dataset.bound = "1";
+            increaseMyTradeQty.addEventListener("click", () => {
+                const selectedCard = findCardById(myCardInventory, myTradeCardSelect ? myTradeCardSelect.value : "");
+                if (!myTradeQuantity || !selectedCard) {
+                    return;
+                }
+                myTradeQuantity.value = String(Math.min(Number(selectedCard.quantity || 1), Number(myTradeQuantity.value || 1) + 1));
+                myTradeQuantity.dispatchEvent(new Event("change"));
+            });
         }
 
         async function loadSelectedTargetCards(options = {}) {
@@ -458,6 +553,7 @@ async function loadTradingPage(tg, user) {
                 const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect ? wantedTradeCardSelect.value : "");
                 updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity.value, "Du willst");
                 renderTradeBuilderSummary();
+                syncTradeVisualState();
             });
         }
 
@@ -477,10 +573,35 @@ async function loadTradingPage(tg, user) {
             resetWantedTradePick.addEventListener("click", clearWantedTradeCard);
         }
 
+        if (decreaseWantedTradeQty && !decreaseWantedTradeQty.dataset.bound) {
+            decreaseWantedTradeQty.dataset.bound = "1";
+            decreaseWantedTradeQty.addEventListener("click", () => {
+                if (!wantedTradeQuantity) {
+                    return;
+                }
+                wantedTradeQuantity.value = String(Math.max(1, Number(wantedTradeQuantity.value || 1) - 1));
+                wantedTradeQuantity.dispatchEvent(new Event("change"));
+            });
+        }
+
+        if (increaseWantedTradeQty && !increaseWantedTradeQty.dataset.bound) {
+            increaseWantedTradeQty.dataset.bound = "1";
+            increaseWantedTradeQty.addEventListener("click", () => {
+                const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect ? wantedTradeCardSelect.value : "");
+                if (!wantedTradeQuantity || !selectedCard) {
+                    return;
+                }
+                wantedTradeQuantity.value = String(Math.min(Number(selectedCard.quantity || 1), Number(wantedTradeQuantity.value || 1) + 1));
+                wantedTradeQuantity.dispatchEvent(new Event("change"));
+            });
+        }
+
         if (preselectTargetUserId && targetTraderSelect && targetTraderSelect.value !== preselectTargetUserId) {
             targetTraderSelect.value = preselectTargetUserId;
             await loadSelectedTargetCards({ wantedCardId: preselectWantedCardId });
         }
+
+        syncTradeVisualState();
 
         const tradeForm = document.getElementById("tradeForm");
         if (tradeForm && !tradeForm.dataset.bound) {

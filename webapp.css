@@ -2887,6 +2887,120 @@ h2{
     background:linear-gradient(90deg, transparent, rgba(103,232,249,.55), transparent);
 }
 
+.trade-qty-card{
+    display:grid;
+    gap:8px;
+    margin-top:10px;
+    padding:10px 12px;
+    border-radius:14px;
+    background:rgba(2,6,23,.42);
+    border:1px solid rgba(148,163,184,.14);
+}
+
+.trade-qty-label{
+    color:#94a3b8;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+.trade-qty-controls{
+    display:grid;
+    grid-template-columns:34px 1fr 34px;
+    gap:8px;
+    align-items:center;
+}
+
+.trade-qty-controls strong{
+    text-align:center;
+    font-size:18px;
+    font-weight:950;
+    color:#f8fafc;
+}
+
+.trade-qty-btn{
+    min-width:34px;
+    height:34px;
+    border:1px solid rgba(255,255,255,.12);
+    border-radius:12px;
+    background:rgba(15,23,42,.92);
+    color:#f8fafc;
+    font-size:20px;
+    font-weight:900;
+}
+
+.trade-qty-btn:disabled{
+    opacity:.38;
+}
+
+.trade-compare-bar{
+    display:grid;
+    grid-template-columns:minmax(0, 1fr) auto minmax(0, 1fr);
+    gap:10px;
+    align-items:center;
+    margin:12px 0 2px;
+    padding:12px;
+    border-radius:18px;
+    background:
+        radial-gradient(circle at 88% 8%, rgba(34,211,238,.10), transparent 32%),
+        linear-gradient(180deg, rgba(15,23,42,.96), rgba(2,6,23,.92));
+    border:1px solid rgba(148,163,184,.18);
+}
+
+.trade-compare-bar.is-empty{
+    grid-template-columns:1fr;
+}
+
+.trade-compare-bar.is-empty span{
+    color:#67e8f9;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+.trade-compare-bar.is-empty strong{
+    font-size:14px;
+}
+
+.trade-compare-side{
+    display:grid;
+    gap:4px;
+    min-width:0;
+}
+
+.trade-compare-side span{
+    color:#67e8f9;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+.trade-compare-side strong{
+    font-size:14px;
+    color:#f8fafc;
+}
+
+.trade-compare-side small{
+    color:#94a3b8;
+    font-size:12px;
+    font-weight:700;
+}
+
+.trade-compare-arrow{
+    width:34px;
+    height:34px;
+    display:grid;
+    place-items:center;
+    border-radius:999px;
+    background:linear-gradient(135deg, rgba(103,232,249,.18), rgba(251,113,133,.18));
+    color:#f8fafc;
+    font-size:18px;
+    font-weight:900;
+}
+
 .trade-slot-reset{
     position:absolute;
     top:8px;
@@ -4067,6 +4181,15 @@ h2{
     }
 
     .trade-mail-swap{
+        margin:0 auto;
+        transform:rotate(90deg);
+    }
+
+    .trade-compare-bar{
+        grid-template-columns:1fr;
+    }
+
+    .trade-compare-arrow{
         margin:0 auto;
         transform:rotate(90deg);
     }
