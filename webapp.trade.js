@@ -386,13 +386,28 @@ async function loadTradingPage(tg, user) {
             } else {
                 traderList.innerHTML = traderData.traders.map(trader => `
                     <div class="trader-card">
-                        <strong>${trader.display_name}</strong><br>
-                        ${trader.bio || "Keine Bio"}<br>
-                        <span class="muted">Lieblingskarte: ${trader.favorite_card_name || "Keine"}</span><br><br>
-                        <button class="shop-btn trader-profile-btn" data-target-user-id="${trader.user_id}">
-                            Profil ansehen
-                            <small>Sammlung und Profil ansehen</small>
-                        </button>
+                        <div class="trader-card-head">
+                            <div>
+                                <strong>${trader.display_name}</strong>
+                                <div class="trader-card-id">ID ${trader.user_id}</div>
+                            </div>
+                            <span class="trader-status-pill ${trader.trading_enabled ? "is-on" : "is-off"}">${trader.trading_enabled ? "Trading an" : "Trading aus"}</span>
+                        </div>
+                        <p class="trader-card-bio">${trader.bio || "Keine Bio"}</p>
+                        <div class="trader-card-meta">
+                            <span>Lieblingskarte: ${trader.favorite_card_name || "Keine"}</span>
+                            <span>Inventar: ${trader.inventory_visibility || "public"}</span>
+                        </div>
+                        <div class="trader-card-actions">
+                            <button class="shop-btn trader-pick-btn" data-target-user-id="${trader.user_id}">
+                                Als Trader waehlen
+                                <small>Direkt oben in den Builder</small>
+                            </button>
+                            <button class="shop-btn trader-profile-btn" data-target-user-id="${trader.user_id}">
+                                Profil ansehen
+                                <small>Sammlung und Profil ansehen</small>
+                            </button>
+                        </div>
                     </div>
                 `).join("");
             }
@@ -539,6 +554,26 @@ async function loadTradingPage(tg, user) {
                 await loadSelectedTargetCards();
             });
         }
+
+        document.querySelectorAll(".trader-pick-btn").forEach(button => {
+            if (button.dataset.bound) {
+                return;
+            }
+
+            button.dataset.bound = "1";
+            button.addEventListener("click", async () => {
+                if (!targetTraderSelect) {
+                    return;
+                }
+
+                targetTraderSelect.value = button.dataset.targetUserId || "";
+                await loadSelectedTargetCards();
+                targetTraderSelect.scrollIntoView({ behavior: "smooth", block: "center" });
+                targetTraderSelect.classList.add("field-needs-attention");
+                window.setTimeout(() => targetTraderSelect.classList.remove("field-needs-attention"), 1400);
+                renderTradeFeedback("Trader wurde in den Builder uebernommen. Waehle jetzt die Wunschkarte.", "info");
+            });
+        });
 
         if (wantedTradeCardSelect && !wantedTradeCardSelect.dataset.bound) {
             wantedTradeCardSelect.dataset.bound = "1";
@@ -698,14 +733,29 @@ async function loadTradingPage(tg, user) {
                     }
 
                     const profile = result.profile;
+                    const visibleCards = profile.visible_cards || [];
+                    const visibleCount = visibleCards.length;
+                    const rareCount = visibleCards.filter(card => String(card.rarity || "").toUpperCase() === "R").length;
+                    const srSecCount = visibleCards.filter(card => {
+                        const rarity = String(card.rarity || "").toUpperCase();
+                        return rarity === "SR" || rarity === "SEC";
+                    }).length;
 
                     publicProfileView.innerHTML = `
-                        <div class="trader-card">
-                            <strong>${profile.display_name || "User " + profile.user_id}</strong><br>
-                            ${profile.bio || "Keine Bio"}<br>
-                            Trading: ${profile.trading_enabled ? "aktiv" : "aus"}<br>
-                            Inventar: ${profile.inventory_visibility}<br>
-                            Lieblingskarte: ${profile.favorite_card_name || "Keine"}
+                        <div class="trader-card trader-profile-card">
+                            <div class="trader-card-head">
+                                <div>
+                                    <strong>${profile.display_name || "User " + profile.user_id}</strong>
+                                    <div class="trader-card-id">ID ${profile.user_id}</div>
+                                </div>
+                                <span class="trader-status-pill ${profile.trading_enabled ? "is-on" : "is-off"}">${profile.trading_enabled ? "Trading an" : "Trading aus"}</span>
+                            </div>
+                            <p class="trader-card-bio">${profile.bio || "Keine Bio"}</p>
+                            <div class="trader-profile-stats">
+                                <div><strong>${profile.inventory_visibility === "public" ? visibleCount : 0}</strong><span>Sichtbar</span></div>
+                                <div><strong>${profile.inventory_visibility === "public" ? rareCount : 0}</strong><span>Rare</span></div>
+                                <div><strong>${profile.inventory_visibility === "public" ? srSecCount : 0}</strong><span>SR/SEC</span></div>
+                            </div>
                         </div>
                         <div class="public-showcase-card">
                             ${
@@ -720,6 +770,7 @@ async function loadTradingPage(tg, user) {
                                             <div class="card-slot">${profile.favorite_card_rarity || "CARD"}</div>
                                         </div>
                                         <div>
+                                            <span class="trade-showcase-label">Lieblingskarte</span>
                                             <strong>${profile.favorite_card_name}</strong>
                                             <p>${profile.favorite_card_rarity || "CARD"} aus ${profile.favorite_card_pack_key || "Collection"}</p>
                                         </div>
@@ -727,12 +778,16 @@ async function loadTradingPage(tg, user) {
                                     : "<div class='inventory-item'>Keine Lieblingskarte gesetzt.</div>"
                             }
                         </div>
+                        <div class="trade-visible-head">
+                            <strong>Oeffentliche Karten</strong>
+                            <span>${profile.inventory_visibility === "public" ? `${visibleCount} sichtbar` : "privat"}</span>
+                        </div>
                         <div class="card-reveal-grid">
                             ${
                                 profile.inventory_visibility === "public"
                                     ? (
-                                        profile.visible_cards.length
-                                            ? profile.visible_cards.map(card => `
+                                        visibleCards.length
+                                            ? visibleCards.map(card => `
                                                 <div class="card-face ${getRarityClass(card.rarity)}" ${getCardDetailAttributes(card, { tradeTargetUserId: profile.user_id })}>
                                                     <div class="card-slot">${card.rarity}</div>
                                                     <div class="card-name">${card.card_name}</div>

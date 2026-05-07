@@ -3333,6 +3333,139 @@ h2{
     text-align:left;
 }
 
+.trader-card-head{
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+}
+
+.trader-card-id{
+    margin-top:4px;
+    color:#94a3b8;
+    font-size:12px;
+    font-weight:800;
+}
+
+.trader-card-bio{
+    margin:12px 0 10px;
+    color:#e2e8f0;
+    font-size:14px;
+    line-height:1.45;
+}
+
+.trader-card-meta{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    margin-bottom:12px;
+}
+
+.trader-card-meta span,
+.trader-status-pill{
+    display:inline-flex;
+    align-items:center;
+    min-height:28px;
+    padding:0 10px;
+    border-radius:999px;
+    border:1px solid rgba(148,163,184,.16);
+    background:rgba(2,6,23,.42);
+    color:#cbd5e1;
+    font-size:11px;
+    font-weight:900;
+}
+
+.trader-status-pill.is-on{
+    color:#86efac;
+    border-color:rgba(34,197,94,.22);
+}
+
+.trader-status-pill.is-off{
+    color:#fca5a5;
+    border-color:rgba(239,68,68,.22);
+}
+
+.trader-card-actions{
+    display:grid;
+    grid-template-columns:repeat(2, minmax(0, 1fr));
+    gap:10px;
+}
+
+.trader-profile-card{
+    margin-bottom:12px;
+}
+
+.trader-profile-stats{
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    gap:10px;
+    margin-top:12px;
+}
+
+.trader-profile-stats div{
+    display:grid;
+    gap:4px;
+    padding:10px;
+    border-radius:14px;
+    background:rgba(2,6,23,.42);
+    border:1px solid rgba(148,163,184,.14);
+}
+
+.trader-profile-stats strong{
+    color:#f8fafc;
+    font-size:18px;
+}
+
+.trader-profile-stats span{
+    color:#94a3b8;
+    font-size:11px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+}
+
+.trade-showcase-label{
+    display:inline-flex;
+    align-items:center;
+    min-height:24px;
+    padding:0 10px;
+    border-radius:999px;
+    background:rgba(103,232,249,.12);
+    color:#67e8f9;
+    font-size:11px;
+    font-weight:900;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+}
+
+.trade-visible-head{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    margin:0 0 10px;
+}
+
+.trade-visible-head strong{
+    font-size:18px;
+    color:#f8fafc;
+}
+
+.trade-visible-head span{
+    display:inline-flex;
+    align-items:center;
+    min-height:28px;
+    padding:0 10px;
+    border-radius:999px;
+    background:rgba(2,6,23,.42);
+    border:1px solid rgba(148,163,184,.14);
+    color:#94a3b8;
+    font-size:11px;
+    font-weight:900;
+    text-transform:uppercase;
+    letter-spacing:.08em;
+}
+
 .trade-panel .card-reveal-grid{
     grid-template-columns:1fr;
     margin-top:0;
