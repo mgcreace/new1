@@ -1777,6 +1777,7 @@ async function loadTradingPage(tg, user) {
         const wantedTradeTapCards = document.getElementById("wantedTradeTapCards");
         const resetMyTradePick = document.getElementById("resetMyTradePick");
         const resetWantedTradePick = document.getElementById("resetWantedTradePick");
+        const tradeBuilderSummary = document.getElementById("tradeBuilderSummary");
         const tradeParams = new URLSearchParams(window.location.search);
         const preselectTargetUserId = tradeParams.get("target_user_id");
         const preselectWantedCardId = tradeParams.get("wanted_card_id");
@@ -1806,6 +1807,41 @@ async function loadTradingPage(tg, user) {
                     qtyLabel
                 }
             );
+        }
+
+        function renderTradeBuilderSummary() {
+            if (!tradeBuilderSummary) {
+                return;
+            }
+
+            const selectedTrader = (traderData.traders || []).find(trader => String(trader.user_id) === String(targetTraderSelect ? targetTraderSelect.value : ""));
+            const mySelectedCard = findCardById(myCardInventory, myTradeCardSelect ? myTradeCardSelect.value : "");
+            const wantedSelectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect ? wantedTradeCardSelect.value : "");
+            const missing = [];
+
+            if (!selectedTrader) {
+                missing.push("Trader");
+            }
+            if (!mySelectedCard) {
+                missing.push("deine Karte");
+            }
+            if (!wantedSelectedCard) {
+                missing.push("Wunschkarte");
+            }
+
+            tradeBuilderSummary.className = `trade-builder-summary ${missing.length ? "is-pending" : "is-ready"}`;
+            tradeBuilderSummary.innerHTML = `
+                <strong>${missing.length ? "Trade noch nicht fertig" : "Trade ist bereit"}</strong>
+                <span>${selectedTrader ? `Trader: ${selectedTrader.display_name}` : "Trader noch nicht gewaehlt"}</span>
+                <span>${mySelectedCard ? `Du gibst: ${mySelectedCard.card_name} x${myTradeQuantity ? myTradeQuantity.value : 1}` : "Deine Karte fehlt noch"}</span>
+                <span>${wantedSelectedCard ? `Du willst: ${wantedSelectedCard.card_name} x${wantedTradeQuantity ? wantedTradeQuantity.value : 1}` : "Wunschkarte fehlt noch"}</span>
+                <small>${missing.length ? `Fehlt noch: ${missing.join(", ")}` : "Sieht gut aus. Du kannst das Angebot jetzt senden."}</small>
+            `;
+
+            const createButton = document.getElementById("createTradeButton");
+            if (createButton) {
+                createButton.disabled = missing.length > 0;
+            }
         }
 
         function focusTradeField(element, message) {
@@ -1850,6 +1886,7 @@ async function loadTradingPage(tg, user) {
         function refreshTradeTapSelection() {
             renderTradeTapCards(myTradeTapCards, myCardInventory, myTradeCardSelect ? myTradeCardSelect.value : "", "Du hast noch keine Karten zum Traden.", "mine");
             renderTradeTapCards(wantedTradeTapCards, selectedTargetCards, wantedTradeCardSelect ? wantedTradeCardSelect.value : "", "Waehle zuerst einen Trader.", "wanted");
+            renderTradeBuilderSummary();
         }
 
         function selectMyTradeCard(cardId) {
@@ -1987,6 +2024,7 @@ async function loadTradingPage(tg, user) {
             myTradeQuantity.addEventListener("change", () => {
                 const selectedCard = findCardById(myCardInventory, myTradeCardSelect ? myTradeCardSelect.value : "");
                 updateTradePreview(myTradePreview, selectedCard, "Deine ausgewaehlte Karte erscheint hier.", "DEIN", myTradeQuantity.value, "Du gibst");
+                renderTradeBuilderSummary();
             });
         }
 
@@ -2069,6 +2107,7 @@ async function loadTradingPage(tg, user) {
             wantedTradeQuantity.addEventListener("change", () => {
                 const selectedCard = findCardById(selectedTargetCards, wantedTradeCardSelect ? wantedTradeCardSelect.value : "");
                 updateTradePreview(wantedTradePreview, selectedCard, "Die Wunschkarte des Traders erscheint hier.", "WUNSCH", wantedTradeQuantity.value, "Du willst");
+                renderTradeBuilderSummary();
             });
         }
 

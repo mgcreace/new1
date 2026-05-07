@@ -1099,6 +1099,44 @@ h2{
     border:1px solid rgba(148,163,184,.18);
 }
 
+.trade-builder-summary{
+    display:grid;
+    gap:6px;
+    margin:12px 0 2px;
+    padding:13px;
+    border-radius:18px;
+    text-align:left;
+    border:1px solid rgba(148,163,184,.18);
+    background:
+        radial-gradient(circle at 88% 8%, rgba(103,232,249,.10), transparent 32%),
+        linear-gradient(180deg, rgba(15,23,42,.96), rgba(2,6,23,.92));
+}
+
+.trade-builder-summary.is-ready{
+    border-color:rgba(74,222,128,.32);
+    box-shadow:0 18px 38px rgba(74,222,128,.08);
+}
+
+.trade-builder-summary.is-pending{
+    border-color:rgba(251,191,36,.24);
+    box-shadow:0 18px 38px rgba(251,191,36,.06);
+}
+
+.trade-builder-summary strong{
+    font-size:15px;
+}
+
+.trade-builder-summary span{
+    color:#cbd5e1;
+    font-size:12px;
+}
+
+.trade-builder-summary small{
+    color:#67e8f9;
+    font-size:11px;
+    font-weight:900;
+}
+
 .trade-preview-panel > span{
     display:block;
     margin-bottom:8px;
